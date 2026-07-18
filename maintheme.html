@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SC/ST Cell — UCOST Portal Extension Theme Template.">
+  <title>SC/ST Cell | UCOST — Theme Template</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===========================================
+       DESIGN SYSTEM — CSS CUSTOM PROPERTIES
+    =========================================== */
+    :root {
+      --ucost-blue: #0B3D6E;
+      --ucost-blue-mid: #144F8A;
+      --ucost-blue-light: #1E6FB5;
+      --ucost-blue-dark: #071E3A;
+      --ucost-blue-deep: #050F1E;
+      --saffron-accent: #FF9933;
+      --saffron-light: #FFF3E0;
+      --saffron-glow: rgba(255,153,51,0.15);
+      --green-accent: #128807;
+      --green-light: #E8F5E3;
+      --bg-base: #F3F5F9;
+      --bg-card: #FFFFFF;
+      --bg-glass: rgba(255,255,255,0.7);
+      --text-primary: #1A1A1A;
+      --text-secondary: #5A5A5A;
+      --text-muted: #8A8A8A;
+      --border-color: #E5E7EB;
+      --border-strong: #D0D5DD;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+      --shadow-glow: 0 0 20px rgba(30,111,181,0.15);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+      --max-width: 1300px;
+      --nav-h: 56px;
+      --sidebar-w: 300px;
+      --transition: 200ms cubic-bezier(0.4,0,0.2,1);
+      --font-scale: 1;
+    }
+    /* ===========================================
+       RESET & GLOBAL BASE
+    =========================================== */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;font-size:calc(14px * var(--font-scale))}
+    body{font-family:'Inter','Noto Sans','Noto Sans Devanagari',sans-serif;line-height:1.6;background:var(--bg-base);color:var(--text-primary);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    a{color:var(--ucost-blue-light);text-decoration:none;transition:color var(--transition)}
+    a:hover{color:var(--ucost-blue)}
+    a:focus-visible{outline:2px solid var(--saffron-accent);outline-offset:3px;border-radius:3px}
+    img{display:block;max-width:100%;height:auto}
+    ul{list-style:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:inherit}
+    address{font-style:normal}
+    h1{font-size:2.4rem;font-weight:800;line-height:1.2}
+    h2{font-size:1.5rem;font-weight:700;line-height:1.3;color:var(--ucost-blue)}
+    h3{font-size:1.125rem;font-weight:600;line-height:1.4}
+    /* ===========================================
+       SKIP LINK
+    =========================================== */
+    .skip-link{position:absolute;z-index:10000;top:-200%;left:20px;background:var(--ucost-blue);color:#fff;padding:10px 20px;border-radius:0 0 8px 8px;font-weight:600;font-size:13px;transition:top .2s ease}
+    .skip-link:focus{top:0;color:#fff}
+    /* ===========================================
+       UTILITY BAR
+    =========================================== */
+    .utility-bar{background:linear-gradient(135deg,var(--ucost-blue-dark),var(--ucost-blue-deep));color:rgba(255,255,255,.85);font-size:12px;height:38px;display:flex;align-items:center;position:relative;z-index:101}
+    .utility-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between}
+    .utility-left{display:flex;align-items:center;gap:12px}
+    .utility-left .gov-text{font-weight:500;letter-spacing:.02em}
+    .utility-right{display:flex;align-items:center;gap:4px}
+    .utility-btn{color:rgba(255,255,255,.8);padding:4px 10px;border-radius:4px;font-size:12px;font-weight:500;transition:all var(--transition);display:inline-flex;align-items:center;gap:4px}
+    .utility-btn:hover,.utility-btn.active{background:rgba(255,255,255,.15);color:#fff}
+    .utility-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+    .utility-sep{width:1px;height:16px;background:rgba(255,255,255,.2);margin:0 4px}
+    .font-size-cluster{display:flex;align-items:center;gap:2px}
+    .font-size-cluster .fs-btn{font-weight:700;min-width:26px;text-align:center;padding:3px 6px;border-radius:4px}
+    .fs-btn.active{background:var(--saffron-accent);color:var(--ucost-blue-dark)}
+    .lang-cluster{display:flex;align-items:center;gap:4px}
+    /* ===========================================
+       HEADER / BRANDING
+    =========================================== */
+    .site-header{background:#fff;border-bottom:1px solid var(--border-color);position:relative;z-index:110}
+    .header-inner{max-width:var(--max-width);margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .header-brand{display:flex;align-items:center;gap:24px}
+    .header-banner{height:100px;max-height:100px;width:auto;max-width:350px;object-fit:contain;border-radius:var(--radius-sm);transition:all var(--transition);margin-left:auto}
+    /* Ticker Styles */
+    .nav-ticker{display:flex;align-items:center;overflow:hidden;background:rgba(0,0,0,.20);border-radius:var(--radius-sm);height:34px;flex-grow:1;margin-left:20px;max-width:650px;min-width:0;position:relative}
+    .ticker-label{flex-shrink:0;background:var(--saffron-accent);color:var(--ucost-blue-dark);padding:0 12px;font-weight:700;font-size:.75rem;height:100%;display:flex;align-items:center;justify-content:center;letter-spacing:.04em;text-transform:uppercase;position:relative;z-index:2;box-shadow:2px 0 5px rgba(0,0,0,.15)}
+    .ticker-content{overflow:hidden;display:flex;align-items:center;position:relative;height:100%;flex-grow:1;padding-left:16px}
+    .ticker-track{display:flex;white-space:nowrap;animation:marquee 30s linear infinite;flex-shrink:0;min-width:max-content}
+    .ticker-track:hover{animation-play-state:paused}
+    .ticker-item{font-size:.8rem;color:#fff;font-weight:500;display:flex;align-items:center;text-decoration:none;transition:color var(--transition);flex-shrink:0;white-space:nowrap;padding-right:50px}
+    .ticker-item a{color:#fff;text-decoration:none}
+    .ticker-item a:hover{color:var(--saffron-accent);text-decoration:underline}
+    .ticker-item.has-link::after{content:' ↗';font-size:.65rem;opacity:.7;margin-left:4px}
+    @keyframes marquee{
+      0%{transform:translate3d(100%,0,0)}
+      100%{transform:translate3d(-50%,0,0)}
+    }
+    .header-logo{height:100px;width:auto;object-fit:contain;flex-shrink:0}
+    .scst-wordmark{display:flex;flex-direction:column;align-items:flex-start}
+    .scst-badge{display:inline-flex;align-items:center;gap:0;font-weight:800;font-size:2.6rem;letter-spacing:-.02em;line-height:1.1}
+    .scst-badge .sc{color:var(--ucost-blue)}
+    .scst-badge .slash{color:var(--ucost-blue);margin:0 3px;font-weight:400;opacity:.8}
+    .scst-badge .st{color:var(--ucost-blue)}
+    .scst-badge .cell{color:var(--ucost-blue);margin-left:8px;font-weight:700;font-size:2.4rem}
+    .scst-subtitle{font-size:14px;color:var(--ucost-blue-light);letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-top:4px}
+    /* Hindi overrides for SC/ST Cell wordmark to prevent overflow */
+    html[lang="hi"] .scst-badge {
+      font-size: 1.45rem;
+      letter-spacing: normal;
+    }
+    html[lang="hi"] .scst-badge .cell {
+      font-size: 1.35rem;
+      margin-left: 6px;
+    }
+    html[lang="hi"] .scst-subtitle {
+      font-size: 11.5px;
+      letter-spacing: normal;
+      text-transform: none;
+    }
+    /* ===========================================
+       NAVIGATION
+    =========================================== */
+    .main-nav{background:var(--ucost-blue);position:sticky;top:0;z-index:100;transition:background .4s ease,backdrop-filter .4s ease,box-shadow .4s ease;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .main-nav.scrolled{background:rgba(11,61,110,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 2px 20px rgba(0,0,0,.3)}
+    .nav-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:var(--nav-h)}
+    .nav-list{display:flex;align-items:center;gap:0;height:100%}
+    .nav-item{position:relative;height:100%;display:flex;align-items:center}
+    .nav-link{color:rgba(255,255,255,.85);padding:0 20px;height:100%;display:flex;align-items:center;font-weight:500;font-size:.9rem;letter-spacing:.01em;position:relative;transition:all var(--transition)}
+    .nav-link::after{content:'';position:absolute;bottom:0;left:20px;right:20px;height:3px;background:var(--saffron-accent);border-radius:3px 3px 0 0;transform:scaleX(0);transition:transform .3s ease}
+    .nav-link:hover,.nav-link:focus{color:#fff;background:rgba(255,255,255,.08)}
+    .nav-link:hover::after{transform:scaleX(1)}
+    .nav-link[aria-expanded="true"]{background:rgba(255,255,255,.1);color:#fff}
+    .nav-link .arrow{margin-left:6px;transition:transform .2s ease;font-size:10px}
+    .nav-link[aria-expanded="true"] .arrow{transform:rotate(180deg)}
+    /* Dropdown */
+    .nav-dropdown{position:absolute;top:100%;left:0;min-width:220px;background:#fff;border-radius:0 0 var(--radius-sm) var(--radius-sm);box-shadow:var(--shadow-lg);opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .25s ease;z-index:200;overflow:hidden}
+    .nav-item:hover .nav-dropdown,.nav-link:focus+.nav-dropdown,.nav-dropdown:hover{opacity:1;visibility:visible;transform:translateY(0)}
+    .dropdown-link{display:block;padding:12px 20px;color:var(--text-primary);font-size:.875rem;font-weight:500;transition:all var(--transition);border-left:3px solid transparent}
+    .dropdown-link:hover{background:var(--bg-base);color:var(--ucost-blue);border-left-color:var(--saffron-accent)}
+    /* Hamburger */
+    .nav-toggle{display:none;color:#fff;padding:8px;border-radius:var(--radius-xs)}
+    .nav-toggle svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2}
+    /* ===========================================
+       PAGE LAYOUT
+    =========================================== */
+    .page-layout{display:grid;grid-template-columns:1fr var(--sidebar-w);gap:32px;max-width:var(--max-width);margin:0 auto;padding:36px 24px}
+    .main-content{min-width:0}
+    /* ===========================================
+       SECTION STYLES
+    =========================================== */
+    .section{margin-bottom:40px}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .section-title{font-size:1.35rem;font-weight:700;color:var(--ucost-blue);display:flex;align-items:center;gap:10px}
+    .section-title .icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;border:2px solid var(--saffron-accent);box-shadow:0 8px 22px rgba(2,12,34,0.08)}
+    .section-title .icon svg{width:18px;height:18px;stroke:var(--ucost-blue-dark);fill:none;stroke-width:2}
+    /* ===========================================
+       CARD BASE
+    =========================================== */
+    .card{background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-color);box-shadow:var(--shadow-sm);transition:box-shadow .22s ease,border-color .22s ease,transform .22s ease;overflow:hidden}
+    .card:hover{box-shadow:0 8px 28px rgba(0,0,0,.13);border-color:var(--border-strong);transform:translateY(-4px)}
+    /* ===========================================
+       GLOBAL PORTAL SEARCH
+    =========================================== */
+    .header-search {
+      position: relative;
+      width: 280px;
+      margin: 0;
+      z-index: 1000;
+    }
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .header-search input {
+      width: 100%;
+      padding: 8px 36px 8px 36px;
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      transition: all var(--transition);
+    }
+    .header-search input::-webkit-search-cancel-button,
+    .header-search input::-webkit-search-decoration,
+    .header-search input::-webkit-search-results-button,
+    .header-search input::-webkit-search-results-decoration {
+      display: none;
+      -webkit-appearance: none;
+    }
+    .header-search input:focus {
+      outline: none;
+      border-color: var(--ucost-blue-light);
+      box-shadow: 0 0 0 3px rgba(30,111,181,0.15);
+      background: #fff;
+    }
+    .header-search .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2.5;
+      pointer-events: none;
+    }
+    .search-clear-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+    }
+    .search-clear-btn:hover {
+      color: var(--text-primary);
+    }
+    .search-results-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      max-height: 320px;
+      overflow-y: auto;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      padding: 6px 0;
+    }
+    .search-result-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      transition: background var(--transition);
+      text-decoration: none;
+      text-align: left;
+    }
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    .search-result-item:hover, .search-result-item.focused {
+      background: var(--bg-base);
+      outline: none;
+    }
+    .search-result-item .result-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ucost-blue);
+    }
+    .search-result-item .result-snippet {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .search-result-item .result-category {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--saffron-accent);
+      align-self: flex-start;
+    }
+    .search-no-results {
+      padding: 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    @keyframes searchFlash {
+      0% { background-color: rgba(255, 153, 51, 0.4); outline: 3px solid var(--saffron-accent); }
+      100% { background-color: transparent; outline: 3px solid transparent; }
+    }
+    .search-highlight {
+      animation: searchFlash 2s ease-out;
+      border-radius: 4px;
+    }
+    /* ===========================================
+       FOOTER
+    =========================================== */
+    .site-footer{background:linear-gradient(135deg,var(--ucost-blue-dark) 0%,var(--ucost-blue-deep) 100%);color:#fff;border-top:4px solid var(--saffron-accent)}
+    .footer-inner{max-width:var(--max-width);margin:0 auto}
+    .footer-grid{display:grid;gap:36px;max-width:var(--max-width);margin:0 auto;padding:48px 24px}
+    .footer-col h4{font-size:.95rem;font-weight:700;margin-bottom:18px;color:#fff;letter-spacing:.02em;position:relative;padding-bottom:8px}
+    .footer-col h4::after{content:'';position:absolute;left:0;bottom:0;width:32px;height:2px;background:var(--saffron-accent)}
+    .footer-col p{font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.7}
+    .footer-col ul li{margin-bottom:6px}
+    .footer-col ul li a{color:rgba(255,255,255,.65);font-size:.78rem;transition:all var(--transition);display:flex;align-items:center;gap:6px}
+    .footer-col ul li a:hover{color:var(--saffron-accent);padding-left:4px}
+    .footer-col ul li a::before{content:'›';opacity:.5}
+    .footer-social{display:flex;gap:10px;margin-top:12px}
+    .footer-social a{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);transition:all var(--transition)}
+    .footer-social a:hover{background:var(--saffron-accent);border-color:var(--saffron-accent);color:var(--ucost-blue-dark)}
+    .footer-social a svg{width:14px;height:14px;fill:currentColor}
+    .footer-bottom{padding:16px 24px;max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .footer-bottom p{font-size:.72rem;color:rgba(255,255,255,.4)}
+    /* High Contrast Mode CSS */
+    body.high-contrast{--bg-base:#000;--bg-card:#111;--text-primary:#fff;--text-secondary:#ddd;--text-muted:#bbb;--border-color:#555;--bg-glass:rgba(0,0,0,.8)}
+    body.high-contrast .site-header{background:#111;border-color:#555}
+    body.high-contrast .card{background:#111;border-color:#555}
+    /* Scroll Progress */
+    #scroll-progress{position:fixed;top:0;left:0;width:0%;height:3px;background:linear-gradient(90deg,var(--saffron-accent),var(--ucost-blue-light));z-index:99999;transition:width .1s linear;pointer-events:none;border-radius:0 2px 2px 0}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .aria-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+    /* Responsive */
+    @media(max-width:1024px){
+      .page-layout{grid-template-columns:1fr;--sidebar-w:100%}
+      .footer-grid{grid-template-columns:1fr 1fr !important}
+      .header-logo{height:80px}
+      .scst-badge{font-size:2.0rem}
+      .scst-badge .cell{font-size:1.8rem}
+      html[lang="hi"] .scst-badge{font-size:1.15rem}
+      html[lang="hi"] .scst-badge .cell{font-size:1.05rem}
+      html[lang="hi"] .scst-subtitle{font-size:10px}
+      .header-banner{height:80px;width:auto;max-width:280px;object-fit:contain}
+    }
+    @media(max-width:768px){
+      :root{--nav-h:50px}
+      .utility-inner{flex-direction:column;gap:4px;padding:6px 16px}
+      .utility-bar{height:auto;padding:4px 0}
+      .header-inner{padding:10px 16px;flex-direction:column;gap:12px;align-items:stretch}
+      .header-logo{height:60px}
+      .scst-badge{font-size:1.6rem}
+      .scst-badge .cell{font-size:1.4rem}
+      .scst-subtitle{font-size:10px}
+      html[lang="hi"] .scst-badge{font-size:0.9rem}
+      html[lang="hi"] .scst-badge .cell{font-size:0.8rem;margin-left:4px}
+      html[lang="hi"] .scst-subtitle{font-size:8px}
+      .header-banner{display:block;height:60px;width:auto;max-width:200px;object-fit:contain}
+      .nav-ticker{max-width:100%;margin-left:0;margin-right:12px;height:30px}
+      .ticker-track{animation-duration:45s}
+      .ticker-item{font-size:.75rem}
+      .nav-toggle{display:flex}
+      .nav-list{display:none;position:absolute;top:100%;left:0;right:0;background:var(--ucost-blue-dark);flex-direction:column;padding:8px 0;box-shadow:var(--shadow-lg)}
+      .nav-list.open{display:flex}
+      .nav-item{height:auto}
+      .nav-link{padding:14px 24px;width:100%;justify-content:space-between}
+      .nav-link::after{display:none}
+      .nav-dropdown{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border-radius:0;background:rgba(0,0,0,.15);display:none}
+      .nav-item.dropdown-open .nav-dropdown{display:block}
+      .dropdown-link{color:rgba(255,255,255,.8);padding:12px 40px;border-left:none}
+      .dropdown-link:hover{background:rgba(255,255,255,.05);color:#fff}
+      .page-layout{padding:20px 16px;gap:20px}
+      .footer-grid{grid-template-columns:1fr !important}
+      .footer-bottom{flex-direction:column;text-align:center}
+      .header-search{width:100%;margin:0}
+    }
+    @media(max-width:480px){
+      .header-banner{display:none !important}
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a class="skip-link" href="#main-content">Skip to Main Content</a>
+
+  <!-- ARIA Live Region -->
+  <div id="aria-live" class="aria-live" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ========== UTILITY BAR ========== -->
+  <div class="utility-bar">
+    <div class="utility-inner">
+      <div class="utility-left">
+        <span class="gov-text">Government of Uttarakhand</span>
+      </div>
+      <div class="utility-right">
+        <!-- Language selector with poster logo toggle -->
+        <div class="lang-cluster" role="group" aria-label="Language selection">
+          <button class="utility-btn active" onclick="setLang('en',this)" lang="en" aria-pressed="true">English</button>
+          <button class="utility-btn" onclick="setLang('hi',this)" lang="hi" aria-pressed="false">हिन्दी</button>
+        </div>
+        <div class="utility-sep"></div>
+        <div class="font-size-cluster" role="group" aria-label="Font size controls">
+          <button class="fs-btn utility-btn" data-size="small" title="Decrease font size">A-</button>
+          <button class="fs-btn utility-btn active" data-size="normal" title="Default font size">A</button>
+          <button class="fs-btn utility-btn" data-size="large" title="Increase font size">A+</button>
+        </div>
+        <div class="utility-sep"></div>
+        <button class="utility-btn" id="hc-toggle" aria-pressed="false" title="Toggle High Contrast" style="display: inline-flex; align-items: center; gap: 4px;">
+          <svg viewBox="0 0 24 24" style="stroke: currentColor; fill: none; stroke-width: 2;"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z"/></svg>
+          <span data-en="Contrast" data-hi="कॉन्ट्रास्ट">Contrast</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SITE HEADER ========== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <!-- Poster logo toggle handled dynamically via data-en and data-hi -->
+        <a href="#/" aria-label="Home">
+          <img src="assets/logo-UCOST.png" alt="UCOST Logo" class="header-logo" width="166" height="72" data-en="assets/logo-UCOST.png" data-hi="assets/New-logo-UCOST-hindi.png" data-alt-en="UCOST Logo" data-alt-hi="यूकोस्ट लोगो">
+        </a>
+        <div class="scst-wordmark" style="flex-shrink:0;">
+          <div class="scst-badge" data-en='<span class="sc">SC</span><span class="slash">/</span><span class="st">ST</span><span class="cell">Cell</span>' data-hi='<span class="sc">अनुसूचित जाति</span><span class="slash">/</span><span class="st">अनुसूचित जनजाति</span><span class="cell">प्रकोष्ठ</span>'>
+            <span class="sc">SC</span><span class="slash">/</span><span class="st">ST</span><span class="cell">Cell</span>
+          </div>
+          <div class="scst-subtitle" data-en="SEED · DST · Government of India" data-hi="सीड (SEED) · विज्ञान एवं प्रौद्योगिकी विभाग (DST) · भारत सरकार">SEED · DST · Government of India</div>
+        </div>
+      </div>
+      <!-- Banner Image -->
+      <img src="top.png" alt="Branding Banner" class="header-banner">
+      <!-- Search Bar kept exactly as it is -->
+      <div class="header-search" role="search">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" style="stroke: var(--text-muted); fill: none; stroke-width: 2.5;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="portal-search-input" data-en="Search portal..." data-hi="पोर्टल खोजें..." placeholder="Search portal..." aria-label="Search portal" data-aria-en="Search portal" data-aria-hi="पोर्टल खोजें" autocomplete="off">
+          <button id="search-clear-btn" class="search-clear-btn" type="button" aria-label="Clear search" data-aria-en="Clear search" data-aria-hi="खोज साफ करें" style="display:none;">&times;</button>
+        </div>
+        <div id="search-results-dropdown" class="search-results-dropdown" role="region" aria-live="polite" style="display:none;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== NAVIGATION (BLUE HEADER SECTION) ========== -->
+  <nav class="main-nav" id="main-nav" role="navigation" aria-label="Main Navigation">
+    <div class="nav-inner">
+      <ul class="nav-list" id="nav-list" role="menubar">
+        <li class="nav-item" role="none">
+          <a class="nav-link" href="https://ucost.uk.gov.in/" target="_blank" rel="noopener" role="menuitem" data-en="Home" data-hi="होम">Home</a>
+        </li>
+        <li class="nav-item" role="none">
+          <a class="nav-link" href="#/about" role="menuitem" aria-haspopup="true" aria-expanded="false" id="about-toggle">
+            <span data-en="About Us" data-hi="हमारे बारे में">About Us</span> <span class="arrow">▾</span>
+          </a>
+           <div class="nav-dropdown" role="menu" aria-label="About Us submenu">
+            <a class="dropdown-link" href="#/about/ucost" role="menuitem" data-en="UCOST" data-hi="यूकोस्ट">UCOST</a>
+            <a class="dropdown-link" href="#/about/scst-cell" role="menuitem" data-en="SC/ST Cell" data-hi="अनु.जाति/जनजाति प्रकोष्ठ">SC/ST Cell</a>
+          </div>
+        </li>
+        <li class="nav-item" role="none" style="display: flex; align-items: center;">
+          <a class="nav-link nav-contact" href="#/contact" role="menuitem" data-en="Contact Us" data-hi="संपर्क करें">Contact Us</a>
+        </li>
+      </ul>
+      <!-- News Ticker (Advisory) -->
+      <div class="nav-ticker" id="nav-ticker" tabindex="0">
+        <div class="ticker-label" data-en="Advisory" data-hi="सलाह">Advisory</div>
+        <div class="ticker-content">
+          <div class="ticker-track" id="ticker-track">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========== MAIN CONTENT AREA (PLACEHOLDER) ========== -->
+  <main id="main-content" class="main-content">
+    <div class="page-layout" style="grid-template-columns: 1fr;">
+      <div class="main-content">
+        <section class="section visible">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="icon">
+                <svg viewBox="0 0 24 24" style="stroke: var(--ucost-blue); fill: none; stroke-width: 2;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </span>
+              <span data-en="Extension Base Template" data-hi="विस्तार बेस टेम्पलेट">Extension Base Template</span>
+            </h2>
+          </div>
+          <div class="card" style="padding: 32px;">
+            <h3 style="margin-bottom: 12px; color: var(--ucost-blue);" data-en="Welcome to your new extension page" data-hi="आपके नए विस्तार पृष्ठ में आपका स्वागत है">Welcome to your new extension page</h3>
+            <p style="color: var(--text-secondary); line-height: 1.8;" data-en="This file serves as a skeleton with the exact styling and accessibility features of the main portal. You can copy this file, rename it, and replace the contents of this main content section to create your new page or extension." data-hi="यह फ़ाइल मुख्य पोर्टल के सटीक स्टाइलिंग और एक्सेसिबिलिटी सुविधाओं के साथ एक कंकाल के रूप में कार्य करती है। आप इस फ़ाइल की प्रतिलिपि बना सकते हैं, इसका नाम बदल सकते हैं, और अपने नए पृष्ठ या एक्सटेंशन को बनाने के लिए इस मुख्य सामग्री अनुभाग की सामग्री को बदल सकते हैं।">
+              This file serves as a skeleton with the exact styling and accessibility features of the main portal. You can copy this file, rename it, and replace the contents of this main content section to create your new page or extension.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER (ALL EXCEPT INSTITUTIONS) ========== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid" style="grid-template-columns: 1.2fr 2fr;">
+        <!-- Col 1: About -->
+        <div class="footer-col">
+          <h4 data-en="About SC/ST Cell" data-hi="अनु.जाति/जनजाति प्रकोष्ठ के बारे में">About SC/ST Cell</h4>
+          <p data-en="A SEED-DST funded initiative under UCOST for the socio-economic development and technological empowerment of SC/ST communities across all 13 districts of Uttarakhand." data-hi="उत्तराखंड के सभी 13 जिलों में अनुसूचित जाति/अनुसूचित जनजाति समुदायों के सामाजिक-आर्थिक विकास और तकनीकी सशक्तिकरण के लिए यूकोस्ट के तहत एक SEED-DST वित्त पोषित पहल।">A SEED-DST funded initiative under UCOST for the socio-economic development and technological empowerment of SC/ST communities across all 13 districts of Uttarakhand.</p>
+          <div class="footer-social">
+            <a href="https://www.facebook.com/ucostpage" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+            <a href="https://x.com/ucostdehradun" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24"><path d="M4 4l11.733 16h4.267l-11.733-16zM4 20l6.768-6.768M20 4l-6.768 6.768"/></svg></a>
+            <a href="https://www.youtube.com/@ucostdehradun" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+            <a href="https://www.linkedin.com/in/ucostdehradun/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+          </div>
+        </div>
+
+        <!-- Col 2 & 3: Map Location -->
+        <div class="footer-col">
+          <h4 data-en="UCOST Location" data-hi="यूकोस्ट स्थान">UCOST Location</h4>
+          <iframe src="https://maps.google.com/maps?q=Uttarakhand%20State%20Council%20for%20Science%20And%20Technology&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="180" style="width:100%; height:180px; border:none; border-radius: var(--radius-sm); margin-top:10px;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="UCOST Location Map"></iframe>
+          <p style="margin-top:8px; font-size:0.75rem;"><a href="https://maps.app.goo.gl/Jug9zk8YkKdKFj947" target="_blank" rel="noopener" style="color:var(--saffron-accent);">→ Get Directions</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <p data-en="© 2026 Uttarakhand State Council for Science &amp; Technology (UCOST). All rights reserved." data-hi="© 2026 उत्तराखंड राज्य विज्ञान एवं प्रौद्योगिकी परिषद (यूकोस्ट)। सर्वाधिकार सुरक्षित।">© 2026 Uttarakhand State Council for Science &amp; Technology (UCOST). All rights reserved.</p>
+      <div style="display: flex; gap: 16px;">
+        <a href="#/accessibility" data-en="Accessibility Statement" data-hi="अभिगम्यता विवरण" style="color: rgba(255,255,255,0.55); font-size: 0.78rem; text-decoration: none; transition: color var(--transition);" onmouseover="this.style.color='var(--saffron-accent)'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Accessibility Statement</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
+
+  <!-- ========== JAVASCRIPT LOGIC ========== -->
+  <script>
+    /* ===========================================
+       APP STATE
+    =========================================== */
+    const APP = {
+      newsTicker: [],
+      currentLang: 'en',
+      searchIndex: []
+    };
+
+    /* ===========================================
+       LANGUAGE SWAPPING
+    =========================================== */
+    window.setLang = function(lang, el) {
+      APP.currentLang = lang;
+      document.documentElement.setAttribute('lang', lang);
+      
+      if (el) {
+        el.closest('.lang-cluster').querySelectorAll('button').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        el.classList.add('active');
+        el.setAttribute('aria-pressed', 'true');
+      }
+
+      // Update title
+      document.title = lang === 'hi'
+        ? 'प्रकोष्ठ | यूकोस्ट — उत्तराखंड राज्य विज्ञान एवं प्रौद्योगिकी परिषद'
+        : 'SC/ST Cell | UCOST — Theme Template';
+
+      // Swap text & attributes
+      document.querySelectorAll('[data-en][data-hi]').forEach(node => {
+        const val = node.getAttribute('data-' + lang);
+        if (val === null) return;
+        const tagName = node.tagName.toLowerCase();
+        if (tagName === 'input') {
+          node.setAttribute('placeholder', val);
+          return;
+        }
+        if (tagName === 'img') {
+          node.setAttribute('src', val);
+          const altVal = node.getAttribute('data-alt-' + lang);
+          if (altVal !== null) {
+            node.setAttribute('alt', altVal);
+          }
+          return;
+        }
+        if (tagName === 'text') {
+          node.textContent = val;
+          return;
+        }
+        if (val.includes('<') || val.includes('&amp;')) {
+          node.innerHTML = val;
+        } else {
+          node.textContent = val;
+        }
+      });
+
+      document.querySelectorAll('[data-aria-en][data-aria-hi]').forEach(node => {
+        const val = node.getAttribute('data-aria-' + lang);
+        if (val !== null) {
+          node.setAttribute('aria-label', val);
+        }
+      });
+
+      // Update font family preference
+      document.body.style.fontFamily = lang === 'hi'
+        ? "'Noto Sans Devanagari', 'Noto Sans', 'Inter', sans-serif"
+        : "'Inter', 'Noto Sans', 'Noto Sans Devanagari', sans-serif";
+
+      // Rebuild search index with the correct lang
+      buildSearchIndex();
+    };
+
+    /* ===========================================
+       ACCESSIBILITY: FONT SIZE
+    =========================================== */
+    function initFontSize() {
+      document.querySelectorAll('.fs-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const size = btn.dataset.size;
+          const scale = size === 'small' ? 0.875 : size === 'large' ? 1.15 : 1;
+          document.documentElement.style.setProperty('--font-scale', scale);
+          document.querySelectorAll('.fs-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          announce(`Font size set to ${size}`);
+        });
+      });
+    }
+
+    /* ===========================================
+       ACCESSIBILITY: HIGH CONTRAST
+    =========================================== */
+    function initHighContrast() {
+      const btn = document.getElementById('hc-toggle');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        const active = document.body.classList.toggle('high-contrast');
+        this.setAttribute('aria-pressed', active);
+        this.classList.toggle('active', active);
+        announce(active ? 'High contrast mode enabled' : 'High contrast mode disabled');
+      });
+    }
+
+    /* ===========================================
+       ANNOUNCE (ARIA LIVE)
+    =========================================== */
+    function announce(msg) {
+      const el = document.getElementById('aria-live');
+      if (el) {
+        el.textContent = '';
+        setTimeout(() => { el.textContent = msg; }, 100);
+      }
+    }
+
+    /* ===========================================
+       STICKY NAV
+    =========================================== */
+    function initStickyNav() {
+      const nav = document.getElementById('main-nav');
+      if (!nav) return;
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 80);
+      }, { passive: true });
+    }
+
+    /* ===========================================
+       MOBILE MENU
+    =========================================== */
+    function initMobileMenu() {
+      const toggle = document.getElementById('nav-toggle');
+      const list = document.getElementById('nav-list');
+      const aboutToggle = document.getElementById('about-toggle');
+      if (!toggle || !list) return;
+
+      toggle.addEventListener('click', () => {
+        const open = list.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open);
+      });
+
+      if (aboutToggle) {
+        aboutToggle.addEventListener('click', e => {
+          if (window.innerWidth <= 768) {
+            e.preventDefault();
+            const item = aboutToggle.closest('.nav-item');
+            item.classList.toggle('dropdown-open');
+            aboutToggle.setAttribute('aria-expanded', item.classList.contains('dropdown-open'));
+          }
+        });
+      }
+
+      document.querySelectorAll('.dropdown-link').forEach(link => {
+        link.addEventListener('click', () => {
+          list.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      document.querySelectorAll('.nav-link:not(#about-toggle)').forEach(link => {
+        link.addEventListener('click', () => {
+          list.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+    }
+
+    /* ===========================================
+       ADVISORY TICKER LOGIC
+    =========================================== */
+    async function loadTickerData() {
+      try {
+        const r = await fetch('content/news-ticker.json');
+        APP.newsTicker = await r.json();
+      } catch (e) {
+        // Fallback default message
+        APP.newsTicker = [{
+          "text": "Important Notice: This is the UCOST SC/ST Cell portal extension layout template. Add your content to the main-content block.",
+          "link": ""
+        }];
+      }
+    }
+
+    function renderNewsTicker() {
+      const track = document.getElementById('ticker-track');
+      if (!track || !APP.newsTicker || !APP.newsTicker.length) return;
+      const itemsHtml = APP.newsTicker.map(item => {
+        if (item.link) {
+          return `<div class="ticker-item has-link"><a href="${item.link}" target="_blank" rel="noopener">${item.text}</a></div>`;
+        } else {
+          return `<div class="ticker-item">${item.text}</div>`;
+        }
+      }).join('');
+      track.innerHTML = itemsHtml + itemsHtml;
+      const container = track.closest('.ticker-content');
+      try {
+        const singleWidth = track.scrollWidth / 2 || track.scrollWidth;
+        const distance = singleWidth + (container ? container.clientWidth : 0);
+        const pxPerSecond = 80;
+        const duration = Math.max(12, Math.round(distance / pxPerSecond));
+        track.style.animationDuration = duration + 's';
+      } catch (e) { }
+    }
+
+    function startForcedMarquee() {
+      const track = document.getElementById('ticker-track');
+      if (!track) return;
+      if (track._marqueeRaf) cancelAnimationFrame(track._marqueeRaf);
+      if (track.innerHTML && track.innerHTML.indexOf(track.children[0].outerHTML) === -1) {
+        track.innerHTML = track.innerHTML + track.innerHTML;
+      }
+      track.style.animation = 'none';
+      track.style.willChange = 'transform';
+
+      const speed = 80; 
+      const singleWidth = track.scrollWidth / 2 || track.scrollWidth;
+      let start = performance.now();
+      let paused = false;
+
+      function step(ts) {
+        if (!start) start = ts;
+        if (!paused) {
+          const elapsed = (ts - start) / 1000;
+          const dist = (elapsed * speed) % singleWidth;
+          track.style.transform = `translateX(${-dist}px)`;
+        }
+        track._marqueeRaf = requestAnimationFrame(step);
+      }
+
+      track._setPaused = function(p) { paused = !!p; };
+      track._marqueeRaf = requestAnimationFrame(step);
+    }
+
+    function setupTickerInteractions() {
+      const ticker = document.getElementById('nav-ticker');
+      const track = document.getElementById('ticker-track');
+      if (!ticker || !track) return;
+
+      let proximityPaused = false;
+      const threshold = 80; 
+
+      function setPaused(p) {
+        track.style.animationPlayState = p ? 'paused' : 'running';
+        if (typeof track._setPaused === 'function') track._setPaused(p);
+      }
+
+      ticker.addEventListener('mouseenter', () => setPaused(true));
+      ticker.addEventListener('mouseleave', () => setPaused(false));
+      ticker.addEventListener('focusin', () => setPaused(true));
+      ticker.addEventListener('focusout', () => setPaused(false));
+
+      document.addEventListener('mousemove', (e) => {
+        const rect = ticker.getBoundingClientRect();
+        const dx = e.clientX < rect.left ? rect.left - e.clientX : (e.clientX > rect.right ? e.clientX - rect.right : 0);
+        const dy = e.clientY < rect.top ? rect.top - e.clientY : (e.clientY > rect.bottom ? e.clientY - rect.bottom : 0);
+        const dist = Math.hypot(dx, dy);
+        if (dist < threshold) {
+          if (!proximityPaused) { proximityPaused = true; setPaused(true); }
+        } else {
+          if (proximityPaused && !ticker.matches(':hover')) { proximityPaused = false; setPaused(false); }
+        }
+      }, { passive: true });
+    }
+
+    function initJsMarquee() {
+      const track = document.getElementById('ticker-track');
+      const container = track ? track.closest('.ticker-content') : null;
+      if (!track || !container) return;
+
+      const cs = window.getComputedStyle(track);
+      let usingCss = false;
+      try {
+        if (cs && cs.animationName && cs.animationName !== 'none') {
+          const dur = cs.animationDuration || '';
+          let ms = 0;
+          if (dur.endsWith('ms')) ms = parseFloat(dur);
+          else if (dur.endsWith('s')) ms = parseFloat(dur) * 1000;
+          usingCss = ms > 40; 
+        }
+      } catch (e) { usingCss = false; }
+      if (usingCss) return;
+
+      if (track.children.length && track.innerHTML.indexOf(track.children[0].outerHTML) === -1) {
+        track.innerHTML = track.innerHTML + track.innerHTML;
+      }
+
+      const speed = 80; 
+      let singleWidth = track.scrollWidth / 2 || track.scrollWidth;
+      let startTime = null;
+      let paused = false;
+
+      track.style.animation = 'none';
+
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        if (!paused) {
+          const elapsed = (ts - startTime) / 1000;
+          const dist = (elapsed * speed) % singleWidth;
+          track.style.transform = `translateX(${-dist}px)`;
+        }
+        track._marqueeRaf = requestAnimationFrame(step);
+      }
+
+      track._setPaused = function(p) { paused = !!p; };
+      track._marqueeRaf = requestAnimationFrame(step);
+    }
+
+    /* ===========================================
+       GLOBAL PORTAL SEARCH LOGIC
+    =========================================== */
+    function buildSearchIndex() {
+      // Create a simplified index for this template page.
+      // You can add your custom extension sections here to make them searchable.
+      APP.searchIndex = [
+        {
+          id: 'home-ext',
+          title_en: 'Extension Template Base',
+          title_hi: 'विस्तार टेम्पलेट आधार',
+          text_en: 'Welcome to your new page template. This is the main theme of the SC/ST Cell UCOST Portal.',
+          text_hi: 'आपके नए पृष्ठ टेम्पलेट में आपका स्वागत है। यह एससी/एसटी सेल यूकोस्ट पोर्टल का मुख्य विषय है।',
+          route: '#/',
+          elementId: 'main-content',
+          category_en: 'Page Content',
+          category_hi: 'पृष्ठ सामग्री'
+        }
+      ];
+    }
+
+    function initGlobalSearch() {
+      const input = document.getElementById('portal-search-input');
+      const clearBtn = document.getElementById('search-clear-btn');
+      const dropdown = document.getElementById('search-results-dropdown');
+      if (!input || !dropdown) return;
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      let focusedIndex = -1;
+      buildSearchIndex();
+
+      function getResults(query) {
+        if (!query) return [];
+        const terms = query.toLowerCase().split(/\s+/).filter(t => t);
+        if (!terms.length) return [];
+
+        const isHi = APP.currentLang === 'hi';
+
+        return APP.searchIndex.map(doc => {
+          let score = 0;
+          const title = (isHi ? doc.title_hi : doc.title_en) || '';
+          const text = (isHi ? doc.text_hi : doc.text_en) || '';
+          const fullText = (title + ' ' + text).toLowerCase();
+
+          let matchAll = true;
+          terms.forEach(term => {
+            const count = (fullText.split(term).length - 1);
+            if (count > 0) {
+              score += count * 5;
+              if (title.toLowerCase().includes(term)) {
+                score += 15;
+              }
+            } else {
+              matchAll = false;
+            }
+          });
+
+          return { doc, score, match: matchAll };
+        })
+        .filter(res => res.score > 0 && res.match)
+        .sort((a, b) => b.score - a.score)
+        .map(res => res.doc);
+      }
+
+      // Hide dropdown helper
+      function hideDropdown() {
+        dropdown.style.display = 'none';
+        input.removeAttribute('aria-activedescendant');
+        focusedIndex = -1;
+      }
+
+      function showResults(results, query) {
+        if (!results.length) {
+          const escaped = escapeHtml(query);
+          dropdown.innerHTML = `<div class="search-no-results" data-en="No results found for '${escaped}'" data-hi="'${escaped}' के लिए कोई परिणाम नहीं मिला">No results found for '${escaped}'</div>`;
+          setLang(APP.currentLang, null); 
+        } else {
+          const isHi = APP.currentLang === 'hi';
+          dropdown.innerHTML = results.slice(0, 8).map((doc, idx) => {
+            const title = isHi ? doc.title_hi : doc.title_en;
+            const category = isHi ? doc.category_hi : doc.category_en;
+            let snippet = isHi ? doc.text_hi : doc.text_en;
+            snippet = snippet.replace(/<[^>]*>/g, '');
+            return `
+              <a class="search-result-item" id="search-opt-${idx}" href="${doc.route}" data-index="${idx}" role="option">
+                <span class="result-category">${category}</span>
+                <span class="result-title">${title}</span>
+                <span class="result-snippet">${snippet}</span>
+              </a>
+            `;
+          }).join('');
+        }
+        dropdown.style.display = 'flex';
+        focusedIndex = -1;
+
+        const count = results.length;
+        const msg = APP.currentLang === 'hi' ? `${count} परिणाम मिले।` : `${count} results found.`;
+        announce(msg);
+      }
+
+      function handleSelection(doc) {
+        input.value = '';
+        if (clearBtn) clearBtn.style.display = 'none';
+        hideDropdown();
+
+        // Perform scroll highlight
+        if (doc.elementId) {
+          const target = document.getElementById(doc.elementId);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('search-highlight');
+            setTimeout(() => {
+              target.classList.remove('search-highlight');
+            }, 2000);
+          }
+        }
+      }
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim();
+        if (clearBtn) clearBtn.style.display = query ? 'flex' : 'none';
+
+        if (!query) {
+          hideDropdown();
+          return;
+        }
+
+        const results = getResults(query);
+        showResults(results, query);
+
+        dropdown.querySelectorAll('.search-result-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const idx = parseInt(item.dataset.index);
+            const doc = results[idx];
+            if (doc) handleSelection(doc);
+          });
+        });
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          input.value = '';
+          clearBtn.style.display = 'none';
+          hideDropdown();
+          input.focus();
+        });
+      }
+
+      input.addEventListener('keydown', (e) => {
+        const items = Array.from(dropdown.querySelectorAll('.search-result-item'));
+        if (dropdown.style.display === 'none' || !items.length) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          focusedIndex = (focusedIndex + 1) % items.length;
+          items.forEach((item, idx) => {
+            item.classList.toggle('focused', idx === focusedIndex);
+            if (idx === focusedIndex) {
+              input.setAttribute('aria-activedescendant', item.id);
+              item.scrollIntoView({ block: 'nearest' });
+            }
+          });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          focusedIndex = (focusedIndex - 1 + items.length) % items.length;
+          items.forEach((item, idx) => {
+            item.classList.toggle('focused', idx === focusedIndex);
+            if (idx === focusedIndex) {
+              input.setAttribute('aria-activedescendant', item.id);
+              item.scrollIntoView({ block: 'nearest' });
+            }
+          });
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (focusedIndex >= 0 && focusedIndex < items.length) {
+            items[focusedIndex].click();
+          } else if (items.length > 0) {
+            items[0].click();
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          hideDropdown();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.header-search')) {
+          hideDropdown();
+        }
+      });
+    }
+
+    /* ===========================================
+       SCROLL PROGRESS BAR
+    =========================================== */
+    function initScrollProgress() {
+      const progressBar = document.getElementById('scroll-progress');
+      if (!progressBar) return;
+      window.addEventListener('scroll', function() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docH = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const pct = docH > 0 ? (scrollTop / docH) * 100 : 0;
+        progressBar.style.width = pct + '%';
+      }, { passive: true });
+    }
+
+    /* ===========================================
+       INITIALIZATION
+    =========================================== */
+    async function init() {
+      await loadTickerData();
+      renderNewsTicker();
+      setupTickerInteractions();
+      initJsMarquee();
+      startForcedMarquee();
+      
+      initFontSize();
+      initHighContrast();
+      initStickyNav();
+      initMobileMenu();
+      initGlobalSearch();
+      initScrollProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

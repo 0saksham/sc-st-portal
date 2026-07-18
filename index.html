@@ -1,0 +1,3377 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SC/ST Population Mapping Feature - Uttarakhand SC/ST Cell Portal">
+  <title>SC/ST Population Mapping | UCOST Portal</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Apache ECharts JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+
+  <style>
+    /* ===========================================
+       DESIGN SYSTEM — CSS CUSTOM PROPERTIES
+    =========================================== */
+    :root {
+      --ucost-blue: #0B3D6E;
+      --ucost-blue-mid: #144F8A;
+      --ucost-blue-light: #1E6FB5;
+      --ucost-blue-dark: #071E3A;
+      --ucost-blue-deep: #050F1E;
+      --saffron-accent: #FF9933;
+      --saffron-light: #FFF3E0;
+      --saffron-glow: rgba(255,153,51,0.15);
+      --green-accent: #128807;
+      --green-light: #E8F5E3;
+      --bg-base: #F3F5F9;
+      --bg-card: #FFFFFF;
+      --bg-glass: rgba(255,255,255,0.7);
+      --text-primary: #1A1A1A;
+      --text-secondary: #5A5A5A;
+      --text-muted: #8A8A8A;
+      --border-color: #E5E7EB;
+      --border-strong: #D0D5DD;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+      --shadow-glow: 0 0 20px rgba(30,111,181,0.15);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+      --max-width: 1300px;
+      --nav-h: 56px;
+      --sidebar-w: 380px; /* Slightly wider sidebar for cards & scroll lists */
+      --transition: 200ms cubic-bezier(0.4,0,0.2,1);
+      --font-scale: 1;
+    }
+
+    /* ===========================================
+       RESET & GLOBAL BASE
+    =========================================== */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;font-size:calc(14px * var(--font-scale))}
+    body{font-family:'Inter','Noto Sans','Noto Sans Devanagari',sans-serif;line-height:1.6;background:var(--bg-base);color:var(--text-primary);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    a{color:var(--ucost-blue-light);text-decoration:none;transition:color var(--transition)}
+    a:hover{color:var(--ucost-blue)}
+    a:focus-visible{outline:2px solid var(--saffron-accent);outline-offset:3px;border-radius:3px}
+    img{display:block;max-width:100%;height:auto}
+    ul{list-style:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:inherit}
+    h1{font-size:2.2rem;font-weight:800;line-height:1.2;color:var(--ucost-blue-dark)}
+    h2{font-size:1.4rem;font-weight:700;line-height:1.3;color:var(--ucost-blue)}
+    h3{font-size:1.1rem;font-weight:600;line-height:1.4}
+    
+    .skip-link{position:absolute;z-index:10000;top:-200%;left:20px;background:var(--ucost-blue);color:#fff;padding:10px 20px;border-radius:0 0 8px 8px;font-weight:600;font-size:13px;transition:top .2s ease}
+    .skip-link:focus{top:0;color:#fff}
+
+    /* High Contrast Mode CSS */
+    body.high-contrast{--bg-base:#000;--bg-card:#111;--text-primary:#fff;--text-secondary:#ddd;--text-muted:#bbb;--border-color:#555;--bg-glass:rgba(0,0,0,.8);--ucost-blue-dark:#1E6FB5;--ucost-blue:#fff}
+    body.high-contrast .site-header{background:#111;border-color:#555}
+    body.high-contrast .card{background:#111;border-color:#555;color:#fff}
+    body.high-contrast .utility-bar{background:#000;border-bottom:1px solid #555}
+    body.high-contrast .main-nav{background:#111;border-color:#555}
+    body.high-contrast .compare-drawer{background:#111;color:#fff;border-left:2px solid #555}
+    body.high-contrast .legend-container{background:#111;border-color:#555}
+    body.high-contrast .dropdown-link:hover{background:#333;color:#fff}
+
+    /* ===========================================
+       UTILITY BAR & BRANDING
+    =========================================== */
+    .utility-bar{background:linear-gradient(135deg,var(--ucost-blue-dark),var(--ucost-blue-deep));color:rgba(255,255,255,.85);font-size:12px;height:38px;display:flex;align-items:center;position:relative;z-index:101}
+    .utility-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between}
+    .utility-left{display:flex;align-items:center;gap:12px}
+    .utility-left .gov-text{font-weight:500;letter-spacing:.02em}
+    .utility-right{display:flex;align-items:center;gap:4px}
+    .utility-btn{color:rgba(255,255,255,.8);padding:4px 10px;border-radius:4px;font-size:12px;font-weight:500;transition:all var(--transition);display:inline-flex;align-items:center;gap:4px}
+    .utility-btn:hover,.utility-btn.active{background:rgba(255,255,255,.15);color:#fff}
+    .utility-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+    .utility-sep{width:1px;height:16px;background:rgba(255,255,255,.2);margin:0 4px}
+    .font-size-cluster{display:flex;align-items:center;gap:2px}
+    .font-size-cluster .fs-btn{font-weight:700;min-width:26px;text-align:center;padding:3px 6px;border-radius:4px}
+    .fs-btn.active{background:var(--saffron-accent);color:var(--ucost-blue-dark)}
+    
+    .site-header{background:#fff;border-bottom:1px solid var(--border-color);position:relative;z-index:110}
+    .header-inner{max-width:var(--max-width);margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .header-brand{display:flex;align-items:center;gap:24px}
+    .header-banner{height:100px;max-height:100px;width:auto;max-width:350px;object-fit:contain;border-radius:var(--radius-sm);margin-left:auto}
+    .header-logo{height:100px;width:auto;object-fit:contain;flex-shrink:0}
+    .scst-wordmark{display:flex;flex-direction:column;align-items:flex-start}
+    .scst-badge{display:inline-flex;align-items:center;gap:0;font-weight:800;font-size:2.6rem;letter-spacing:-.02em;line-height:1.1}
+    .scst-badge .sc{color:var(--ucost-blue)}
+    .scst-badge .slash{color:var(--ucost-blue);margin:0 3px;font-weight:400;opacity:.8}
+    .scst-badge .st{color:var(--ucost-blue)}
+    .scst-badge .cell{color:var(--ucost-blue);margin-left:8px;font-weight:700;font-size:2.4rem}
+    .scst-subtitle{font-size:14px;color:var(--ucost-blue-light);letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-top:4px}
+    
+    html[lang="hi"] .scst-badge {
+      font-size: 1.45rem;
+      letter-spacing: normal;
+    }
+    html[lang="hi"] .scst-badge .cell {
+      font-size: 1.35rem;
+      margin-left: 6px;
+    }
+    html[lang="hi"] .scst-subtitle {
+      font-size: 11.5px;
+      letter-spacing: normal;
+      text-transform: none;
+    }
+
+    /* ===========================================
+       NAVIGATION & BREADCRUMBS
+    =========================================== */
+    .main-nav{background:var(--ucost-blue);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .main-nav.scrolled{background:rgba(11,61,110,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 2px 20px rgba(0,0,0,.3)}
+    .nav-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:var(--nav-h);gap:24px}
+    
+    /* Breadcrumb Links */
+    .breadcrumb-container{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.9rem;font-weight:500;flex-shrink:0}
+    .breadcrumb-container a{color:rgba(255,255,255,0.85);transition:color var(--transition)}
+    .breadcrumb-container a:hover{color:var(--saffron-accent)}
+    .breadcrumb-container span.sep{color:rgba(255,255,255,0.4);font-family:serif}
+    .breadcrumb-container span.active-crumb{color:#fff;font-weight:600}
+
+    /* News Ticker */
+    .nav-ticker{display:flex;align-items:center;overflow:hidden;background:rgba(0,0,0,.20);border-radius:var(--radius-sm);height:34px;flex-grow:1;max-width:650px;min-width:0;position:relative}
+    .ticker-label{flex-shrink:0;background:var(--saffron-accent);color:var(--ucost-blue-dark);padding:0 12px;font-weight:700;font-size:.75rem;height:100%;display:flex;align-items:center;justify-content:center;letter-spacing:.04em;text-transform:uppercase;position:relative;z-index:2;box-shadow:2px 0 5px rgba(0,0,0,.15)}
+    .ticker-content{overflow:hidden;display:flex;align-items:center;position:relative;height:100%;flex-grow:1;padding-left:16px}
+    .ticker-track{display:flex;white-space:nowrap;animation:marquee 30s linear infinite;flex-shrink:0;min-width:max-content}
+    .ticker-track:hover{animation-play-state:paused}
+    .ticker-item{font-size:.8rem;color:#fff;font-weight:500;display:flex;align-items:center;text-decoration:none;flex-shrink:0;white-space:nowrap;padding-right:50px}
+    
+    @keyframes marquee{
+      0%{transform:translate3d(100%,0,0)}
+      100%{transform:translate3d(-50%,0,0)}
+    }
+
+    /* ===========================================
+       PAGE TRANSITIONS & CORE LAYOUT
+    =========================================== */
+    .page-layout{display:grid;grid-template-columns:1fr var(--sidebar-w);gap:32px;max-width:var(--max-width);margin:0 auto;padding:36px 24px;position:relative}
+    .main-content{min-width:0}
+    .sidebar{display:flex;flex-direction:column;gap:24px}
+
+    /* Smooth page scaling & fading */
+    .page-transition {
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 200ms ease-in, transform 200ms ease-in;
+    }
+    .page-transition.fade-out {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+    .page-transition.fade-in {
+      opacity: 0;
+      transform: scale(0.97);
+      transition: none;
+    }
+    .page-transition.fade-in-active {
+      transition: opacity 250ms ease-out, transform 250ms ease-out;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ===========================================
+       SECTION & CARD STYLES
+    =========================================== */
+    .section{margin-bottom:30px}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+    .section-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .section-title{font-size:1.35rem;font-weight:700;color:var(--ucost-blue);display:flex;align-items:center;gap:10px}
+    .section-title .icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;border:2px solid var(--saffron-accent);box-shadow:0 8px 22px rgba(2,12,34,0.08)}
+    .section-title .icon svg{width:18px;height:18px;stroke:var(--ucost-blue-dark);fill:none;stroke-width:2}
+    
+    .card{background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-color);box-shadow:var(--shadow-sm);transition:box-shadow .22s ease,border-color .22s ease,transform .22s ease;overflow:hidden;padding:24px;margin-bottom:24px}
+    .card:hover{box-shadow:0 8px 28px rgba(0,0,0,.13);border-color:var(--border-strong);transform:translateY(-4px)}
+    .card-title{font-size:1.1rem;font-weight:700;color:var(--ucost-blue);margin-bottom:18px;display:flex;align-items:center;justify-content:between;gap:8px}
+
+    /* ===========================================
+       LOADING OVERLAY
+    =========================================== */
+    .loader-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(243, 245, 249, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease-out;
+      border-radius: var(--radius);
+    }
+    .loader-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid var(--border-strong);
+      border-top-color: var(--ucost-blue-light);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===========================================
+       MAP COMPONENT
+    =========================================== */
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+    .map-dir-badge {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      z-index: 1000;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: all var(--transition);
+    }
+    .map-dir-badge:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+    }
+    .map-dir-n {
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--saffron-accent);
+      color: var(--ucost-blue-dark);
+      font-weight: 900;
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .map-dir-n:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+    .map-dir-s {
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-secondary);
+      font-weight: 800;
+      font-size: 0.68rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .map-dir-s:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+    .map-dir-w {
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-weight: 800;
+      font-size: 0.68rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+    .map-dir-w:hover {
+      transform: translateY(-50%) scale(1.05);
+    }
+    .map-dir-e {
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-weight: 800;
+      font-size: 0.68rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+    .map-dir-e:hover {
+      transform: translateY(-50%) scale(1.05);
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      background: #eef2f7;
+    }
+
+    /* Leaflet Path Transitions */
+    .child-polygon {
+      transition: opacity 300ms ease-out, transform 300ms ease-out, fill 400ms ease-in-out, filter 180ms ease-out, stroke-width 180ms ease-out, stroke 180ms ease-out;
+    }
+    /* Glow hover */
+    .child-polygon:hover {
+      animation: none !important;
+      filter: drop-shadow(0 0 8px var(--saffron-accent)) !important;
+      stroke: var(--saffron-accent) !important;
+      stroke-width: 2.5px !important;
+      fill-opacity: 0.65 !important;
+      cursor: pointer;
+    }
+    /* Click Confirm Pulse */
+    .clicked-confirm {
+      animation: none !important;
+      filter: drop-shadow(0 0 12px var(--saffron-accent)) !important;
+      stroke: var(--saffron-accent) !important;
+      stroke-width: 3px !important;
+      fill-opacity: 0.8 !important;
+      transition: all 100ms ease-out !important;
+    }
+    /* Breathe animation */
+    @keyframes districtPulse {
+      0% { filter: drop-shadow(0 0 4px rgba(30, 111, 181, 0.15)); }
+      50% { filter: drop-shadow(0 0 8px rgba(30, 111, 181, 0.35)); }
+      100% { filter: drop-shadow(0 0 4px rgba(30, 111, 181, 0.15)); }
+    }
+    .child-polygon.pulsing {
+      animation: districtPulse 3.2s ease-in-out infinite;
+    }
+
+    /* Map Tooltip */
+    .custom-tooltip {
+      position: absolute;
+      z-index: 2000;
+      pointer-events: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      opacity: 0;
+      transform: translate(-50%, -105%) scale(0.95);
+      transition: opacity 150ms ease-out, transform 150ms ease-out;
+    }
+    .custom-tooltip.visible {
+      opacity: 1;
+      transform: translate(-50%, -105%) scale(1);
+    }
+    .custom-tooltip-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--ucost-blue-dark);
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 4px;
+    }
+    .custom-tooltip-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .custom-tooltip-row span.val {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Segmented Control & Legends */
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .segmented-control {
+      display: flex;
+      background: rgba(0,0,0,0.05);
+      padding: 3px;
+      border-radius: 30px;
+      gap: 2px;
+    }
+    .segmented-btn {
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .segmented-btn:hover {
+      color: var(--ucost-blue);
+    }
+    .segmented-btn.active {
+      background: #fff;
+      color: var(--ucost-blue-dark);
+      box-shadow: var(--shadow-sm);
+    }
+    .legend-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      transition: opacity 300ms ease;
+      opacity: 0;
+      pointer-events: none;
+      height: 32px;
+    }
+    .legend-container.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .legend-gradient {
+      width: 120px;
+      height: 10px;
+      border-radius: 5px;
+    }
+    .compare-btn {
+      background: var(--saffron-accent);
+      color: var(--ucost-blue-dark);
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .compare-btn:hover {
+      background: var(--ucost-blue);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* ===========================================
+       STATISTICS & CHARTS SIDEBAR
+    =========================================== */
+    .counters-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      text-align: center;
+      background: var(--bg-base);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+    }
+    .stat-val {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--ucost-blue-dark);
+      line-height: 1.2;
+    }
+    .stat-pct {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .donut-chart-wrapper {
+      position: relative;
+      width: 100%;
+      height: 240px;
+    }
+    .donut-center-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      text-align: center;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .donut-center-num {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--ucost-blue-dark);
+      line-height: 1.2;
+    }
+    .donut-center-sub {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-top: 2px;
+    }
+
+    /* ===========================================
+       VILLAGE SEARCH & SELECTION (PAGE 3)
+    =========================================== */
+    .search-list-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+    .village-search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .village-search-input-wrapper input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      font-size: 0.88rem;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      transition: all var(--transition);
+    }
+    .village-search-input-wrapper input:focus {
+      outline: none;
+      border-color: var(--ucost-blue-light);
+      box-shadow: 0 0 0 3px rgba(30,111,181,0.15);
+      background: #fff;
+    }
+    .village-search-input-wrapper .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2.5;
+    }
+    .village-list {
+      flex-grow: 1;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: #fff;
+    }
+    .village-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      cursor: pointer;
+      font-size: 0.84rem;
+      font-weight: 500;
+      transition: all var(--transition);
+      text-align: left;
+    }
+    .village-row:hover {
+      background: var(--bg-base);
+      color: var(--ucost-blue);
+    }
+    .village-row.selected {
+      background: var(--saffron-light);
+      border-left: 4px solid var(--saffron-accent);
+      color: var(--ucost-blue-dark);
+      font-weight: 600;
+    }
+    .village-row .vol {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+    .empty-state {
+      padding: 24px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Selected Village Pin & Micro charts */
+    .village-ping-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ping-dot {
+      width: 10px;
+      height: 10px;
+      background-color: var(--saffron-accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--saffron-accent);
+      position: absolute;
+      z-index: 2;
+    }
+    .ping-ring {
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--saffron-accent);
+      border-radius: 50%;
+      position: absolute;
+      z-index: 1;
+      animation: pingAnimation 1.4s ease-out infinite;
+    }
+    @keyframes pingAnimation {
+      0% { width: 10px; height: 10px; opacity: 1; }
+      100% { width: 42px; height: 42px; opacity: 0; }
+    }
+
+    .village-micro-charts {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .micro-chart-container {
+      flex: 1;
+      height: 140px;
+      position: relative;
+    }
+    .gauge-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      padding: 10px;
+    }
+    .gauge-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .gauge-bg {
+      height: 16px;
+      background: var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .gauge-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--ucost-blue-light), var(--ucost-blue));
+      border-radius: 8px;
+      width: 0%;
+    }
+    
+    .village-detail-card {
+      animation: mFadeScale 400ms cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    @keyframes mFadeScale {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .download-btn-cluster {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .download-btn {
+      flex: 1;
+      border: 1px solid var(--border-strong);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ucost-blue-dark);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #fff;
+      transition: all var(--transition);
+    }
+    .download-btn:hover {
+      background: var(--bg-base);
+      border-color: var(--ucost-blue-light);
+      color: var(--ucost-blue-light);
+    }
+    .download-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    /* ===========================================
+       DISTRICT COMPARE DRAWER
+    =========================================== */
+    .compare-drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: 520px;
+      max-width: 90vw;
+      height: 100%;
+      background: #fff;
+      box-shadow: var(--shadow-lg);
+      z-index: 2000;
+      transform: translateX(100%);
+      transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .compare-drawer.open {
+      transform: translateX(0);
+    }
+    .compare-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms ease-out;
+    }
+    .compare-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .compare-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--ucost-blue-dark);
+      color: #fff;
+    }
+    .compare-header h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .close-drawer-btn {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .close-drawer-btn:hover {
+      color: #fff;
+    }
+    .compare-body {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .district-checklist {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg-base);
+      border-radius: var(--radius-sm);
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .checklist-item input {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .compare-table-wrapper {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    .compare-table th {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--border-strong);
+    }
+    .compare-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .compare-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* ===========================================
+       FOOTER
+    =========================================== */
+    .site-footer{background:linear-gradient(135deg,var(--ucost-blue-dark) 0%,var(--ucost-blue-deep) 100%);color:#fff;border-top:4px solid var(--saffron-accent);margin-top:40px}
+    .footer-inner{max-width:var(--max-width);margin:0 auto}
+    .footer-grid{display:grid;gap:36px;max-width:var(--max-width);margin:0 auto;padding:48px 24px}
+    .footer-col h4{font-size:.95rem;font-weight:700;margin-bottom:18px;color:#fff;letter-spacing:.02em;position:relative;padding-bottom:8px}
+    .footer-col h4::after{content:'';position:absolute;left:0;bottom:0;width:32px;height:2px;background:var(--saffron-accent)}
+    .footer-col p{font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.7}
+    .footer-col ul li{margin-bottom:6px}
+    .footer-col ul li a{color:rgba(255,255,255,.65);font-size:.78rem;transition:all var(--transition);display:flex;align-items:center;gap:6px}
+    .footer-col ul li a:hover{color:var(--saffron-accent);padding-left:4px}
+    .footer-col ul li a::before{content:'›';opacity:.5}
+    .footer-bottom{padding:16px 24px;max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .footer-bottom p{font-size:.72rem;color:rgba(255,255,255,.4)}
+    
+    #scroll-progress{position:fixed;top:0;left:0;width:0%;height:3px;background:linear-gradient(90deg,var(--saffron-accent),var(--ucost-blue-light));z-index:99999;transition:width .1s linear;pointer-events:none;border-radius:0 2px 2px 0}
+    .aria-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+    /* Tribal Section Styles */
+    .tribal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 16px;
+    }
+    .tribe-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+    }
+    .tribe-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-strong);
+    }
+    .tribe-img-wrap {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+    .tribe-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 500ms ease;
+    }
+    .tribe-card:hover .tribe-img {
+      transform: scale(1.08);
+    }
+    .tribe-info {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .tribe-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ucost-blue-dark);
+      margin-bottom: 6px;
+    }
+    .tribe-districts-badge {
+      display: inline-block;
+      background: var(--saffron-light);
+      color: var(--saffron-accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      align-self: flex-start;
+    }
+    .tribe-desc {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Top Highlights Styles */
+    .top-highlights-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 0 auto 24px;
+      max-width: var(--max-width);
+      padding: 0 24px;
+    }
+    .highlight-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      transition: all var(--transition);
+    }
+    .highlight-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+    }
+
+    /* ===========================================
+       RESPONSIVE BREAKPOINTS
+    =========================================== */
+    @media(max-width:1024px){
+      .page-layout{grid-template-columns:1fr;--sidebar-w:100%}
+      .footer-grid{grid-template-columns:1fr 1fr !important}
+      .header-logo{height:80px}
+      .scst-badge{font-size:2.0rem}
+      .scst-badge .cell{font-size:1.8rem}
+      html[lang="hi"] .scst-badge{font-size:1.15rem}
+      html[lang="hi"] .scst-badge .cell{font-size:1.05rem}
+      html[lang="hi"] .scst-subtitle{font-size:10px}
+      .header-banner{height:80px;width:auto;max-width:280px;object-fit:contain}
+    }
+    @media(max-width:768px){
+      :root{--nav-h:auto}
+      .top-highlights-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0 16px;
+        margin-bottom: 16px;
+      }
+      .nav-inner{flex-direction:column;align-items:stretch;padding:12px 24px;height:auto}
+      .breadcrumb-container{order:2;margin-top:6px}
+      .nav-ticker{order:1;max-width:100%;height:30px}
+      .utility-inner{flex-direction:column;gap:4px;padding:6px 16px}
+      .utility-bar{height:auto;padding:4px 0}
+      .header-inner{padding:10px 16px;flex-direction:column;gap:12px;align-items:stretch}
+      .header-logo{height:60px}
+      .scst-badge{font-size:1.6rem}
+      .scst-badge .cell{font-size:1.4rem}
+      .scst-subtitle{font-size:10px}
+      html[lang="hi"] .scst-badge{font-size:0.9rem}
+      html[lang="hi"] .scst-badge .cell{font-size:0.8rem;margin-left:4px}
+      html[lang="hi"] .scst-subtitle{font-size:8px}
+      .header-banner{display:none}
+      .page-layout{padding:20px 16px;gap:20px}
+      .footer-grid{grid-template-columns:1fr !important}
+      .footer-bottom{flex-direction:column;text-align:center}
+      .compare-drawer {width:100%}
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a class="skip-link" href="#main-content">Skip to Main Content</a>
+
+  <!-- ARIA Live Region -->
+  <div id="aria-live" class="aria-live" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ========== UTILITY BAR ========== -->
+  <div class="utility-bar">
+    <div class="utility-inner">
+      <div class="utility-left">
+        <span class="gov-text">Government of Uttarakhand</span>
+      </div>
+      <div class="utility-right">
+        <div class="lang-cluster" role="group" aria-label="Language selection">
+          <button class="utility-btn active" onclick="setLang('en',this)" lang="en" aria-pressed="true">English</button>
+          <button class="utility-btn" onclick="setLang('hi',this)" lang="hi" aria-pressed="false">हिन्दी</button>
+        </div>
+        <div class="utility-sep"></div>
+        <div class="font-size-cluster" role="group" aria-label="Font size controls">
+          <button class="fs-btn utility-btn" data-size="small" title="Decrease font size">A-</button>
+          <button class="fs-btn utility-btn active" data-size="normal" title="Default font size">A</button>
+          <button class="fs-btn utility-btn" data-size="large" title="Increase font size">A+</button>
+        </div>
+        <div class="utility-sep"></div>
+        <button class="utility-btn" id="hc-toggle" aria-pressed="false" title="Toggle High Contrast" style="display: inline-flex; align-items: center; gap: 4px;">
+          <svg viewBox="0 0 24 24" style="stroke: currentColor; fill: none; stroke-width: 2;"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z"/></svg>
+          <span data-en="Contrast" data-hi="कॉन्ट्रास्ट">Contrast</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SITE HEADER ========== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <a href="#/" aria-label="Home">
+          <img src="assets/logo-UCOST.png" alt="UCOST Logo" class="header-logo" width="166" height="72" data-en="assets/logo-UCOST.png" data-hi="assets/New-logo-UCOST-hindi.png" data-alt-en="UCOST Logo" data-alt-hi="यूकोस्ट लोगो">
+        </a>
+        <div class="scst-wordmark" style="flex-shrink:0;">
+          <div class="scst-badge" data-en='<span class="sc">SC</span><span class="slash">/</span><span class="st">ST</span><span class="cell">Cell</span>' data-hi='<span class="sc">अनुसूचित जाति</span><span class="slash">/</span><span class="st">अनुसूचित जनजाति</span><span class="cell">प्रकोष्ठ</span>'>
+            <span class="sc">SC</span><span class="slash">/</span><span class="st">ST</span><span class="cell">Cell</span>
+          </div>
+          <div class="scst-subtitle" data-en="SEED · DST · Government of India" data-hi="सीड (SEED) · विज्ञान एवं प्रौद्योगिकी विभाग (DST) · भारत सरकार">SEED · DST · Government of India</div>
+        </div>
+      </div>
+      <!-- Banner Image -->
+      <img src="top.png" alt="Branding Banner" class="header-banner">
+    </div>
+  </header>
+
+  <!-- ========== NAVIGATION (NAV BAR WITH BREADCRUMBS & TICKER) ========== -->
+  <nav class="main-nav" id="main-nav" role="navigation" aria-label="Main Navigation">
+    <div class="nav-inner">
+      <!-- Breadcrumbs -->
+      <div class="breadcrumb-container" id="nav-breadcrumbs" aria-label="Breadcrumb navigation">
+        <!-- Dynamically rendered -->
+      </div>
+      
+      <!-- News Ticker -->
+      <div class="nav-ticker" id="nav-ticker" tabindex="0">
+        <div class="ticker-label" data-en="Advisory" data-hi="सलाह">Advisory</div>
+        <div class="ticker-content">
+          <div class="ticker-track" id="ticker-track">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== MAIN CONTENT AREA ========== -->
+  <main id="main-content" class="main-content">
+    <div id="app-container" class="page-transition">
+      <!-- Active views injected here -->
+    </div>
+  </main>
+
+  <!-- ========== COMPARE DRAWER ========== -->
+  <div class="compare-overlay" id="compare-overlay" onclick="toggleCompareDrawer(false)"></div>
+  <div class="compare-drawer" id="compare-drawer" role="dialog" aria-modal="true" aria-labelledby="compare-title">
+    <div class="compare-header">
+      <h3 id="compare-title" data-en="Compare Districts" data-hi="जिलों की तुलना करें">Compare Districts</h3>
+      <button class="close-drawer-btn" onclick="toggleCompareDrawer(false)" aria-label="Close Comparison Drawer">&times;</button>
+    </div>
+    <div class="compare-body">
+      <div class="section-title-wrap">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);" id="compare-header-label" data-en="Select districts to compare:" data-hi="तुलना के लिए जिलों का चयन करें:">Select districts to compare:</span>
+      </div>
+      <div class="district-checklist" id="compare-district-checklist">
+        <!-- Generated checkboxes -->
+      </div>
+      <div class="compare-table-wrapper">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th data-en="District" data-hi="जिला">District</th>
+              <th data-en="Total Population" data-hi="कुल जनसंख्या">Total Population</th>
+              <th data-en="SC %" data-hi="अ.जा. %">SC %</th>
+              <th data-en="ST %" data-hi="अ.ज.जा. %">ST %</th>
+              <th data-en="Literacy %" data-hi="साक्षरता %">Literacy %</th>
+            </tr>
+          </thead>
+          <tbody id="compare-table-rows">
+            <!-- Render comparison rows -->
+          </tbody>
+        </table>
+      </div>
+      <div id="compare-chart" style="width: 100%; height: 260px;"></div>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid" style="grid-template-columns: 1.2fr 2fr;">
+        <!-- Col 1: About -->
+        <div class="footer-col">
+          <h4 data-en="About SC/ST Cell" data-hi="अनु.जाति/जनजाति प्रकोष्ठ के बारे में">About SC/ST Cell</h4>
+          <p data-en="A SEED-DST funded initiative under UCOST for the socio-economic development and technological empowerment of SC/ST communities across all 13 districts of Uttarakhand." data-hi="उत्तराखंड के सभी 13 जिलों में अनुसूचित जाति/अनुसूचित जनजाति समुदायों के सामाजिक-आर्थिक विकास और तकनीकी सशक्तिकरण के लिए यूकोस्ट के तहत एक SEED-DST वित्त पोषित पहल।">A SEED-DST funded initiative under UCOST for the socio-economic development and technological empowerment of SC/ST communities across all 13 districts of Uttarakhand.</p>
+        </div>
+
+        <!-- Col 2: Map Location -->
+        <div class="footer-col">
+          <h4 data-en="UCOST Location" data-hi="यूकोस्ट स्थान">UCOST Location</h4>
+          <iframe src="https://maps.google.com/maps?q=Uttarakhand%20State%20Council%20for%20Science%20And%20Technology&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="180" style="width:100%; height:180px; border:none; border-radius: var(--radius-sm); margin-top:10px;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="UCOST Location Map"></iframe>
+          <p style="margin-top:8px; font-size:0.75rem;"><a href="https://maps.app.goo.gl/Jug9zk8YkKdKFj947" target="_blank" rel="noopener" style="color:var(--saffron-accent);">→ Get Directions</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p data-en="© 2026 Uttarakhand State Council for Science &amp; Technology (UCOST). All rights reserved." data-hi="© 2026 उत्तराखंड राज्य विज्ञान एवं प्रौद्योगिकी परिषद (यूकोस्ट)। सर्वाधिकार सुरक्षित।">© 2026 Uttarakhand State Council for Science &amp; Technology (UCOST). All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
+
+  <!-- ========== JAVASCRIPT LOGIC ========== -->
+  <script>
+    /* ===========================================
+       DICTIONARY FOR HINDI TRANSLATION (CHROME ONLY)
+    =========================================== */
+    const UI_TRANSLATIONS = {
+      en: {
+        title: "SC/ST Population Mapping",
+        stateTitle: "SC/ST Population Distribution — Uttarakhand",
+        districtTitle: "SC/ST Population Distribution — ",
+        subdistrictTitle: "SC/ST Population Distribution — ",
+        overallCardTitle: "Overall SC/ST Population",
+        rankCardTitle: "Districts Ranked by SC/ST Concentration",
+        compareBtn: "Compare Districts",
+        overallPop: "Total Population",
+        scPop: "SC Population",
+        stPop: "ST Population",
+        otherPop: "Other",
+        literacyRate: "Literacy Rate",
+        households: "Households",
+        workers: "Total Workers",
+        notAvailable: "2011 census data not available for this sub-district (created after the 2011 census).",
+        noVillageData: "No verified village-level data available for this sub-district yet.",
+        searchPlaceholder: "Search villages...",
+        villageDetail: "Village Detail",
+        downloadCsv: "Download Village CSV",
+        downloadSubdistrictCsv: "Download Subdistrict Dataset (CSV)",
+        minLabel: "Min",
+        maxLabel: "Max",
+        compareTableColDistrict: "District",
+        compareTableColPop: "Total Population",
+        closeDrawer: "Close",
+        selectAtLeastTwo: "Select at least 2 districts to compare.",
+        noVillageSelected: "Select a village from the search list to inspect details.",
+        subdistrictAvg: "Tehsil Avg",
+        villageVal: "Village",
+        flatMode: "Flat",
+        scMode: "SC Intensity",
+        stMode: "ST Intensity",
+        stateCrumb: "Uttarakhand",
+        malePop: "Male Population",
+        femalePop: "Female Population",
+        compareHeaderLabel: "Select districts to compare:"
+      },
+      hi: {
+        title: "अनुसूचित जाति/जनजाति जनसंख्या मानचित्रण",
+        stateTitle: "अनुसूचित जाति/जनजाति जनसंख्या वितरण — उत्तराखंड",
+        districtTitle: "अनुसूचित जाति/जनजाति जनसंख्या वितरण — ",
+        subdistrictTitle: "अनुसूचित जाति/जनजाति जनसंख्या वितरण — ",
+        overallCardTitle: "समग्र अनुसूचित जाति/जनजाति जनसंख्या",
+        rankCardTitle: "अ.जा./अ.ज.जा. सांद्रता के आधार पर जिलों की रैंकिंग",
+        compareBtn: "जिलों की तुलना",
+        overallPop: "कुल जनसंख्या",
+        scPop: "अ.जा. जनसंख्या",
+        stPop: "अ.ज.जा. जनसंख्या",
+        otherPop: "अन्य",
+        literacyRate: "साक्षरता दर",
+        households: "परिवार",
+        workers: "कुल श्रमिक",
+        notAvailable: "इस उप-जिले (तहसील) के लिए 2011 की जनगणना के आंकड़े उपलब्ध नहीं हैं (2011 की जनगणना के बाद निर्मित)।",
+        noVillageData: "इस उप-जिले के लिए अभी तक कोई सत्यापित ग्राम-स्तरीय डेटा उपलब्ध नहीं है।",
+        searchPlaceholder: "गांव खोजें...",
+        villageDetail: "ग्राम विवरण",
+        downloadCsv: "ग्राम डेटा डाउनलोड (CSV)",
+        downloadSubdistrictCsv: "तहसील डेटा डाउनलोड (CSV)",
+        minLabel: "न्यूनतम",
+        maxLabel: "अधिकतम",
+        compareTableColDistrict: "जिला",
+        compareTableColPop: "कुल जनसंख्या",
+        closeDrawer: "बंद करें",
+        selectAtLeastTwo: "तुलना करने के लिए कम से कम 2 जिलों का चयन करें।",
+        noVillageSelected: "विवरण देखने के लिए खोज सूची से एक गांव का चयन करें।",
+        subdistrictAvg: "तहसील औसत",
+        villageVal: "गांव",
+        flatMode: "सामान्य",
+        scMode: "अ.जा. तीव्रता",
+        stMode: "अ.ज.जा. तीव्रता",
+        stateCrumb: "उत्तराखंड",
+        malePop: "पुरुष जनसंख्या",
+        femalePop: "महिला जनसंख्या",
+        compareHeaderLabel: "तुलना के लिए जिलों का चयन करें:"
+      }
+    };
+
+    /* ===========================================
+       GLOBAL APP STATE
+    =========================================== */
+    const APP = {
+      newsTicker: [],
+      currentLang: 'en',
+      activeDistrict: null,
+      activeSubdistrict: null,
+      selectedVillage: null,
+      choroplethMode: 'flat',
+      compareSelectedDistricts: [],
+      compareDrawerOpen: false,
+      satelliteActive: false,
+      map: null,
+      charts: {}
+    };
+
+    // Shared GeoJSON cache
+    const DATA_CACHE = {};
+
+    /* ===========================================
+       DATA LOADING UTIL
+    =========================================== */
+    async function loadGeoJSON(name) {
+      if (DATA_CACHE[name]) return DATA_CACHE[name];
+      try {
+        const response = await fetch(`./data/${name}.geojson`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        DATA_CACHE[name] = await response.json();
+        return DATA_CACHE[name];
+      } catch (err) {
+        console.error(`Failed to load data: ${name}`, err);
+        throw err;
+      }
+    }
+
+    function showLoader(show) {
+      const loader = document.getElementById('loader-overlay');
+      if (loader) {
+        if (show) loader.classList.add('active');
+        else loader.classList.remove('active');
+      }
+    }
+
+    /* ===========================================
+       HD SATELLITE BASE LAYER SETUP
+    =========================================== */
+    function setupBaseLayers(map) {
+      const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 19
+      });
+
+      if (APP.satelliteActive) {
+        satelliteLayer.addTo(map);
+      }
+
+      const ToggleControl = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd: function() {
+          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+          container.style.backgroundColor = '#fff';
+          container.style.width = '34px';
+          container.style.height = '34px';
+          container.style.display = 'flex';
+          container.style.alignItems = 'center';
+          container.style.justifyContent = 'center';
+          container.style.cursor = 'pointer';
+          container.title = APP.currentLang === 'hi' ? 'सैटेलाइट मैप चालू/बंद करें' : 'Toggle Satellite Map';
+
+          container.innerHTML = `
+            <svg viewBox="0 0 24 24" style="width:20px; height:20px; fill:none; stroke:var(--ucost-blue); stroke-width:2;">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+              <polyline points="2 17 12 22 22 17"/>
+              <polyline points="2 12 12 17 22 12"/>
+            </svg>
+          `;
+
+          if (APP.satelliteActive) {
+            container.style.backgroundColor = 'var(--saffron-light)';
+            container.querySelector('svg').style.stroke = 'var(--saffron-accent)';
+          }
+
+          L.DomEvent.on(container, 'click', function(e) {
+            L.DomEvent.stopPropagation(e);
+            APP.satelliteActive = !APP.satelliteActive;
+            if (APP.satelliteActive) {
+              satelliteLayer.addTo(map);
+              container.style.backgroundColor = 'var(--saffron-light)';
+              container.querySelector('svg').style.stroke = 'var(--saffron-accent)';
+            } else {
+              map.removeLayer(satelliteLayer);
+              container.style.backgroundColor = '#fff';
+              container.querySelector('svg').style.stroke = 'var(--ucost-blue)';
+            }
+            applyActiveMapStyles();
+          });
+
+          return container;
+        }
+      });
+
+      map.addControl(new ToggleControl());
+    }
+
+    /* ===========================================
+       MAP STYLE SYNCHRONIZER
+    =========================================== */
+    function applyActiveMapStyles() {
+      if (!APP.map) return;
+      const isSatellite = APP.satelliteActive;
+      const hash = window.location.hash || '#/state';
+      const parts = hash.split('/');
+
+      if (parts[1] === 'state') {
+        updateChoroplethColors(true);
+      } else if (parts[1] === 'district') {
+        if (APP.subdistrictsLayer) {
+          APP.subdistrictsLayer.eachLayer(layer => {
+            const avail = layer.feature.properties.census_2011_data_available;
+            if (avail === false || avail === "false") {
+              layer.setStyle({
+                color: isSatellite ? '#FFFFFF' : '#9CA3AF',
+                weight: isSatellite ? 2.5 : 1.5
+              });
+            } else {
+              layer.setStyle({
+                color: isSatellite ? '#FFFFFF' : '#1E6FB5',
+                weight: isSatellite ? 2.5 : 1.5,
+                fillOpacity: isSatellite ? 0.35 : 0.2
+              });
+            }
+          });
+        }
+      } else if (parts[1] === 'subdistrict') {
+        if (APP.subdistrictBoundary) {
+          APP.subdistrictBoundary.setStyle({
+            color: isSatellite ? '#FF9933' : 'var(--ucost-blue-dark)',
+            weight: isSatellite ? 3.5 : 2.5,
+            fillOpacity: isSatellite ? 0.25 : 1
+          });
+        }
+      }
+    }
+
+    /* ===========================================
+       DYNAMIC LANGUAGE TRANSLATION
+    =========================================== */
+    function translateDOM() {
+      const lang = APP.currentLang;
+      document.querySelectorAll('[data-en][data-hi]').forEach(node => {
+        const val = node.getAttribute('data-' + lang);
+        if (val === null) return;
+        const tagName = node.tagName.toLowerCase();
+        if (tagName === 'input') {
+          node.setAttribute('placeholder', val);
+          return;
+        }
+        if (tagName === 'img') {
+          node.setAttribute('src', val);
+          const altVal = node.getAttribute('data-alt-' + lang);
+          if (altVal !== null) node.setAttribute('alt', altVal);
+          return;
+        }
+        if (tagName === 'text') {
+          node.textContent = val;
+          return;
+        }
+        if (val.includes('<') || val.includes('&amp;')) {
+          node.innerHTML = val;
+        } else {
+          node.textContent = val;
+        }
+      });
+
+      document.querySelectorAll('[data-aria-en][data-aria-hi]').forEach(node => {
+        const val = node.getAttribute('data-aria-' + lang);
+        if (val !== null) {
+          node.setAttribute('aria-label', val);
+        }
+      });
+    }
+
+    window.setLang = function(lang, el) {
+      APP.currentLang = lang;
+      document.documentElement.setAttribute('lang', lang);
+      
+      if (el) {
+        el.closest('.lang-cluster').querySelectorAll('button').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        el.classList.add('active');
+        el.setAttribute('aria-pressed', 'true');
+      }
+
+      document.title = UI_TRANSLATIONS[lang].title + " | UCOST Portal";
+      document.body.style.fontFamily = lang === 'hi'
+        ? "'Noto Sans Devanagari', 'Noto Sans', 'Inter', sans-serif"
+        : "'Inter', 'Noto Sans', 'Noto Sans Devanagari', sans-serif";
+
+      // Translate static markup
+      translateDOM();
+
+      // Translate Compare Drawer header
+      document.getElementById('compare-title').textContent = UI_TRANSLATIONS[lang].compareBtn;
+      
+      // Update breadcrumbs and active page in-place (without full fade route change)
+      renderBreadcrumbs();
+      const hash = window.location.hash || '#/state';
+      renderRoute(hash, true); // True skips page transitions to stay seamless
+      
+      // Update Compare Drawer contents if open
+      if (APP.compareDrawerOpen) {
+        renderCompareDrawer();
+      }
+    };
+
+    /* ===========================================
+       ANIMATED NUMBER COUNTER helper
+    =========================================== */
+    function animateCounter(el, targetValue) {
+      if (!el) return;
+      let start = null;
+      const duration = 900;
+      const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+      
+      function step(timestamp) {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / duration, 1);
+        const easedProgress = easeOutCubic(progress);
+        const currentValue = Math.floor(easedProgress * targetValue);
+        el.textContent = currentValue.toLocaleString('en-IN');
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    /* ===========================================
+       MAP HELPER FUNCTIONS
+    =========================================== */
+    function destroyCurrentMap() {
+      if (APP.map) {
+        APP.map.remove();
+        APP.map = null;
+      }
+    }
+
+    // Custom Map Tooltip Positioning
+    let tooltipTimeout = null;
+    const tooltipEl = document.getElementById('custom-map-tooltip') || (() => {
+      const el = document.createElement('div');
+      el.id = 'custom-map-tooltip';
+      el.className = 'custom-tooltip';
+      document.body.appendChild(el);
+      return el;
+    })();
+
+    function showMapTooltip(e, name, pop, scPct, stPct) {
+      clearTimeout(tooltipTimeout);
+      const lang = APP.currentLang;
+      tooltipTimeout = setTimeout(() => {
+        tooltipEl.innerHTML = `
+          <div class="custom-tooltip-title">${name}</div>
+          <div class="custom-tooltip-row">
+            <span>${UI_TRANSLATIONS[lang].overallPop}:</span>
+            <span class="val">${parseInt(pop).toLocaleString('en-IN')}</span>
+          </div>
+          <div class="custom-tooltip-row">
+            <span>${UI_TRANSLATIONS[lang].scPop} %:</span>
+            <span class="val">${parseFloat(scPct).toFixed(2)}%</span>
+          </div>
+          <div class="custom-tooltip-row">
+            <span>${UI_TRANSLATIONS[lang].stPop} %:</span>
+            <span class="val">${parseFloat(stPct).toFixed(2)}%</span>
+          </div>
+        `;
+        tooltipEl.classList.add('visible');
+        updateMapTooltipPos(e);
+      }, 120);
+    }
+
+    function updateMapTooltipPos(e) {
+      tooltipEl.style.left = `${e.originalEvent.pageX}px`;
+      tooltipEl.style.top = `${e.originalEvent.pageY - 15}px`;
+    }
+
+    function hideMapTooltip() {
+      clearTimeout(tooltipTimeout);
+      tooltipEl.classList.remove('visible');
+    }
+
+    // Color Interpolator
+    function interpolateColor(color1, color2, factor) {
+      const r1 = parseInt(color1.substring(1, 3), 16);
+      const g1 = parseInt(color1.substring(3, 5), 16);
+      const b1 = parseInt(color1.substring(5, 7), 16);
+
+      const r2 = parseInt(color2.substring(1, 3), 16);
+      const g2 = parseInt(color2.substring(3, 5), 16);
+      const b2 = parseInt(color2.substring(5, 7), 16);
+
+      const r = Math.round(r1 + factor * (r2 - r1));
+      const g = Math.round(g1 + factor * (g2 - g1));
+      const b = Math.round(b1 + factor * (b2 - b1));
+
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    }
+
+    // SVG Pattern Injector (for missing census datasets)
+    function injectHatchPattern(map) {
+      const svgEl = map.getRenderer(map)._container;
+      if (svgEl && !svgEl.querySelector('#diagonal-hatch')) {
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = `
+          <pattern id="diagonal-hatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+            <rect width="8" height="8" fill="#E5E7EB" />
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#9CA3AF" stroke-width="1.5" />
+          </pattern>
+        `;
+        svgEl.appendChild(defs);
+      }
+    }
+
+    /* ===========================================
+       CLIENT-SIDE ROUTING & BREADCRUMBS
+    =========================================== */
+    function renderBreadcrumbs() {
+      const container = document.getElementById('nav-breadcrumbs');
+      if (!container) return;
+
+      const hash = window.location.hash || '#/state';
+      const parts = hash.split('/');
+      const lang = APP.currentLang;
+
+      let html = `<a href="#/state" data-en="Uttarakhand" data-hi="उत्तराखंड">${UI_TRANSLATIONS[lang].stateCrumb}</a>`;
+
+      if (parts[1] === 'district' && parts[2]) {
+        const dCode = parts[2];
+        const dName = APP.activeDistrict ? APP.activeDistrict.properties.district_name : dCode;
+        html += ` <span class="sep">›</span> <span class="active-crumb">${dName}</span>`;
+      } else if (parts[1] === 'subdistrict' && parts[2] && parts[3]) {
+        const dCode = parts[2];
+        const sdCode = parts[3];
+        const dName = APP.activeDistrict ? APP.activeDistrict.properties.district_name : dCode;
+        const sdName = APP.activeSubdistrict ? APP.activeSubdistrict.properties.subdistrict_name : sdCode;
+        html += ` <span class="sep">›</span> <a href="#/district/${dCode}">${dName}</a>`;
+        html += ` <span class="sep">›</span> <span class="active-crumb">${sdName}</span>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    async function handleHashChange() {
+      hideMapTooltip();
+      const hash = window.location.hash || '#/state';
+      if (hash === '#/') {
+        window.location.hash = '#/state';
+        return;
+      }
+      
+      const appContainer = document.getElementById('app-container');
+      
+      // Page Fade-out (Outbound)
+      appContainer.className = 'page-transition fade-out';
+      
+      setTimeout(async () => {
+        try {
+          await renderRoute(hash, false);
+          renderBreadcrumbs();
+          
+          // Page Fade-in (Inbound)
+          appContainer.className = 'page-transition fade-in';
+          appContainer.getBoundingClientRect(); // trigger reflow
+          appContainer.className = 'page-transition fade-in-active';
+        } catch (err) {
+          console.error("Routing error", err);
+          window.location.hash = '#/state';
+        }
+      }, 200);
+    }
+
+    async function renderRoute(hash, isLangSwitch = false) {
+      const parts = hash.split('/');
+      
+      // Release ECharts instances
+      for (let k in APP.charts) {
+        if (APP.charts[k]) {
+          APP.charts[k].dispose();
+          delete APP.charts[k];
+        }
+      }
+      destroyCurrentMap();
+
+      if (parts[1] === 'state') {
+        await buildStatePage(isLangSwitch);
+      } else if (parts[1] === 'district' && parts[2]) {
+        await buildDistrictPage(parts[2], isLangSwitch);
+      } else if (parts[1] === 'subdistrict' && parts[2] && parts[3]) {
+        await buildSubdistrictPage(parts[2], parts[3], isLangSwitch);
+      } else {
+        window.location.hash = '#/state';
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange);
+
+    /* ===========================================
+       PAGE 1: STATE LEVEL BUILDER
+    =========================================== */
+    async function buildStatePage(isLangSwitch) {
+      const lang = APP.currentLang;
+      const appContainer = document.getElementById('app-container');
+      
+      // Initial HTML Injection
+      appContainer.innerHTML = `
+        <!-- State Demographic Highlights -->
+        <div class="top-highlights-row">
+          <div class="highlight-card" style="border-left: 5px solid var(--saffron-accent);">
+            <div style="background: var(--saffron-light); color: var(--saffron-accent); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 800; flex-shrink: 0;">SC</div>
+            <div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;" data-en="Highest SC Concentration" data-hi="सर्वाधिक अ.जा. सांद्रता">Highest SC Concentration</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: var(--ucost-blue-dark);" data-en="Haridwar (21.8%)" data-hi="हरिद्वार (21.8%)">Haridwar (21.8%)</div>
+            </div>
+          </div>
+          <div class="highlight-card" style="border-left: 5px solid var(--green-accent);">
+            <div style="background: var(--green-light); color: var(--green-accent); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 800; flex-shrink: 0;">ST</div>
+            <div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;" data-en="Highest ST Concentration" data-hi="सर्वाधिक अ.ज.जा. सांद्रता">Highest ST Concentration</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: var(--ucost-blue-dark);" data-en="Udham Singh Nagar (7.5%)" data-hi="ऊधम सिंह नगर (7.5%)">Udham Singh Nagar (7.5%)</div>
+            </div>
+          </div>
+          <div class="highlight-card" style="border-left: 5px solid var(--ucost-blue-light);">
+            <div style="background: var(--bg-base); color: var(--ucost-blue-light); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 800; flex-shrink: 0; border: 1px solid var(--border-color);">LIT</div>
+            <div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;" data-en="Highest Literacy Rate" data-hi="सर्वाधिक साक्षरता दर">Highest Literacy Rate</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: var(--ucost-blue-dark);" data-en="Dehradun (84.3%)" data-hi="देहरादून (84.3%)">Dehradun (84.3%)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-layout">
+          <div class="main-content">
+            <section class="section">
+              <div class="section-header">
+                <div class="section-title-wrap">
+                  <h2 class="section-title">
+                    <span class="icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </span>
+                    <span data-en="${UI_TRANSLATIONS.en.stateTitle}" data-hi="${UI_TRANSLATIONS.hi.stateTitle}">${UI_TRANSLATIONS[lang].stateTitle}</span>
+                  </h2>
+                </div>
+              </div>
+              
+              <div class="controls-row">
+                <div class="segmented-control">
+                  <button class="segmented-btn ${APP.choroplethMode === 'flat' ? 'active' : ''}" onclick="setChoroplethMode('flat')">${UI_TRANSLATIONS[lang].flatMode}</button>
+                  <button class="segmented-btn ${APP.choroplethMode === 'sc' ? 'active' : ''}" onclick="setChoroplethMode('sc')">${UI_TRANSLATIONS[lang].scMode}</button>
+                  <button class="segmented-btn ${APP.choroplethMode === 'st' ? 'active' : ''}" onclick="setChoroplethMode('st')">${UI_TRANSLATIONS[lang].stMode}</button>
+                </div>
+                
+                <div class="legend-container ${APP.choroplethMode !== 'flat' ? 'active' : ''}" id="choropleth-legend">
+                  <span id="legend-min">0%</span>
+                  <div class="legend-gradient" id="legend-gradient-bar"></div>
+                  <span id="legend-max">100%</span>
+                </div>
+                
+                <button class="compare-btn" onclick="toggleCompareDrawer(true)">
+                  <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2.5;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  <span>${UI_TRANSLATIONS[lang].compareBtn}</span>
+                </button>
+              </div>
+
+              <div class="map-wrapper">
+                <div class="map-dir-badge map-dir-n" title="North / उत्तर">▲ <span data-en="N" data-hi="उ">N</span></div>
+                <div class="map-dir-badge map-dir-s" title="South / दक्षिण"><span data-en="S" data-hi="द">S</span> ▼</div>
+                <div class="map-dir-badge map-dir-w" title="West / पश्चिम" data-en="W" data-hi="प">W</div>
+                <div class="map-dir-badge map-dir-e" title="East / पूर्व" data-en="E" data-hi="पू">E</div>
+                <div id="map"></div>
+                <div class="loader-overlay" id="loader-overlay"><div class="spinner"></div></div>
+              </div>
+            </section>
+          </div>
+          
+          <div class="sidebar">
+            <div class="card">
+              <h3 class="card-title" data-en="${UI_TRANSLATIONS.en.overallCardTitle}" data-hi="${UI_TRANSLATIONS.hi.overallCardTitle}">${UI_TRANSLATIONS[lang].overallCardTitle}</h3>
+              <div class="counters-grid">
+                <div class="stat-box">
+                  <div class="stat-val" id="cnt-total">0</div>
+                  <div class="stat-pct">&nbsp;</div>
+                  <div class="stat-label" data-en="Total" data-hi="कुल">Total</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-val" id="cnt-sc">0</div>
+                  <div class="stat-pct" id="cnt-sc-pct">0%</div>
+                  <div class="stat-label" data-en="SC" data-hi="अ.जा.">SC</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-val" id="cnt-st">0</div>
+                  <div class="stat-pct" id="cnt-st-pct">0%</div>
+                  <div class="stat-label" data-en="ST" data-hi="अ.ज.जा.">ST</div>
+                </div>
+              </div>
+              <div class="donut-chart-wrapper">
+                <div id="state-donut-chart" style="width: 100%; height: 100%;"></div>
+                <div class="donut-center-label">
+                  <div class="donut-center-num" id="donut-center-num">0</div>
+                  <div class="donut-center-sub">${UI_TRANSLATIONS[lang].overallPop}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title" data-en="${UI_TRANSLATIONS.en.rankCardTitle}" data-hi="${UI_TRANSLATIONS.hi.rankCardTitle}">${UI_TRANSLATIONS[lang].rankCardTitle}</h3>
+              <div id="state-rank-chart" style="width: 100%; height: 320px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tribal Communities Section -->
+        <div class="tribal-section-wrapper" style="max-width: var(--max-width); margin: 40px auto 20px; padding: 0 24px;">
+          <div class="section-title-wrap" style="margin-bottom: 20px;">
+            <h3 class="section-title" style="font-size: 1.25rem; font-weight: 800; color: var(--ucost-blue-dark); display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.5;">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span data-en="Scheduled Tribes of Uttarakhand" data-hi="उत्तराखंड की अनुसूचित जनजातियां">Scheduled Tribes of Uttarakhand</span>
+            </h3>
+          </div>
+          <div class="tribal-grid">
+            <!-- Card 1: Bhotia -->
+            <div class="tribe-card">
+              <div class="tribe-img-wrap">
+                <img src="./tribe/Bhotia.jpg" alt="Bhotia Tribe" class="tribe-img">
+              </div>
+              <div class="tribe-info">
+                <div class="tribe-name" data-en="Bhotia" data-hi="भोटिया">Bhotia</div>
+                <div class="tribe-districts-badge" data-en="Chamoli, Pithoragarh, Uttarkashi" data-hi="चमोली, पिथौरागढ़, उत्तरकाशी">Chamoli, Pithoragarh, Uttarkashi</div>
+                <p class="tribe-desc" data-en="Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts. Traditionally engaged in trans-Himalayan trade, animal husbandry, and agriculture. Known for weaving woolen garments and carpets." data-hi="मुख्य रूप से चमोली, पिथौरागढ़ और उत्तरकाशी जिलों में पाए जाते हैं। पारंपरिक रूप से ट्रांस-हिमालयी व्यापार, पशुपालन और कृषि में लगे हुए हैं। ऊनी कपड़े और कालीन बुनने के लिए जाने जाते हैं।">Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts. Traditionally engaged in trans-Himalayan trade, animal husbandry, and agriculture. Known for weaving woolen garments and carpets.</p>
+              </div>
+            </div>
+
+            <!-- Card 2: Jaunsari -->
+            <div class="tribe-card">
+              <div class="tribe-img-wrap">
+                <img src="./tribe/Jaunsari.jpg" alt="Jaunsari Tribe" class="tribe-img">
+              </div>
+              <div class="tribe-info">
+                <div class="tribe-name" data-en="Jaunsari" data-hi="जौनसारी">Jaunsari</div>
+                <div class="tribe-districts-badge" data-en="Dehradun (Jaunsar-Bawar)" data-hi="देहरादून (जौनसार-बावर)">Dehradun (Jaunsar-Bawar)</div>
+                <p class="tribe-desc" data-en="Primarily live in the Jaunsar-Bawar region of Dehradun district. Practice agriculture and livestock rearing. Have a distinct language (Jaunsari) and rich folk traditions." data-hi="मुख्य रूप से देहरादून जिले के जौनसार-बावर क्षेत्र में रहते हैं। कृषि और पशुपालन करते हैं। इनकी एक अलग भाषा (जौनसारी) और समृद्ध लोक परंपराएं हैं।">Primarily live in the Jaunsar-Bawar region of Dehradun district. Practice agriculture and livestock rearing. Have a distinct language (Jaunsari) and rich folk traditions.</p>
+              </div>
+            </div>
+
+            <!-- Card 3: Tharu -->
+            <div class="tribe-card">
+              <div class="tribe-img-wrap">
+                <img src="./tribe/Tharu.jpg" alt="Tharu Tribe" class="tribe-img">
+              </div>
+              <div class="tribe-info">
+                <div class="tribe-name" data-en="Tharu" data-hi="थारू">Tharu</div>
+                <div class="tribe-districts-badge" data-en="Udham Singh Nagar" data-hi="उधम सिंह नगर">Udham Singh Nagar</div>
+                <p class="tribe-desc" data-en="Inhabit the Terai region, especially Udham Singh Nagar district. Traditionally depend on farming, fishing, and forest resources. Famous for vibrant folk dances and festivals." data-hi="तराई क्षेत्र, विशेष रूप से उधम सिंह नगर जिले में निवास करते हैं। पारंपरिक रूप से खेती, मछली पकड़ने और वन संसाधनों पर निर्भर हैं। जीवंत लोक नृत्यों और त्योहारों के लिए प्रसिद्ध हैं।">Inhabit the Terai region, especially Udham Singh Nagar district. Traditionally depend on farming, fishing, and forest resources. Famous for vibrant folk dances and festivals.</p>
+              </div>
+            </div>
+
+            <!-- Card 4: Buksa -->
+            <div class="tribe-card">
+              <div class="tribe-img-wrap">
+                <img src="./tribe/Buksa.jpg" alt="Buksa Tribe" class="tribe-img">
+              </div>
+              <div class="tribe-info">
+                <div class="tribe-name" data-en="Buksa (Bhoksa)" data-hi="बुक्सा (भोक्सा)">Buksa (Bhoksa)</div>
+                <div class="tribe-districts-badge" data-en="Dehradun, Nainital, Udham Singh Nagar" data-hi="देहरादून, नैनीताल, उधम सिंह नगर">Dehradun, Nainital, Udham Singh Nagar</div>
+                <p class="tribe-desc" data-en="Found in Dehradun, Nainital, and Udham Singh Nagar districts. Mainly involved in agriculture and wage labor. Recognized as one of the Scheduled Tribes of Uttarakhand." data-hi="देहरादून, नैनीताल और उधम सिंह नगर जिलों में पाए जाते हैं। मुख्य रूप से कृषि और दैनिक मजदूरी में शामिल हैं। उत्तराखंड की अनुसूचित जनजातियों में से एक के रूप में मान्यता प्राप्त है।">Found in Dehradun, Nainital, and Udham Singh Nagar districts. Mainly involved in agriculture and wage labor. Recognized as one of the Scheduled Tribes of Uttarakhand.</p>
+              </div>
+            </div>
+
+            <!-- Card 5: Raji -->
+            <div class="tribe-card">
+              <div class="tribe-img-wrap">
+                <img src="./tribe/Raji.jpg" alt="Raji Tribe" class="tribe-img">
+              </div>
+              <div class="tribe-info">
+                <div class="tribe-name" data-en="Raji" data-hi="राजी">Raji</div>
+                <div class="tribe-districts-badge" data-en="Pithoragarh, Champawat" data-hi="पिथौरागढ़, चंपावत">Pithoragarh, Champawat</div>
+                <p class="tribe-desc" data-en="Live in Pithoragarh and Champawat districts. One of India's Particularly Vulnerable Tribal Groups (PVTGs). Traditionally depended on hunting, gathering, and forest produce, though many now practice settled agriculture." data-hi="पिथौरागढ़ और चंपावत जिलों में रहते हैं। भारत के विशेष रूप से कमजोर जनजातीय समूहों (PVTGs) में से एक। पारंपरिक रूप से शिकार, संग्रहण और वनोपज पर निर्भर थे, हालांकि अब कई लोग व्यवस्थित कृषि करते हैं।">Live in Pithoragarh and Champawat districts. One of India's Particularly Vulnerable Tribal Groups (PVTGs). Traditionally depended on hunting, gathering, and forest produce, though many now practice settled agriculture.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      showLoader(true);
+      const stateGeoJSON = await loadGeoJSON('uttarakhand_state');
+      const districtsGeoJSON = await loadGeoJSON('uttarakhand_districts');
+      showLoader(false);
+
+      // Set Up active district state tracker
+      APP.activeDistrict = null;
+      APP.activeSubdistrict = null;
+
+      const stateProps = stateGeoJSON.features[0].properties;
+      const totalPop = parseInt(stateProps.total_population) || 0;
+      const scPop = parseInt(stateProps.sc_population) || 0;
+      const stPop = parseInt(stateProps.st_population) || 0;
+      const scPct = parseFloat(stateProps.sc_percent) || 0;
+      const stPct = parseFloat(stateProps.st_percent) || 0;
+
+      // Check Compare Drawer Defaults
+      if (APP.compareSelectedDistricts.length === 0) {
+        // Default check first two districts in checklist
+        APP.compareSelectedDistricts = districtsGeoJSON.features.slice(0, 3).map(f => f.properties.district_code);
+      }
+      populateCompareChecklist(districtsGeoJSON);
+
+      // Map Setup
+      const map = L.map('map', { zoomControl: true, zoomSnap: 0.1 }).setView([30.0668, 79.0193], 7.5);
+      APP.map = map;
+      setupBaseLayers(map);
+
+      // Add Base outline (static, non-interactive)
+      const parentOutline = L.geoJSON(stateGeoJSON, {
+        style: {
+          color: 'var(--ucost-blue-dark)',
+          weight: 2,
+          fillOpacity: 0,
+          interactive: false
+        }
+      }).addTo(map);
+
+      // Animation calculations & timings
+      parentOutline.eachLayer(layer => {
+        const el = layer.getElement();
+        if (el) {
+          el.classList.add('parent-outline-path');
+          const len = el.getTotalLength();
+          el.style.strokeDasharray = len;
+          el.style.strokeDashoffset = len;
+          el.getBoundingClientRect(); // reflow
+          el.style.transition = 'stroke-dashoffset 600ms ease-in-out';
+          el.style.strokeDashoffset = '0';
+        }
+      });
+
+      // Child Polygons (districts)
+      const districtsLayer = L.geoJSON(districtsGeoJSON, {
+        style: (feature) => {
+          return {
+            color: '#1E6FB5',
+            weight: 1.5,
+            fillColor: '#FFFFFF',
+            fillOpacity: 0.15
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          layer.on('mousemove', (e) => {
+            updateMapTooltipPos(e);
+          });
+          layer.on('mouseover', (e) => {
+            showMapTooltip(e, feature.properties.district_name, feature.properties.total_population, feature.properties.sc_percent, feature.properties.st_percent);
+            
+            // Highlight ranking bar chart
+            if (APP.charts.rankChart) {
+              APP.charts.rankChart.dispatchAction({
+                type: 'highlight',
+                seriesIndex: 0,
+                name: feature.properties.district_name
+              });
+              APP.charts.rankChart.dispatchAction({
+                type: 'showTip',
+                seriesIndex: 0,
+                name: feature.properties.district_name
+              });
+            }
+          });
+          layer.on('mouseout', () => {
+            hideMapTooltip();
+            if (APP.charts.rankChart) {
+              APP.charts.rankChart.dispatchAction({ type: 'downplay', seriesIndex: 0 });
+              APP.charts.rankChart.dispatchAction({ type: 'hideTip' });
+            }
+          });
+          layer.on('click', (e) => {
+            const pathEl = layer.getElement();
+            if (pathEl) {
+              pathEl.classList.add('clicked-confirm');
+            }
+            setTimeout(() => {
+              window.location.hash = `#/district/${feature.properties.district_code}`;
+            }, 220);
+          });
+        }
+      }).addTo(map);
+
+      // Stagger entrance children
+      let idx = 0;
+      districtsLayer.eachLayer(layer => {
+        const el = layer.getElement();
+        if (el) {
+          el.classList.add('child-polygon');
+          el.style.transform = 'scale(0.9)';
+          el.style.opacity = '0';
+          el.style.transformOrigin = 'center';
+          el.style.transition = 'opacity 300ms ease-out, transform 300ms ease-out, fill 400ms ease-in-out, filter 180ms ease-out, stroke 180ms ease-out, stroke-width 180ms ease-out';
+          
+          const delay = isLangSwitch ? 0 : 900 + (idx * 80);
+          setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1)';
+            
+            setTimeout(() => {
+              el.classList.add('pulsing');
+              el.style.animationDelay = `${idx * 80}ms`;
+            }, 300);
+          }, delay);
+          
+          // Attach layer mapping reference
+          layer.districtCode = layer.feature.properties.district_code;
+          idx++;
+        }
+      });
+
+      APP.districtsLayer = districtsLayer;
+      updateChoroplethColors(false);
+
+      // Counters Animation Delay
+      const animationWait = isLangSwitch ? 0 : 900 + (13 * 80) + 300;
+      setTimeout(() => {
+        animateCounter(document.getElementById('cnt-total'), totalPop);
+        animateCounter(document.getElementById('cnt-sc'), scPop);
+        animateCounter(document.getElementById('cnt-st'), stPop);
+        animateCounter(document.getElementById('donut-center-num'), totalPop);
+        
+        document.getElementById('cnt-sc-pct').textContent = `${scPct.toFixed(1)}%`;
+        document.getElementById('cnt-st-pct').textContent = `${stPct.toFixed(1)}%`;
+      }, animationWait);
+
+      // Donut Chart ECharts Build
+      const donutEl = document.getElementById('state-donut-chart');
+      const donutChart = echarts.init(donutEl);
+      APP.charts.donutChart = donutChart;
+
+      const donutOption = {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+          bottom: '0%',
+          left: 'center',
+          itemWidth: 10,
+          itemHeight: 10,
+          textStyle: { fontFamily: 'inherit', fontSize: 11, fontWeight: 'bold' }
+        },
+        series: [
+          {
+            name: UI_TRANSLATIONS[lang].overallPop,
+            type: 'pie',
+            radius: ['55%', '75%'],
+            center: ['50%', '42%'],
+            avoidLabelOverlap: false,
+            label: { show: false },
+            emphasis: { label: { show: false } },
+            labelLine: { show: false },
+            data: [
+              { value: scPop, name: UI_TRANSLATIONS[lang].scPop, itemStyle: { color: '#0B3D6E' } },
+              { value: stPop, name: UI_TRANSLATIONS[lang].stPop, itemStyle: { color: '#128807' } },
+              { value: totalPop - scPop - stPop, name: UI_TRANSLATIONS[lang].otherPop, itemStyle: { color: '#D0D5DD' } }
+            ],
+            animationType: 'scale',
+            animationEasing: 'elasticOut',
+            animationDuration: 900
+          }
+        ]
+      };
+      donutChart.setOption(donutOption);
+
+      // Ranking Chart build (Staggered grow horizontal bar chart)
+      const rankEl = document.getElementById('state-rank-chart');
+      const rankChart = echarts.init(rankEl);
+      APP.charts.rankChart = rankChart;
+
+      // Compute Combined stats & sort descending
+      const districtRankData = districtsGeoJSON.features.map(f => {
+        const p = f.properties;
+        return {
+          name: p.district_name,
+          code: p.district_code,
+          scPct: parseFloat(p.sc_percent) || 0,
+          stPct: parseFloat(p.st_percent) || 0,
+          combinedPct: (parseFloat(p.sc_percent) || 0) + (parseFloat(p.st_percent) || 0)
+        };
+      }).sort((a, b) => a.combinedPct - b.combinedPct); // ECharts horizontal bars rank from bottom-up
+
+      const yAxisNames = districtRankData.map(d => d.name);
+      const combinedValues = districtRankData.map(d => d.combinedPct);
+
+      const rankOption = {
+        grid: { left: '3%', right: '8%', top: '3%', bottom: '3%', containLabel: true },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          formatter: function(params) {
+            const item = districtRankData[params[0].dataIndex];
+            return `<strong>${item.name}</strong><br/>` +
+                   `${UI_TRANSLATIONS[lang].scPop}: ${item.scPct.toFixed(1)}%<br/>` +
+                   `${UI_TRANSLATIONS[lang].stPop}: ${item.stPct.toFixed(1)}%<br/>` +
+                   `Combined: ${item.combinedPct.toFixed(1)}%`;
+          }
+        },
+        xAxis: {
+          type: 'value',
+          axisLabel: { formatter: '{value}%', fontSize: 10 },
+          splitLine: { lineStyle: { type: 'dashed' } }
+        },
+        yAxis: {
+          type: 'category',
+          data: yAxisNames,
+          axisLabel: { interval: 0, fontSize: 10, fontWeight: 'bold' }
+        },
+        series: [
+          {
+            type: 'bar',
+            data: combinedValues,
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                { offset: 0, color: '#1E6FB5' },
+                { offset: 1, color: '#0B3D6E' }
+              ]),
+              borderRadius: [0, 4, 4, 0]
+            },
+            animationEasing: 'cubicOut',
+            animationDelay: function (idx) { return idx * 60; }
+          }
+        ]
+      };
+      rankChart.setOption(rankOption);
+
+      // Chart Cross highlighting events
+      rankChart.on('mouseover', (params) => {
+        const item = districtRankData[params.dataIndex];
+        districtsLayer.eachLayer(layer => {
+          if (layer.districtCode === item.code) {
+            const el = layer.getElement();
+            if (el) {
+              el.classList.add('clicked-confirm');
+            }
+          }
+        });
+      });
+      rankChart.on('mouseout', (params) => {
+        districtsLayer.eachLayer(layer => {
+          const el = layer.getElement();
+          if (el) el.classList.remove('clicked-confirm');
+        });
+      });
+    }
+
+    // Dynamic Color Mode Recolor trigger
+    window.setChoroplethMode = function(mode) {
+      APP.choroplethMode = mode;
+      
+      const segmentedControl = document.querySelector('.segmented-control');
+      if (segmentedControl) {
+        segmentedControl.querySelectorAll('.segmented-btn').forEach(btn => {
+          btn.classList.remove('active');
+          if (btn.textContent === UI_TRANSLATIONS[APP.currentLang][mode + 'Mode']) {
+            btn.classList.add('active');
+          }
+        });
+      }
+      
+      // Update toggle buttons active class locally
+      const btns = document.querySelectorAll('.segmented-btn');
+      const labels = [UI_TRANSLATIONS[APP.currentLang].flatMode, UI_TRANSLATIONS[APP.currentLang].scMode, UI_TRANSLATIONS[APP.currentLang].stMode];
+      btns.forEach((btn, idx) => {
+        btn.classList.toggle('active', (mode === 'flat' && idx === 0) || (mode === 'sc' && idx === 1) || (mode === 'st' && idx === 2));
+      });
+
+      const legend = document.getElementById('choropleth-legend');
+      const gradient = document.getElementById('legend-gradient-bar');
+      const minEl = document.getElementById('legend-min');
+      const maxEl = document.getElementById('legend-max');
+      const lang = APP.currentLang;
+
+      if (mode === 'flat') {
+        legend.classList.remove('active');
+      } else {
+        legend.classList.add('active');
+        if (mode === 'sc') {
+          gradient.style.background = 'linear-gradient(to right, #FCE7F3, #9D174D)';
+          minEl.textContent = `${UI_TRANSLATIONS[lang].minLabel}: 12.3%`;
+          maxEl.textContent = `${UI_TRANSLATIONS[lang].maxLabel}: 32.5%`;
+        } else {
+          gradient.style.background = 'linear-gradient(to right, #E8F5E3, #0b5704)';
+          minEl.textContent = `${UI_TRANSLATIONS[lang].minLabel}: 0.1%`;
+          maxEl.textContent = `${UI_TRANSLATIONS[lang].maxLabel}: 22.0%`;
+        }
+      }
+
+      updateChoroplethColors(true);
+    };
+
+    function updateChoroplethColors(animate) {
+      if (!APP.districtsLayer) return;
+      const mode = APP.choroplethMode;
+
+      APP.districtsLayer.eachLayer(layer => {
+        const props = layer.feature.properties;
+        let fill = '#FFFFFF';
+        let op = APP.satelliteActive ? 0.25 : 0.15;
+        let stroke = APP.satelliteActive ? '#FFFFFF' : '#1E6FB5';
+        let weight = APP.satelliteActive ? 2.5 : 1.5;
+
+        if (mode === 'sc') {
+          const val = parseFloat(props.sc_percent) || 0;
+          // Normalize between min (12.3) and max (32.5) using Pink hues
+          const factor = Math.min(1, Math.max(0, (val - 12.3) / (32.5 - 12.3)));
+          fill = interpolateColor('#FCE7F3', '#9D174D', factor);
+          op = 0.85;
+          stroke = APP.satelliteActive ? '#FFFFFF' : '#9D174D';
+          weight = APP.satelliteActive ? 2.5 : 1;
+        } else if (mode === 'st') {
+          const val = parseFloat(props.st_percent) || 0;
+          // Normalize between min (0.1) and max (22.0) using Green hues
+          const factor = Math.min(1, Math.max(0, (val - 0.1) / (22.0 - 0.1)));
+          fill = interpolateColor('#E8F5E3', '#0b5704', factor);
+          op = 0.85;
+          stroke = APP.satelliteActive ? '#FFFFFF' : '#128807';
+          weight = APP.satelliteActive ? 2.5 : 1;
+        }
+
+        layer.setStyle({
+          fillColor: fill,
+          fillOpacity: op,
+          color: stroke,
+          weight: weight
+        });
+      });
+    }
+
+    /* ===========================================
+       PAGE 2: DISTRICT LEVEL BUILDER
+    =========================================== */
+    async function buildDistrictPage(districtCode, isLangSwitch) {
+      const lang = APP.currentLang;
+      const appContainer = document.getElementById('app-container');
+
+      showLoader(true);
+      const stateGeoJSON = await loadGeoJSON('uttarakhand_state');
+      const districtsGeoJSON = await loadGeoJSON('uttarakhand_districts');
+      const subdistrictsGeoJSON = await loadGeoJSON('uttarakhand_subdistricts');
+      showLoader(false);
+
+      // Find selected district properties
+      const district = districtsGeoJSON.features.find(f => f.properties.district_code === districtCode);
+      if (!district) {
+        window.location.hash = '#/state';
+        return;
+      }
+
+      APP.activeDistrict = district;
+      APP.activeSubdistrict = null;
+
+      const p = district.properties;
+      const totalPop = parseInt(p.total_population) || 0;
+      const scPop = parseInt(p.sc_population) || 0;
+      const stPop = parseInt(p.st_population) || 0;
+      const scPct = parseFloat(p.sc_percent) || 0;
+      const stPct = parseFloat(p.st_percent) || 0;
+
+      appContainer.innerHTML = `
+        <div class="page-layout">
+          <div class="main-content">
+            <section class="section">
+              <div class="section-header">
+                <div class="section-title-wrap">
+                  <h2 class="section-title">
+                    <span class="icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </span>
+                    <span>${UI_TRANSLATIONS[lang].districtTitle}${p.district_name}</span>
+                  </h2>
+                </div>
+              </div>
+
+              <div class="map-wrapper">
+                <div class="map-dir-badge map-dir-n" title="North / उत्तर">▲ <span data-en="N" data-hi="उ">N</span></div>
+                <div class="map-dir-badge map-dir-s" title="South / दक्षिण"><span data-en="S" data-hi="द">S</span> ▼</div>
+                <div class="map-dir-badge map-dir-w" title="West / पश्चिम" data-en="W" data-hi="प">W</div>
+                <div class="map-dir-badge map-dir-e" title="East / पूर्व" data-en="E" data-hi="पू">E</div>
+                <div id="map"></div>
+                <div class="loader-overlay" id="loader-overlay"><div class="spinner"></div></div>
+              </div>
+            </section>
+          </div>
+
+          <div class="sidebar">
+            <div class="card">
+              <h3 class="card-title">${p.district_name} — ${UI_TRANSLATIONS[lang].overallCardTitle}</h3>
+              <div class="counters-grid">
+                <div class="stat-box">
+                  <div class="stat-val" id="cnt-total">0</div>
+                  <div class="stat-pct">&nbsp;</div>
+                  <div class="stat-label" data-en="Total" data-hi="कुल">Total</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-val" id="cnt-sc">0</div>
+                  <div class="stat-pct" id="cnt-sc-pct">0%</div>
+                  <div class="stat-label" data-en="SC" data-hi="अ.जा.">SC</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-val" id="cnt-st">0</div>
+                  <div class="stat-pct" id="cnt-st-pct">0%</div>
+                  <div class="stat-label" data-en="ST" data-hi="अ.ज.जा.">ST</div>
+                </div>
+              </div>
+              <div class="donut-chart-wrapper">
+                <div id="district-donut-chart" style="width: 100%; height: 100%;"></div>
+                <div class="donut-center-label">
+                  <div class="donut-center-num" id="donut-center-num">0</div>
+                  <div class="donut-center-sub">${UI_TRANSLATIONS[lang].overallPop}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title" data-en="SC/ST Concentration Rank" data-hi="अ.जा./अ.ज.जा. सांद्रता रैंकिंग">SC/ST Concentration Rank</h3>
+              <div id="district-rank-chart" style="width: 100%; height: 180px;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Filter sub-districts
+      const localSubdistricts = {
+        type: 'FeatureCollection',
+        features: subdistrictsGeoJSON.features.filter(f => f.properties.district_code === districtCode)
+      };
+
+      // Map Setup
+      const map = L.map('map', { zoomControl: true, zoomSnap: 0.1 });
+      APP.map = map;
+      setupBaseLayers(map);
+      
+      // Inject Hatch definition for this map
+      injectHatchPattern(map);
+
+      // Render dimmed state background
+      L.geoJSON(stateGeoJSON, {
+        style: {
+          color: 'var(--ucost-blue-light)',
+          weight: 1,
+          fillOpacity: 0,
+          className: 'state-background-dimmed',
+          interactive: false
+        }
+      }).addTo(map);
+
+      // Render emphasized active district boundary
+      const districtBoundary = L.geoJSON(district, {
+        style: {
+          color: 'var(--ucost-blue-dark)',
+          weight: 2.5,
+          fillOpacity: 0.05,
+          interactive: false
+        }
+      }).addTo(map);
+
+      // Auto fit map bounds
+      map.fitBounds(districtBoundary.getBounds(), { padding: [50, 50] });
+
+      // Animate parent outline
+      districtBoundary.eachLayer(layer => {
+        const el = layer.getElement();
+        if (el) {
+          el.classList.add('parent-outline-path');
+          const len = el.getTotalLength();
+          el.style.strokeDasharray = len;
+          el.style.strokeDashoffset = len;
+          el.getBoundingClientRect();
+          el.style.transition = 'stroke-dashoffset 600ms ease-in-out';
+          el.style.strokeDashoffset = '0';
+        }
+      });
+
+      // Interactive Subdistricts
+      const subdistrictsLayer = L.geoJSON(localSubdistricts, {
+        style: (feature) => {
+          const avail = feature.properties.census_2011_data_available;
+          if (avail === false || avail === "false") {
+            return {
+              fillColor: 'url(#diagonal-hatch)',
+              fillOpacity: 1,
+              color: '#9CA3AF',
+              weight: 1.5
+            };
+          }
+          return {
+            color: '#1E6FB5',
+            weight: 1.5,
+            fillColor: '#FFFFFF',
+            fillOpacity: 0.2
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const pSub = feature.properties;
+          const isAvail = pSub.census_2011_data_available;
+          
+          layer.on('mousemove', (e) => {
+            updateMapTooltipPos(e);
+          });
+          layer.on('mouseover', (e) => {
+            if (isAvail === false || isAvail === "false") {
+              // Diagonal hatch layout tooltip
+              tooltipEl.innerHTML = `<div class="custom-tooltip-title">${pSub.subdistrict_name}</div><div style="font-size:0.75rem; color:var(--saffron-accent); font-weight:600;">${UI_TRANSLATIONS[lang].notAvailable}</div>`;
+              tooltipEl.classList.add('visible');
+              updateMapTooltipPos(e);
+            } else {
+              showMapTooltip(e, pSub.subdistrict_name, pSub.total_population, pSub.sc_percent, pSub.st_percent);
+            }
+          });
+          layer.on('mouseout', () => {
+            hideMapTooltip();
+          });
+          layer.on('click', () => {
+            const pathEl = layer.getElement();
+            if (pathEl) {
+              pathEl.classList.add('clicked-confirm');
+            }
+            setTimeout(() => {
+              window.location.hash = `#/subdistrict/${districtCode}/${pSub.subdistrict_code}`;
+            }, 220);
+          });
+        }
+      }).addTo(map);
+      APP.subdistrictsLayer = subdistrictsLayer;
+      applyActiveMapStyles();
+
+      // Stagger entrance children
+      let idx = 0;
+      subdistrictsLayer.eachLayer(layer => {
+        const el = layer.getElement();
+        if (el) {
+          el.classList.add('child-polygon');
+          el.style.transform = 'scale(0.9)';
+          el.style.opacity = '0';
+          el.style.transformOrigin = 'center';
+          el.style.transition = 'opacity 300ms ease-out, transform 300ms ease-out, filter 180ms ease-out, stroke 180ms ease-out, stroke-width 180ms ease-out';
+          
+          const delay = isLangSwitch ? 0 : 900 + (idx * 80);
+          setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1)';
+          }, delay);
+          idx++;
+        }
+      });
+
+      // Counters Animation
+      const animationWait = isLangSwitch ? 0 : 900 + (localSubdistricts.features.length * 80) + 300;
+      setTimeout(() => {
+        animateCounter(document.getElementById('cnt-total'), totalPop);
+        animateCounter(document.getElementById('cnt-sc'), scPop);
+        animateCounter(document.getElementById('cnt-st'), stPop);
+        animateCounter(document.getElementById('donut-center-num'), totalPop);
+        
+        document.getElementById('cnt-sc-pct').textContent = `${scPct.toFixed(1)}%`;
+        document.getElementById('cnt-st-pct').textContent = `${stPct.toFixed(1)}%`;
+      }, animationWait);
+
+      // Donut Chart Build
+      const donutEl = document.getElementById('district-donut-chart');
+      const donutChart = echarts.init(donutEl);
+      APP.charts.donutChart = donutChart;
+
+      donutChart.setOption({
+        tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+        legend: {
+          bottom: '0%',
+          left: 'center',
+          itemWidth: 10,
+          itemHeight: 10,
+          textStyle: { fontSize: 11, fontStyle: 'normal', fontWeight: 'bold' }
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: ['55%', '75%'],
+            center: ['50%', '42%'],
+            avoidLabelOverlap: false,
+            label: { show: false },
+            emphasis: { label: { show: false } },
+            labelLine: { show: false },
+            data: [
+              { value: scPop, name: UI_TRANSLATIONS[lang].scPop, itemStyle: { color: '#0B3D6E' } },
+              { value: stPop, name: UI_TRANSLATIONS[lang].stPop, itemStyle: { color: '#128807' } },
+              { value: totalPop - scPop - stPop, name: UI_TRANSLATIONS[lang].otherPop, itemStyle: { color: '#D0D5DD' } }
+            ],
+            animationType: 'scale',
+            animationEasing: 'elasticOut',
+            animationDuration: 900
+          }
+        ]
+      });
+
+      // Rank chart for current district among all 13
+      const rankEl = document.getElementById('district-rank-chart');
+      const rankChart = echarts.init(rankEl);
+      APP.charts.rankChart = rankChart;
+
+      const rankedList = districtsGeoJSON.features.map(f => {
+        const properties = f.properties;
+        return {
+          name: properties.district_name,
+          code: properties.district_code,
+          combined: (parseFloat(properties.sc_percent) || 0) + (parseFloat(properties.st_percent) || 0)
+        };
+      }).sort((a, b) => b.combined - a.combined);
+
+      const rankIndex = rankedList.findIndex(d => d.code === districtCode) + 1;
+
+      rankChart.setOption({
+        series: [{
+          type: 'gauge',
+          startAngle: 180,
+          endAngle: 0,
+          min: 1,
+          max: 13,
+          splitNumber: 12,
+          radius: '95%',
+          center: ['50%', '80%'],
+          axisLine: {
+            lineStyle: {
+              width: 14,
+              color: [
+                [0.3, '#128807'],
+                [0.7, '#FF9933'],
+                [1.0, '#0B3D6E']
+              ]
+            }
+          },
+          pointer: { icon: 'path://M12.8,0.7l12,20.1c0.6,1,0.3,2.4-0.8,3c-0.3,0.2-0.7,0.2-1,0.2H1.6c-1.2,0-2.2-1-2.2-2.2c0-0.4,0.1-0.7,0.3-1L11.7,0.7C12,0.2,12.4,0,12.8,0.7z', length: '75%', width: 6, offsetCenter: [0, 5], itemStyle: { color: 'auto' } },
+          axisTick: { length: 4, lineStyle: { color: '#auto', width: 1 } },
+          splitLine: { length: 8, lineStyle: { color: '#auto', width: 1.5 } },
+          axisLabel: { show: false },
+          title: { offsetCenter: [0, '-20%'], fontSize: 13, fontWeight: 'bold' },
+          detail: {
+            offsetCenter: [0, '25%'],
+            valueAnimation: true,
+            formatter: function (value) {
+              return lang === 'hi' ? `रैंक: ${Math.round(value)}/13` : `Rank: ${Math.round(value)}/13`;
+            },
+            fontSize: 14,
+            fontWeight: '800',
+            color: 'var(--ucost-blue-dark)'
+          },
+          data: [{
+            value: rankIndex,
+            name: p.district_name
+          }]
+        }]
+      });
+    }
+
+    /* ===========================================
+       PAGE 3: SUB-DISTRICT LEVEL BUILDER
+    =========================================== */
+    let allSubdistrictVillages = [];
+
+    async function buildSubdistrictPage(districtCode, subdistrictCode, isLangSwitch) {
+      const lang = APP.currentLang;
+      const appContainer = document.getElementById('app-container');
+
+      showLoader(true);
+      const subdistrictsGeoJSON = await loadGeoJSON('uttarakhand_subdistricts');
+      const districtsGeoJSON = await loadGeoJSON('uttarakhand_districts');
+      const villagesGeoJSON = await loadGeoJSON('villages');
+      showLoader(false);
+
+      // Find Sub-district Polygon
+      const subdistrict = subdistrictsGeoJSON.features.find(f => f.properties.district_code === districtCode && f.properties.subdistrict_code === subdistrictCode);
+      const district = districtsGeoJSON.features.find(f => f.properties.district_code === districtCode);
+      
+      if (!subdistrict) {
+        window.location.hash = '#/state';
+        return;
+      }
+
+      APP.activeDistrict = district;
+      APP.activeSubdistrict = subdistrict;
+
+      const p = subdistrict.properties;
+      const isCensusAvail = p.census_2011_data_available;
+
+      // Filter villages for this sub-district
+      allSubdistrictVillages = villagesGeoJSON.features.filter(f => f.properties.district_code === districtCode && f.properties.subdistrict_code === subdistrictCode);
+
+      // Reset selected village state
+      APP.selectedVillage = null;
+      let activeMarker = null;
+      let activePing = null;
+
+      appContainer.innerHTML = `
+        <div class="page-layout">
+          <div class="main-content">
+            <section class="section">
+              <div class="section-header">
+                <div class="section-title-wrap">
+                  <h2 class="section-title">
+                    <span class="icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </span>
+                    <span>${UI_TRANSLATIONS[lang].subdistrictTitle}${p.subdistrict_name}</span>
+                  </h2>
+                </div>
+              </div>
+
+              <div class="map-wrapper">
+                <div class="map-dir-badge map-dir-n" title="North / उत्तर">▲ <span data-en="N" data-hi="उ">N</span></div>
+                <div class="map-dir-badge map-dir-s" title="South / दक्षिण"><span data-en="S" data-hi="द">S</span> ▼</div>
+                <div class="map-dir-badge map-dir-w" title="West / पश्चिम" data-en="W" data-hi="प">W</div>
+                <div class="map-dir-badge map-dir-e" title="East / पूर्व" data-en="E" data-hi="पू">E</div>
+                <div id="map"></div>
+                <div class="loader-overlay" id="loader-overlay"><div class="spinner"></div></div>
+              </div>
+            </section>
+
+            <!-- Village Detail Card Section -->
+            <div id="village-detail-section">
+              <div class="card" style="padding: 32px; text-align: center; color: var(--text-muted); font-weight: 500;">
+                <p data-en="${UI_TRANSLATIONS.en.noVillageSelected}" data-hi="${UI_TRANSLATIONS.hi.noVillageSelected}">${UI_TRANSLATIONS[lang].noVillageSelected}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar">
+            <!-- Village live search list -->
+            <div class="card" style="padding: 16px; margin-bottom: 24px;">
+              <h3 class="card-title" style="margin-bottom: 12px;" data-en="Villages Search" data-hi="ग्राम खोजें">Villages Search</h3>
+              <div class="search-list-wrapper">
+                <div class="village-search-input-wrapper">
+                  <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" id="village-search-box" data-en="${UI_TRANSLATIONS.en.searchPlaceholder}" data-hi="${UI_TRANSLATIONS.hi.searchPlaceholder}" placeholder="${UI_TRANSLATIONS[lang].searchPlaceholder}" autocomplete="off">
+                </div>
+                <div class="village-list" id="village-list-rows">
+                  <!-- Rows generated dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Panel -->
+            <div id="subdistrict-stats-panel">
+              <!-- Dynamically populated stats donut & counters or 2011 census warning -->
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Build Subdistrict Stats Sidebar Panel
+      const statsPanel = document.getElementById('subdistrict-stats-panel');
+      if (isCensusAvail === false || isCensusAvail === "false") {
+        statsPanel.innerHTML = `
+          <div class="card" style="border-color: var(--saffron-accent); background: var(--saffron-light);">
+            <p style="font-size: 0.85rem; font-weight: 600; color: var(--ucost-blue-dark); text-align: center;">
+              ${UI_TRANSLATIONS[lang].notAvailable}
+            </p>
+          </div>
+        `;
+      } else {
+        const totalPop = parseInt(p.total_population) || 0;
+        const scPop = parseInt(p.sc_population) || 0;
+        const stPop = parseInt(p.st_population) || 0;
+        const scPct = parseFloat(p.sc_percent) || 0;
+        const stPct = parseFloat(p.st_percent) || 0;
+
+        statsPanel.innerHTML = `
+          <div class="card">
+            <h3 class="card-title">${p.subdistrict_name} — ${UI_TRANSLATIONS[lang].overallCardTitle}</h3>
+            <div class="counters-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="cnt-total">0</div>
+                <div class="stat-pct">&nbsp;</div>
+                <div class="stat-label" data-en="Total" data-hi="कुल">Total</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="cnt-sc">0</div>
+                <div class="stat-pct" id="cnt-sc-pct">0%</div>
+                <div class="stat-label" data-en="SC" data-hi="अ.जा.">SC</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="cnt-st">0</div>
+                <div class="stat-pct" id="cnt-st-pct">0%</div>
+                <div class="stat-label" data-en="ST" data-hi="अ.ज.जा.">ST</div>
+              </div>
+            </div>
+            <div class="donut-chart-wrapper">
+              <div id="subdistrict-donut-chart" style="width: 100%; height: 100%;"></div>
+              <div class="donut-center-label">
+                <div class="donut-center-num" id="donut-center-num">0</div>
+                <div class="donut-center-sub">${UI_TRANSLATIONS[lang].overallPop}</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Donut Chart initialization
+        setTimeout(() => {
+          const donutEl = document.getElementById('subdistrict-donut-chart');
+          if (donutEl) {
+            const donutChart = echarts.init(donutEl);
+            APP.charts.donutChart = donutChart;
+            donutChart.setOption({
+              tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+              legend: {
+                bottom: '0%', left: 'center', itemWidth: 10, itemHeight: 10,
+                textStyle: { fontSize: 11, fontWeight: 'bold' }
+              },
+              series: [{
+                type: 'pie', radius: ['55%', '75%'], center: ['50%', '42%'],
+                avoidLabelOverlap: false, label: { show: false }, emphasis: { label: { show: false } },
+                data: [
+                  { value: scPop, name: UI_TRANSLATIONS[lang].scPop, itemStyle: { color: '#0B3D6E' } },
+                  { value: stPop, name: UI_TRANSLATIONS[lang].stPop, itemStyle: { color: '#128807' } },
+                  { value: totalPop - scPop - stPop, name: UI_TRANSLATIONS[lang].otherPop, itemStyle: { color: '#D0D5DD' } }
+                ],
+                animationType: 'scale', animationEasing: 'elasticOut', animationDuration: 900
+              }]
+            });
+          }
+          
+          animateCounter(document.getElementById('cnt-total'), totalPop);
+          animateCounter(document.getElementById('cnt-sc'), scPop);
+          animateCounter(document.getElementById('cnt-st'), stPop);
+          animateCounter(document.getElementById('donut-center-num'), totalPop);
+          
+          document.getElementById('cnt-sc-pct').textContent = `${scPct.toFixed(1)}%`;
+          document.getElementById('cnt-st-pct').textContent = `${stPct.toFixed(1)}%`;
+        }, 100);
+      }
+
+      // Map Setup
+      const map = L.map('map', { zoomControl: true, zoomSnap: 0.1 });
+      APP.map = map;
+      setupBaseLayers(map);
+
+      const subdistrictBoundary = L.geoJSON(subdistrict, {
+        style: {
+          color: 'var(--ucost-blue-dark)',
+          weight: 2.5,
+          fillColor: 'rgba(30, 111, 181, 0.05)',
+          fillOpacity: 1,
+          interactive: false // Static, no interaction on shape boundary itself
+        }
+      }).addTo(map);
+      APP.subdistrictBoundary = subdistrictBoundary;
+      applyActiveMapStyles();
+
+      map.fitBounds(subdistrictBoundary.getBounds(), { padding: [50, 50] });
+
+      // Show temporary subdistrict name popup and remove after 2 seconds
+      if (isCensusAvail !== false && isCensusAvail !== "false") {
+        const center = subdistrictBoundary.getBounds().getCenter();
+        const tempPopup = L.popup({
+          closeButton: false,
+          className: 'subdistrict-temp-popup',
+          offset: [0, -10]
+        })
+        .setLatLng(center)
+        .setContent(`
+          <div style="padding: 4px 8px; text-align: center;">
+            <div style="font-weight: 800; color: var(--ucost-blue-dark); font-size: 0.9rem;">${p.subdistrict_name}</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">
+              <span data-en="Total Pop" data-hi="कुल जनसंख्या">Total Pop</span>: ${parseInt(p.total_population).toLocaleString('en-IN')}
+            </div>
+          </div>
+        `)
+        .openOn(map);
+
+        setTimeout(() => {
+          if (APP.map && map.hasLayer(tempPopup)) {
+            map.closePopup(tempPopup);
+          }
+        }, 2000);
+      }
+
+      // Outline draw entrance
+      subdistrictBoundary.eachLayer(layer => {
+        const el = layer.getElement();
+        if (el) {
+          el.classList.add('parent-outline-path-p3');
+          const len = el.getTotalLength();
+          el.style.strokeDasharray = len;
+          el.style.strokeDashoffset = len;
+          el.getBoundingClientRect();
+          el.style.transition = 'stroke-dashoffset 600ms ease-in-out';
+          el.style.strokeDashoffset = '0';
+        }
+      });
+
+      // Setup Search and scroll lists
+      const searchBox = document.getElementById('village-search-box');
+      
+      function renderVillageList(filterQuery = '') {
+        const listContainer = document.getElementById('village-list-rows');
+        if (!listContainer) return;
+
+        const filtered = allSubdistrictVillages.filter(v => 
+          v.properties.census_village_name.toLowerCase().includes(filterQuery.toLowerCase())
+        );
+
+        if (filtered.length === 0) {
+          listContainer.innerHTML = `<div class="empty-state">${UI_TRANSLATIONS[lang].noVillageData}</div>`;
+          return;
+        }
+
+        listContainer.innerHTML = filtered.map(v => {
+          const props = v.properties;
+          const isSelected = APP.selectedVillage && APP.selectedVillage.properties.village_code === props.village_code;
+          return `
+            <div class="village-row ${isSelected ? 'selected' : ''}" onclick="selectVillageByCode('${props.village_code}')">
+              <span>${props.census_village_name}</span>
+              <span class="vol">Pop: ${parseInt(props.total_population).toLocaleString('en-IN')}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      searchBox.addEventListener('input', (e) => {
+        renderVillageList(e.target.value);
+      });
+
+      renderVillageList();
+
+      // Expose globally for list triggers
+      window.selectVillageByCode = function(villageCode) {
+        const village = allSubdistrictVillages.find(v => v.properties.village_code === villageCode);
+        if (village) selectVillage(village);
+      };
+
+      // Select Village Handler
+      function selectVillage(village) {
+        APP.selectedVillage = village;
+        
+        // Highlight active list row
+        const rows = document.querySelectorAll('.village-row');
+        rows.forEach(r => r.classList.remove('selected'));
+        renderVillageList(searchBox.value); // keep search filter, but refresh selected indicators
+        
+        const coords = [village.geometry.coordinates[1], village.geometry.coordinates[0]];
+        
+        // Fade-out previous marker if exists
+        if (activeMarker) {
+          const el = activeMarker.getElement();
+          if (el) {
+            el.style.transition = 'opacity 200ms ease-out';
+            el.style.opacity = '0';
+          }
+          const oldMarker = activeMarker;
+          setTimeout(() => oldMarker.remove(), 200);
+        }
+
+        // Add Saffron pulsing point pin marker
+        const pingIcon = L.divIcon({
+          className: 'village-ping-container',
+          html: `
+            <div class="ping-ring"></div>
+            <div class="ping-dot"></div>
+          `,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+
+        activeMarker = L.marker(coords, { icon: pingIcon }).addTo(map);
+
+        // Smooth FlyTo Pan centering, keeping boundary context
+        const maxFitZoom = Math.min(map.getBoundsZoom(subdistrictBoundary.getBounds()), 11);
+        map.flyTo(coords, maxFitZoom, {
+          duration: 0.6
+        });
+
+        // Update Village Detail Card
+        buildVillageDetailCard(village, p);
+      }
+    }
+
+    // Detail village card builders
+    function buildVillageDetailCard(village, parentSubProps) {
+      const lang = APP.currentLang;
+      const container = document.getElementById('village-detail-section');
+      const v = village.properties;
+
+      const totalPop = parseInt(v.total_population) || 0;
+      const malePop = parseInt(v.male_population) || 0;
+      const femalePop = parseInt(v.female_population) || 0;
+      const households = parseInt(v.households) || 0;
+      const scPop = parseInt(v.sc_population) || 0;
+      const stPop = parseInt(v.st_population) || 0;
+      const scPct = parseFloat(v.sc_percent) || 0;
+      const stPct = parseFloat(v.st_percent) || 0;
+      const workers = parseInt(v.total_workers) || 0;
+      const litPop = parseInt(v.literate_population) || 0;
+      const litPct = parseFloat(v.literacy_percent) || 0;
+
+      const pSc = parseFloat(parentSubProps.sc_percent) || 0;
+      const pSt = parseFloat(parentSubProps.st_percent) || 0;
+
+      container.innerHTML = `
+        <div class="card village-detail-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${v.census_village_name}</h3>
+              <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                ${parentSubProps.subdistrict_name} · ${APP.activeDistrict.properties.district_name}
+              </span>
+            </div>
+            
+            <div class="download-btn-cluster" style="margin-top:0;">
+              <button class="download-btn" onclick="exportVillageCSV()">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <span data-en="${UI_TRANSLATIONS.en.downloadCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadCsv}">${UI_TRANSLATIONS[lang].downloadCsv}</span>
+              </button>
+              <button class="download-btn" onclick="exportSubdistrictCSV()">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <span data-en="${UI_TRANSLATIONS.en.downloadSubdistrictCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadSubdistrictCsv}">${UI_TRANSLATIONS[lang].downloadSubdistrictCsv}</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 24px; margin-top: 20px;">
+            <!-- Left Side: Simple Demographics list -->
+            <div style="display: flex; flex-direction: column; gap: 12px; background: var(--bg-base); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);" data-en="Total Population" data-hi="कुल जनसंख्या">Total Population</span>
+                <span style="font-size: 1.15rem; font-weight: 800; color: var(--ucost-blue-dark);">${totalPop.toLocaleString('en-IN')}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);" data-en="Households" data-hi="परिवार">Households</span>
+                <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${households.toLocaleString('en-IN')}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);" data-en="Total Workers" data-hi="कुल श्रमिक">Total Workers</span>
+                <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${workers.toLocaleString('en-IN')}</span>
+              </div>
+              
+              <!-- Gender Split Indicator -->
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">
+                  <span data-en="Male / Female split" data-hi="पुरुष / महिला विभाजन">Male / Female split</span>
+                  <span>${((malePop/Math.max(1, totalPop))*100).toFixed(0)}% / ${((femalePop/Math.max(1, totalPop))*100).toFixed(0)}%</span>
+                </div>
+                <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; display: flex;">
+                  <div style="width: ${((malePop/Math.max(1, totalPop))*100)}%; background: var(--ucost-blue); height: 100%;"></div>
+                  <div style="width: ${((femalePop/Math.max(1, totalPop))*100)}%; background: var(--saffron-accent); height: 100%;"></div>
+                </div>
+              </div>
+
+              <!-- Literacy rate gauge indicator -->
+              <div class="gauge-wrapper" style="padding:0; margin-top: 8px;">
+                <div class="gauge-header">
+                  <span data-en="${UI_TRANSLATIONS.en.literacyRate}" data-hi="${UI_TRANSLATIONS.hi.literacyRate}">${UI_TRANSLATIONS[lang].literacyRate}</span>
+                  <span id="gauge-percent" style="font-weight: 800; color: var(--ucost-blue);">0%</span>
+                </div>
+                <div class="gauge-bg" style="height: 10px;">
+                  <div class="gauge-fill" id="gauge-fill-bar" style="background: linear-gradient(90deg, var(--green-accent), var(--green-light)); height:100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Micro charts & comparison -->
+            <div style="display: flex; gap: 16px; flex-grow: 1; align-items: stretch;">
+              <!-- SC/ST Share Donut -->
+              <div class="micro-chart-container" style="flex: 1; height: 140px; position: relative;">
+                <div id="micro-donut" style="width: 100%; height: 100%;"></div>
+              </div>
+              
+              <!-- Custom Comparison Blocks -->
+              <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 14px; background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                
+                <!-- SC Comparison Row -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">
+                    <span data-en="SC % Comparison" data-hi="अ.जा. % तुलना">SC % Comparison</span>
+                    <span style="font-weight: 800; color: var(--ucost-blue-dark); font-size: 0.75rem;">${scPct.toFixed(1)}% <span style="font-size:0.62rem; color:var(--text-muted); font-weight:600;">(vs ${pSc.toFixed(1)}%)</span></span>
+                  </div>
+                  <!-- Progress bar with average marker -->
+                  <div style="position: relative; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: visible;">
+                    <div style="width: ${scPct}%; background: var(--ucost-blue); height: 100%; border-radius: 4px;"></div>
+                    <!-- Sub-district average marker -->
+                    <div style="position: absolute; left: ${pSc}%; top: -3px; width: 3px; height: 14px; background: var(--saffron-accent); border-radius: 1px; box-shadow: 0 0 2px rgba(0,0,0,0.3);" title="Tehsil Average: ${pSc.toFixed(1)}%"></div>
+                  </div>
+                </div>
+
+                <!-- ST Comparison Row -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">
+                    <span data-en="ST % Comparison" data-hi="अ.ज.जा. % तुलना">ST % Comparison</span>
+                    <span style="font-weight: 800; color: var(--green-accent); font-size: 0.75rem;">${stPct.toFixed(1)}% <span style="font-size:0.62rem; color:var(--text-muted); font-weight:600;">(vs ${pSt.toFixed(1)}%)</span></span>
+                  </div>
+                  <!-- Progress bar with average marker -->
+                  <div style="position: relative; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: visible;">
+                    <div style="width: ${stPct}%; background: var(--green-accent); height: 100%; border-radius: 4px;"></div>
+                    <!-- Sub-district average marker -->
+                    <div style="position: absolute; left: ${pSt}%; top: -3px; width: 3px; height: 14px; background: var(--saffron-accent); border-radius: 1px; box-shadow: 0 0 2px rgba(0,0,0,0.3);" title="Tehsil Average: ${pSt.toFixed(1)}%"></div>
+                  </div>
+                </div>
+
+                <!-- Legend -->
+                <div style="display: flex; align-items: center; gap: 12px; font-size: 0.65rem; font-weight: 600; color: var(--text-muted); margin-top: 2px; border-top: 1px solid rgba(0,0,0,0.04); padding-top: 4px;">
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <div style="width: 8px; height: 8px; background: #e2e8f0; border: 1px solid var(--border-color); border-radius: 2px;"></div>
+                    <span data-en="Village" data-hi="ग्राम">Village</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <div style="width: 3px; height: 8px; background: var(--saffron-accent); border-radius: 1px;"></div>
+                    <span data-en="Tehsil Avg" data-hi="तहसील औसत">Tehsil Avg</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Scatter Plot Plotting area -->
+          <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+            <h4 style="font-size: 0.95rem; color: var(--ucost-blue); margin-bottom: 12px; font-weight: 700;" data-en="Literacy vs. SC/ST concentration scatter plot" data-hi="साक्षरता बनाम अ.जा./अ.ज.जा. सांद्रता स्कैटर प्लॉट">Literacy vs. SC/ST concentration scatter plot</h4>
+            <div id="subdistrict-scatter-chart" style="width: 100%; height: 260px;"></div>
+          </div>
+        </div>
+      `;
+
+      // Set Up Mini Donut Chart
+      const miniDonut = echarts.init(document.getElementById('micro-donut'));
+      APP.charts.miniDonut = miniDonut;
+      miniDonut.setOption({
+        tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+        series: [{
+          type: 'pie', radius: ['45%', '65%'], center: ['50%', '50%'],
+          avoidLabelOverlap: false, label: { show: false }, labelLine: { show: false },
+          data: [
+            { value: scPop, name: UI_TRANSLATIONS[lang].scPop, itemStyle: { color: '#0B3D6E' } },
+            { value: stPop, name: UI_TRANSLATIONS[lang].stPop, itemStyle: { color: '#128807' } },
+            { value: totalPop - scPop - stPop, name: UI_TRANSLATIONS[lang].otherPop, itemStyle: { color: '#D0D5DD' } }
+          ],
+          animationType: 'scale', animationEasing: 'elasticOut', animationDuration: 700
+        }]
+      });
+
+      // Custom animated gauge progress bar trigger
+      setTimeout(() => {
+        const fillBar = document.getElementById('gauge-fill-bar');
+        const numLabel = document.getElementById('gauge-percent');
+        if (fillBar && numLabel) {
+          fillBar.style.transition = 'width 700ms cubic-bezier(0.1, 0.8, 0.2, 1)';
+          fillBar.style.width = `${litPct}%`;
+          
+          // Animate text label percent
+          let start = null;
+          function runNum(ts) {
+            if (!start) start = ts;
+            const progress = Math.min((ts - start) / 700, 1);
+            numLabel.textContent = `${(progress * litPct).toFixed(1)}%`;
+            if (progress < 1) requestAnimationFrame(runNum);
+          }
+          requestAnimationFrame(runNum);
+        }
+      }, 100);
+
+      // Render Scatter plot containing highlighted selected village
+      const scatterEl = document.getElementById('subdistrict-scatter-chart');
+      const scatterChart = echarts.init(scatterEl);
+      APP.charts.scatterChart = scatterChart;
+
+      // Group village data
+      const scatterDataPoints = allSubdistrictVillages.map(item => {
+        const properties = item.properties;
+        const comb = (parseFloat(properties.sc_percent) || 0) + (parseFloat(properties.st_percent) || 0);
+        return [
+          parseFloat(properties.literacy_percent) || 0,
+          comb,
+          parseInt(properties.total_population) || 0,
+          properties.census_village_name,
+          item // store reference to village object
+        ];
+      });
+
+      const selectedPoint = [
+        litPct,
+        scPct + stPct,
+        totalPop,
+        v.census_village_name
+      ];
+
+      const scatterOption = {
+        grid: { left: 45, right: 25, top: 15, bottom: 40 },
+        tooltip: {
+          trigger: 'item',
+          formatter: function(params) {
+            return `<strong>${params.data[3]}</strong><br/>` +
+                   `${UI_TRANSLATIONS[lang].literacyRate}: ${params.data[0].toFixed(1)}%<br/>` +
+                   `SC/ST Concentration: ${params.data[1].toFixed(1)}%<br/>` +
+                   `${UI_TRANSLATIONS[lang].overallPop}: ${params.data[2].toLocaleString('en-IN')}`;
+          }
+        },
+        xAxis: {
+          name: UI_TRANSLATIONS[lang].literacyRate + ' %',
+          nameLocation: 'middle',
+          nameGap: 24,
+          type: 'value',
+          min: 0, max: 100,
+          axisLabel: { fontSize: 9 }
+        },
+        yAxis: {
+          name: 'SC/ST %',
+          type: 'value',
+          min: 0, max: 100,
+          axisLabel: { fontSize: 9 }
+        },
+        series: [
+          {
+            id: 'all-villages',
+            name: 'Villages',
+            type: 'scatter',
+            data: scatterDataPoints,
+            symbolSize: function (data) {
+              // Scale size by population (6px to 25px)
+              return Math.min(25, Math.max(6, 6 + (data[2] / 5000) * 19));
+            },
+            itemStyle: {
+              color: '#1E6FB5',
+              opacity: 0.4
+            }
+          },
+          {
+            id: 'selected-village',
+            name: 'Selected',
+            type: 'scatter',
+            data: [selectedPoint],
+            symbolSize: function (data) {
+              return Math.min(30, Math.max(12, 12 + (data[2] / 5000) * 18));
+            },
+            itemStyle: {
+              color: 'var(--saffron-accent)',
+              opacity: 1,
+              shadowBlur: 10,
+              shadowColor: 'var(--saffron-accent)'
+            },
+            z: 10
+          }
+        ],
+        animationDuration: 400
+      };
+      scatterChart.setOption(scatterOption);
+
+      // Scatter chart select link trigger
+      scatterChart.on('click', (params) => {
+        if (params.seriesId === 'all-villages') {
+          const rawVillage = params.data[4];
+          if (rawVillage) {
+            selectVillageByCode(rawVillage.properties.village_code);
+          }
+        }
+      });
+    }
+
+    /* ===========================================
+       JUDGMENT DESIGN 1: DISTRICT COMPARE DRAWER
+    =========================================== */
+    function toggleCompareDrawer(open) {
+      APP.compareDrawerOpen = open;
+      const drawer = document.getElementById('compare-drawer');
+      const overlay = document.getElementById('compare-overlay');
+      
+      if (open) {
+        drawer.classList.add('open');
+        overlay.classList.add('active');
+        renderCompareDrawer();
+      } else {
+        drawer.classList.remove('open');
+        overlay.classList.remove('active');
+      }
+    }
+
+    async function populateCompareChecklist(districtsGeoJSON) {
+      const container = document.getElementById('compare-district-checklist');
+      if (!container) return;
+
+      container.innerHTML = districtsGeoJSON.features.map(f => {
+        const properties = f.properties;
+        const isChecked = APP.compareSelectedDistricts.includes(properties.district_code);
+        return `
+          <label class="checklist-item">
+            <input type="checkbox" value="${properties.district_code}" ${isChecked ? 'checked' : ''} onchange="handleCompareCheckboxChange(this)">
+            <span>${properties.district_name}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    window.handleCompareCheckboxChange = function(cb) {
+      const code = cb.value;
+      if (cb.checked) {
+        if (!APP.compareSelectedDistricts.includes(code)) {
+          APP.compareSelectedDistricts.push(code);
+        }
+      } else {
+        APP.compareSelectedDistricts = APP.compareSelectedDistricts.filter(c => c !== code);
+      }
+      renderCompareDrawer();
+    };
+
+    async function renderCompareDrawer() {
+      const lang = APP.currentLang;
+      const tableBody = document.getElementById('compare-table-rows');
+      const districtsGeoJSON = await loadGeoJSON('uttarakhand_districts');
+      
+      const filteredDistricts = districtsGeoJSON.features.filter(f => 
+        APP.compareSelectedDistricts.includes(f.properties.district_code)
+      );
+
+      // Handle empty state warning
+      if (filteredDistricts.length < 2) {
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; font-weight:700; color:var(--saffron-accent);">${UI_TRANSLATIONS[lang].selectAtLeastTwo}</td></tr>`;
+        
+        // Clear/Dispose chart inside
+        if (APP.charts.compareChart) {
+          APP.charts.compareChart.clear();
+        }
+        return;
+      }
+
+      tableBody.innerHTML = filteredDistricts.map(f => {
+        const p = f.properties;
+        return `
+          <tr>
+            <td style="font-weight:700; color:var(--ucost-blue-dark);">${p.district_name}</td>
+            <td>${parseInt(p.total_population).toLocaleString('en-IN')}</td>
+            <td>${parseFloat(p.sc_percent).toFixed(1)}%</td>
+            <td>${parseFloat(p.st_percent).toFixed(1)}%</td>
+            <td>${parseFloat(p.literacy_percent).toFixed(1)}%</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Build Comparison drawer chart
+      const chartEl = document.getElementById('compare-chart');
+      const compareChart = APP.charts.compareChart || echarts.init(chartEl);
+      APP.charts.compareChart = compareChart;
+
+      const dNames = filteredDistricts.map(f => f.properties.district_name);
+      const scVals = filteredDistricts.map(f => parseFloat(f.properties.sc_percent) || 0);
+      const stVals = filteredDistricts.map(f => parseFloat(f.properties.st_percent) || 0);
+
+      compareChart.setOption({
+        grid: { left: 40, right: 15, top: 40, bottom: 60 },
+        tooltip: { trigger: 'axis' },
+        legend: { data: [UI_TRANSLATIONS[lang].scPop, UI_TRANSLATIONS[lang].stPop], bottom: 0 },
+        xAxis: { type: 'category', data: dNames, axisLabel: { rotate: 20, fontSize: 9, fontWeight: 'bold' } },
+        yAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%', fontSize: 9 } },
+        series: [
+          { name: UI_TRANSLATIONS[lang].scPop, type: 'bar', data: scVals, itemStyle: { color: '#0B3D6E' } },
+          { name: UI_TRANSLATIONS[lang].stPop, type: 'bar', data: stVals, itemStyle: { color: '#128807' } }
+        ],
+        animationDuration: 400
+      }, true); // force re-render option merge
+    }
+
+    /* ===========================================
+       JUDGMENT DESIGN 2: CSV EXPORTS (PAGE 3)
+    =========================================== */
+    function downloadCSV(filename, rows) {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    window.exportVillageCSV = function() {
+      if (!APP.selectedVillage) return;
+      const v = APP.selectedVillage.properties;
+      const filename = `${v.census_village_name.toLowerCase().replace(/\s+/g, '_')}_census_data.csv`;
+      
+      const rows = [
+        ["Census Indicator", "Value"],
+        ["Village Code", v.village_code],
+        ["Village Name", v.census_village_name],
+        ["Sub-district", APP.activeSubdistrict.properties.subdistrict_name],
+        ["District", APP.activeDistrict.properties.district_name],
+        ["Households", v.households],
+        ["Total Population", v.total_population],
+        ["Male Population", v.male_population],
+        ["Female Population", v.female_population],
+        ["SC Population", v.sc_population],
+        ["SC %", `${(parseFloat(v.sc_percent)||0).toFixed(2)}%`],
+        ["ST Population", v.st_population],
+        ["ST %", `${(parseFloat(v.st_percent)||0).toFixed(2)}%`],
+        ["Literate Population", v.literate_population],
+        ["Literacy Rate %", `${(parseFloat(v.literacy_percent)||0).toFixed(2)}%`],
+        ["Total Workers", v.total_workers]
+      ];
+
+      downloadCSV(filename, rows);
+    };
+
+    window.exportSubdistrictCSV = function() {
+      if (!APP.activeSubdistrict) return;
+      const sd = APP.activeSubdistrict.properties;
+      const filename = `${sd.subdistrict_name.toLowerCase().replace(/\s+/g, '_')}_villages_dataset.csv`;
+
+      const headers = [
+        "Village Code", "Village Name", "Households", 
+        "Total Population", "Male Population", "Female Population", 
+        "SC Population", "SC %", "ST Population", "ST %", 
+        "Literate Population", "Literacy Rate %", "Total Workers"
+      ];
+
+      const rows = [headers];
+
+      allSubdistrictVillages.forEach(item => {
+        const v = item.properties;
+        rows.push([
+          v.village_code,
+          v.census_village_name,
+          v.households,
+          v.total_population,
+          v.male_population,
+          v.female_population,
+          v.sc_population,
+          v.sc_percent,
+          v.st_population,
+          v.st_percent,
+          v.literate_population,
+          v.literacy_percent,
+          v.total_workers
+        ]);
+      });
+
+      downloadCSV(filename, rows);
+    };
+
+    /* ===========================================
+       ACCESSIBILITY SETTINGS (FONT & CONTRAST)
+    =========================================== */
+    function initFontSize() {
+      document.querySelectorAll('.fs-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const size = btn.dataset.size;
+          const scale = size === 'small' ? 0.875 : size === 'large' ? 1.15 : 1;
+          document.documentElement.style.setProperty('--font-scale', scale);
+          document.querySelectorAll('.fs-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          announce(`Font size set to ${size}`);
+        });
+      });
+    }
+
+    function initHighContrast() {
+      const btn = document.getElementById('hc-toggle');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        const active = document.body.classList.toggle('high-contrast');
+        this.setAttribute('aria-pressed', active);
+        this.classList.toggle('active', active);
+        
+        // Force refresh ECharts views so they match contrast theme backgrounds
+        for (let k in APP.charts) {
+          if (APP.charts[k]) {
+            APP.charts[k].resize();
+          }
+        }
+        
+        announce(active ? 'High contrast mode enabled' : 'High contrast mode disabled');
+      });
+    }
+
+    function announce(msg) {
+      const el = document.getElementById('aria-live');
+      if (el) {
+        el.textContent = '';
+        setTimeout(() => { el.textContent = msg; }, 100);
+      }
+    }
+
+    /* ===========================================
+       ADVISORY NEWS TICKER LOOP
+    =========================================== */
+    async function loadTickerData() {
+      try {
+        const r = await fetch('content/news-ticker.json');
+        APP.newsTicker = await r.json();
+      } catch (e) {
+        // Fallback default message
+        APP.newsTicker = [{
+          "text": "Uttarakhand SC/ST Cell Portal Extension - Standalone Mapping Module. Powered by UCOST & DST.",
+          "link": ""
+        }];
+      }
+    }
+
+    function renderNewsTicker() {
+      const track = document.getElementById('ticker-track');
+      if (!track || !APP.newsTicker || !APP.newsTicker.length) return;
+      const itemsHtml = APP.newsTicker.map(item => {
+        if (item.link) {
+          return `<div class="ticker-item"><a href="${item.link}" target="_blank" rel="noopener">${item.text}</a></div>`;
+        } else {
+          return `<div class="ticker-item">${item.text}</div>`;
+        }
+      }).join('');
+      track.innerHTML = itemsHtml + itemsHtml; // duplicate for loop wrapping
+    }
+
+    /* ===========================================
+       SCROLL PROGRESS BAR
+    =========================================== */
+    function initScrollProgress() {
+      const progressBar = document.getElementById('scroll-progress');
+      if (!progressBar) return;
+      window.addEventListener('scroll', function() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docH = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const pct = docH > 0 ? (scrollTop / docH) * 100 : 0;
+        progressBar.style.width = pct + '%';
+      }, { passive: true });
+    }
+
+    /* ===========================================
+       APPLICATION CONTEXT INITIALIZATION
+    =========================================== */
+    async function init() {
+      await loadTickerData();
+      renderNewsTicker();
+      
+      initFontSize();
+      initHighContrast();
+      initScrollProgress();
+      
+      // Initial Routing Trigger
+      handleHashChange();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

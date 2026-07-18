@@ -1,0 +1,10 @@
+# System & IDE files
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# Temporary check files
+temp_check*
+correct_villages.py
