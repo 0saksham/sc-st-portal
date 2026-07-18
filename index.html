@@ -338,7 +338,8 @@
       transition: opacity 300ms ease-out, transform 300ms ease-out, fill 400ms ease-in-out, filter 180ms ease-out, stroke-width 180ms ease-out, stroke 180ms ease-out;
     }
     /* Glow hover */
-    .child-polygon:hover {
+    .child-polygon:hover,
+    .subdistrict-segment-hover {
       animation: none !important;
       filter: drop-shadow(0 0 8px var(--saffron-accent)) !important;
       stroke: var(--saffron-accent) !important;
@@ -2521,10 +2522,23 @@
           const pSub = feature.properties;
           const isAvail = pSub.census_2011_data_available;
           
+          // Attach subdistrict code to the Leaflet layer instance
+          layer.subdistrictCode = pSub.subdistrict_code;
+
           layer.on('mousemove', (e) => {
             updateMapTooltipPos(e);
           });
           layer.on('mouseover', (e) => {
+            // Highlight all segments sharing this subdistrict code
+            if (APP.subdistrictsLayer) {
+              APP.subdistrictsLayer.eachLayer(l => {
+                if (l.subdistrictCode === pSub.subdistrict_code) {
+                  const el = l.getElement();
+                  if (el) el.classList.add('subdistrict-segment-hover');
+                }
+              });
+            }
+
             if (isAvail === false || isAvail === "false") {
               // Diagonal hatch layout tooltip
               tooltipEl.innerHTML = `<div class="custom-tooltip-title">${pSub.subdistrict_name}</div><div style="font-size:0.75rem; color:var(--saffron-accent); font-weight:600;">${UI_TRANSLATIONS[lang].notAvailable}</div>`;
@@ -2535,12 +2549,24 @@
             }
           });
           layer.on('mouseout', () => {
+            // Remove highlight class from all segments
+            if (APP.subdistrictsLayer) {
+              APP.subdistrictsLayer.eachLayer(l => {
+                const el = l.getElement();
+                if (el) el.classList.remove('subdistrict-segment-hover');
+              });
+            }
             hideMapTooltip();
           });
           layer.on('click', () => {
-            const pathEl = layer.getElement();
-            if (pathEl) {
-              pathEl.classList.add('clicked-confirm');
+            // Visual click confirmation on all segments of this subdistrict
+            if (APP.subdistrictsLayer) {
+              APP.subdistrictsLayer.eachLayer(l => {
+                if (l.subdistrictCode === pSub.subdistrict_code) {
+                  const el = l.getElement();
+                  if (el) el.classList.add('clicked-confirm');
+                }
+              });
             }
             setTimeout(() => {
               window.location.hash = `#/subdistrict/${districtCode}/${pSub.subdistrict_code}`;
