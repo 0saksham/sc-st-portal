@@ -879,6 +879,34 @@
       box-shadow: var(--shadow-lg);
       border-color: var(--border-strong);
     }
+    .tribe-card.active-tribe-card {
+      border-color: var(--saffron-accent) !important;
+      box-shadow: 0 0 16px rgba(249, 115, 22, 0.3) !important;
+      transform: translateY(-4px);
+    }
+    .tribe-card {
+      cursor: pointer;
+    }
+    @keyframes pulse-glow {
+      0% {
+        filter: drop-shadow(0 0 3px var(--saffron-accent));
+        fill-opacity: 0.65;
+      }
+      50% {
+        filter: drop-shadow(0 0 14px var(--saffron-accent));
+        fill-opacity: 0.9;
+      }
+      100% {
+        filter: drop-shadow(0 0 3px var(--saffron-accent));
+        fill-opacity: 0.65;
+      }
+    }
+    .tribe-glow {
+      animation: pulse-glow 1.6s ease-in-out infinite !important;
+      stroke: var(--saffron-accent) !important;
+      stroke-width: 3.5px !important;
+      fill: var(--saffron-light) !important;
+    }
     .tribe-img-wrap {
       width: 100%;
       height: 200px;
@@ -1229,6 +1257,61 @@
       satelliteActive: false,
       map: null,
       charts: {}
+    };
+
+    /* ===========================================
+       TRIBAL MAP HIGHLIGHT HANDLER
+    =========================================== */
+    window.highlightTribeDistricts = function(tribeKey, cardElement) {
+      const isActive = cardElement.classList.contains('active-tribe-card');
+      
+      // Clear active style from all cards
+      const allCards = document.querySelectorAll('.tribe-card');
+      allCards.forEach(c => c.classList.remove('active-tribe-card'));
+      
+      // Clear glows from all map layers
+      if (APP.districtsLayer) {
+        APP.districtsLayer.eachLayer(layer => {
+          const el = layer.getElement();
+          if (el) el.classList.remove('tribe-glow');
+        });
+      }
+
+      if (isActive) {
+        // Toggle off if it was already selected
+        return;
+      }
+      
+      // Mark clicked card active
+      cardElement.classList.add('active-tribe-card');
+      
+      // Map of tribe keys to district names in GeoJSON
+      const TRIBE_DISTRICTS = {
+        bhotia: ['Chamoli', 'Pithoragarh', 'Uttarkashi'],
+        jaunsari: ['Dehradun'],
+        tharu: ['Udham Singh Nagar'],
+        buksa: ['Dehradun', 'Nainital', 'Udham Singh Nagar'],
+        raji: ['Pithoragarh', 'Champawat']
+      };
+      
+      const targets = TRIBE_DISTRICTS[tribeKey] || [];
+      
+      if (APP.districtsLayer) {
+        APP.districtsLayer.eachLayer(layer => {
+          const dName = layer.feature.properties.district_name;
+          const match = targets.some(t => t.toLowerCase().replace(/\s+/g, '') === dName.toLowerCase().replace(/\s+/g, ''));
+          if (match) {
+            const el = layer.getElement();
+            if (el) el.classList.add('tribe-glow');
+          }
+        });
+      }
+      
+      // Smooth scroll back up to the map
+      const mapContainer = document.getElementById('map');
+      if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     };
 
     // Shared GeoJSON cache
@@ -1749,7 +1832,7 @@
           </div>
           <div class="tribal-grid">
             <!-- Card 1: Bhotia -->
-            <div class="tribe-card">
+            <div class="tribe-card" onclick="highlightTribeDistricts('bhotia', this)">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Bhotia.jpg" alt="Bhotia Tribe" class="tribe-img">
               </div>
@@ -1761,7 +1844,7 @@
             </div>
 
             <!-- Card 2: Jaunsari -->
-            <div class="tribe-card">
+            <div class="tribe-card" onclick="highlightTribeDistricts('jaunsari', this)">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Jaunsari.jpg" alt="Jaunsari Tribe" class="tribe-img">
               </div>
@@ -1773,7 +1856,7 @@
             </div>
 
             <!-- Card 3: Tharu -->
-            <div class="tribe-card">
+            <div class="tribe-card" onclick="highlightTribeDistricts('tharu', this)">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Tharu.jpg" alt="Tharu Tribe" class="tribe-img">
               </div>
@@ -1785,7 +1868,7 @@
             </div>
 
             <!-- Card 4: Buksa -->
-            <div class="tribe-card">
+            <div class="tribe-card" onclick="highlightTribeDistricts('buksa', this)">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Buksa.jpg" alt="Buksa Tribe" class="tribe-img">
               </div>
@@ -1797,7 +1880,7 @@
             </div>
 
             <!-- Card 5: Raji -->
-            <div class="tribe-card">
+            <div class="tribe-card" onclick="highlightTribeDistricts('raji', this)">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Raji.jpg" alt="Raji Tribe" class="tribe-img">
               </div>
