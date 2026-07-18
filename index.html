@@ -2312,14 +2312,23 @@
         features: subdistrictsGeoJSON.features.filter(f => f.properties.district_code === districtCode)
       };
 
-      const subdistrictsProps = localSubdistricts.features.map(f => f.properties);
+      // Deduplicate sub-districts by code for list/table rendering
+      const uniqueSubdistricts = [];
+      const seenCodes = new Set();
+      for (const feat of localSubdistricts.features) {
+        const props = feat.properties;
+        if (!seenCodes.has(props.subdistrict_code)) {
+          seenCodes.add(props.subdistrict_code);
+          uniqueSubdistricts.push(props);
+        }
+      }
 
       // Find highest SC subdistrict
-      const highestSC = [...subdistrictsProps].sort((a, b) => (parseFloat(b.sc_percent) || 0) - (parseFloat(a.sc_percent) || 0))[0] || {};
+      const highestSC = [...uniqueSubdistricts].sort((a, b) => (parseFloat(b.sc_percent) || 0) - (parseFloat(a.sc_percent) || 0))[0] || {};
       // Find highest ST subdistrict
-      const highestST = [...subdistrictsProps].sort((a, b) => (parseFloat(b.st_percent) || 0) - (parseFloat(a.st_percent) || 0))[0] || {};
+      const highestST = [...uniqueSubdistricts].sort((a, b) => (parseFloat(b.st_percent) || 0) - (parseFloat(a.st_percent) || 0))[0] || {};
       // Find highest Literacy subdistrict
-      const highestLit = [...subdistrictsProps].sort((a, b) => (parseFloat(b.literacy_percent) || 0) - (parseFloat(a.literacy_percent) || 0))[0] || {};
+      const highestLit = [...uniqueSubdistricts].sort((a, b) => (parseFloat(b.literacy_percent) || 0) - (parseFloat(a.literacy_percent) || 0))[0] || {};
 
       appContainer.innerHTML = `
         <div class="page-layout">
@@ -2379,7 +2388,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      ${subdistrictsProps.map(sd => {
+                      ${uniqueSubdistricts.map(sd => {
                         const sdTotal = parseInt(sd.total_population) || 0;
                         const sdSc = parseFloat(sd.sc_percent) || 0;
                         const sdSt = parseFloat(sd.st_percent) || 0;
@@ -2675,19 +2684,25 @@
       const villagesGeoJSON = await loadGeoJSON('villages');
       showLoader(false);
 
-      // Find Sub-district Polygon
-      const subdistrict = subdistrictsGeoJSON.features.find(f => f.properties.district_code === districtCode && f.properties.subdistrict_code === subdistrictCode);
+      // Find Sub-district Polygon(s) - support exclaves/duplicate features by grouping them
+      const subdistrictFeatures = subdistrictsGeoJSON.features.filter(f => f.properties.district_code === districtCode && f.properties.subdistrict_code === subdistrictCode);
       const district = districtsGeoJSON.features.find(f => f.properties.district_code === districtCode);
       
-      if (!subdistrict) {
+      if (!subdistrictFeatures.length) {
         window.location.hash = '#/state';
         return;
       }
 
-      APP.activeDistrict = district;
-      APP.activeSubdistrict = subdistrict;
+      // Combine duplicate features into a FeatureCollection representing the subdistrict
+      const subdistrict = {
+        type: 'FeatureCollection',
+        features: subdistrictFeatures
+      };
 
-      const p = subdistrict.properties;
+      APP.activeDistrict = district;
+      APP.activeSubdistrict = subdistrictFeatures[0]; // Keep first matching feature for basic property references
+
+      const p = subdistrictFeatures[0].properties;
       const isCensusAvail = p.census_2011_data_available;
 
       // Filter villages for this sub-district
