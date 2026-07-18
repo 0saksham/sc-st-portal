@@ -311,6 +311,18 @@
     .map-dir-e:hover {
       transform: translateY(-50%) scale(1.05);
     }
+    .sd-dir-link {
+      transition: all var(--transition);
+    }
+    .sd-dir-link:hover {
+      color: var(--saffron-accent) !important;
+    }
+    .sd-dir-link svg {
+      transition: transform var(--transition);
+    }
+    .sd-dir-link:hover svg {
+      transform: translateX(4px);
+    }
     #map {
       width: 100%;
       height: 100%;
@@ -2100,22 +2112,27 @@
       const combinedValues = districtRankData.map(d => d.combinedPct);
 
       const rankOption = {
-        grid: { left: '3%', right: '8%', top: '3%', bottom: '3%', containLabel: true },
+        grid: { left: '3%', right: '8%', top: '15%', bottom: '3%', containLabel: true },
+        legend: {
+          data: [UI_TRANSLATIONS[lang].scPop, UI_TRANSLATIONS[lang].stPop],
+          top: 0,
+          textStyle: { fontWeight: 600, fontSize: 10 }
+        },
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'shadow' },
           formatter: function(params) {
             const item = districtRankData[params[0].dataIndex];
             return `<strong>${item.name}</strong><br/>` +
-                   `${UI_TRANSLATIONS[lang].scPop}: ${item.scPct.toFixed(1)}%<br/>` +
-                   `${UI_TRANSLATIONS[lang].stPop}: ${item.stPct.toFixed(1)}%<br/>` +
-                   `Combined: ${item.combinedPct.toFixed(1)}%`;
+                   `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:#0B3D6E;"></span>${UI_TRANSLATIONS[lang].scPop}: ${item.scPct.toFixed(1)}%<br/>` +
+                   `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:#128807;"></span>${UI_TRANSLATIONS[lang].stPop}: ${item.stPct.toFixed(1)}%<br/>` +
+                   `<strong>Combined: ${item.combinedPct.toFixed(1)}%</strong>`;
           }
         },
         xAxis: {
           type: 'value',
           axisLabel: { formatter: '{value}%', fontSize: 10 },
-          splitLine: { lineStyle: { type: 'dashed' } }
+          splitLine: { lineStyle: { type: 'dashed', color: 'rgba(0,0,0,0.08)' } }
         },
         yAxis: {
           type: 'category',
@@ -2124,17 +2141,33 @@
         },
         series: [
           {
+            name: UI_TRANSLATIONS[lang].scPop,
             type: 'bar',
-            data: combinedValues,
+            stack: 'total',
+            data: districtRankData.map(d => d.scPct),
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                { offset: 0, color: '#1E6FB5' },
+                { offset: 0, color: '#4A90E2' },
                 { offset: 1, color: '#0B3D6E' }
+              ])
+            },
+            animationEasing: 'cubicOut',
+            animationDelay: function (idx) { return idx * 60; }
+          },
+          {
+            name: UI_TRANSLATIONS[lang].stPop,
+            type: 'bar',
+            stack: 'total',
+            data: districtRankData.map(d => d.stPct),
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                { offset: 0, color: '#58D68D' },
+                { offset: 1, color: '#128807' }
               ]),
               borderRadius: [0, 4, 4, 0]
             },
             animationEasing: 'cubicOut',
-            animationDelay: function (idx) { return idx * 60; }
+            animationDelay: function (idx) { return idx * 60 + 100; }
           }
         ]
       };
@@ -2273,6 +2306,21 @@
       const scPct = parseFloat(p.sc_percent) || 0;
       const stPct = parseFloat(p.st_percent) || 0;
 
+      // Filter sub-districts first so data is available for template string
+      const localSubdistricts = {
+        type: 'FeatureCollection',
+        features: subdistrictsGeoJSON.features.filter(f => f.properties.district_code === districtCode)
+      };
+
+      const subdistrictsProps = localSubdistricts.features.map(f => f.properties);
+
+      // Find highest SC subdistrict
+      const highestSC = [...subdistrictsProps].sort((a, b) => (parseFloat(b.sc_percent) || 0) - (parseFloat(a.sc_percent) || 0))[0] || {};
+      // Find highest ST subdistrict
+      const highestST = [...subdistrictsProps].sort((a, b) => (parseFloat(b.st_percent) || 0) - (parseFloat(a.st_percent) || 0))[0] || {};
+      // Find highest Literacy subdistrict
+      const highestLit = [...subdistrictsProps].sort((a, b) => (parseFloat(b.literacy_percent) || 0) - (parseFloat(a.literacy_percent) || 0))[0] || {};
+
       appContainer.innerHTML = `
         <div class="page-layout">
           <div class="main-content">
@@ -2288,6 +2336,25 @@
                 </div>
               </div>
 
+              <!-- District Highlights Row (Populates empty space beautifully!) -->
+              <div class="highlights-row" style="margin-bottom: 24px;">
+                <div class="highlight-card">
+                  <div class="hl-label" data-en="Highest SC Concentration" data-hi="उच्चतम अ.जा. सांद्रता">Highest SC Concentration</div>
+                  <div class="hl-val" style="color: var(--ucost-blue-dark); font-size: 1.15rem; margin-top: 6px;">${highestSC.subdistrict_name || 'N/A'}</div>
+                  <div class="hl-sub" style="font-weight: 700;">${(parseFloat(highestSC.sc_percent) || 0).toFixed(1)}% <span data-en="SC Share" data-hi="अ.जा. हिस्सेदारी" style="font-weight: 500; color: var(--text-muted);">SC Share</span></div>
+                </div>
+                <div class="highlight-card">
+                  <div class="hl-label" data-en="Highest ST Concentration" data-hi="उच्चतम अ.ज.जा. सांद्रता">Highest ST Concentration</div>
+                  <div class="hl-val" style="color: var(--green-accent); font-size: 1.15rem; margin-top: 6px;">${highestST.subdistrict_name || 'N/A'}</div>
+                  <div class="hl-sub" style="font-weight: 700;">${(parseFloat(highestST.st_percent) || 0).toFixed(1)}% <span data-en="ST Share" data-hi="अ.ज.जा. हिस्सेदारी" style="font-weight: 500; color: var(--text-muted);">ST Share</span></div>
+                </div>
+                <div class="highlight-card">
+                  <div class="hl-label" data-en="Highest Literacy Rate" data-hi="उच्चतम साक्षरता दर">Highest Literacy Rate</div>
+                  <div class="hl-val" style="color: var(--ucost-blue); font-size: 1.15rem; margin-top: 6px;">${highestLit.subdistrict_name || 'N/A'}</div>
+                  <div class="hl-sub" style="font-weight: 700;">${(parseFloat(highestLit.literacy_percent) || 0).toFixed(1)}% <span data-en="Literate" data-hi="साक्षर" style="font-weight: 500; color: var(--text-muted);">Literate</span></div>
+                </div>
+              </div>
+
               <div class="map-wrapper">
                 <div class="map-dir-badge map-dir-n" title="North / उत्तर">▲ <span data-en="N" data-hi="उ">N</span></div>
                 <div class="map-dir-badge map-dir-s" title="South / दक्षिण"><span data-en="S" data-hi="द">S</span> ▼</div>
@@ -2295,6 +2362,46 @@
                 <div class="map-dir-badge map-dir-e" title="East / पूर्व" data-en="E" data-hi="पू">E</div>
                 <div id="map"></div>
                 <div class="loader-overlay" id="loader-overlay"><div class="spinner"></div></div>
+              </div>
+
+              <!-- Sub-districts Directory Table -->
+              <div class="card" style="margin-top: 28px;">
+                <h3 class="card-title" style="margin-bottom: 16px; font-size: 1.1rem; color: var(--ucost-blue-dark);" data-en="Sub-districts Demographic Directory" data-hi="उप-जिलों की जनसांख्यिकीय निर्देशिका">Sub-districts Demographic Directory</h3>
+                <div class="compare-table-wrapper">
+                  <table class="compare-table">
+                    <thead>
+                      <tr>
+                        <th data-en="Sub-district" data-hi="उप-जिला">Sub-district</th>
+                        <th data-en="Total Population" data-hi="कुल जनसंख्या">Total Population</th>
+                        <th data-en="SC %" data-hi="अ.जा. %">SC %</th>
+                        <th data-en="ST %" data-hi="अ.ज.जा. %">ST %</th>
+                        <th data-en="Literacy Rate" data-hi="साक्षरता दर">Literacy Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${subdistrictsProps.map(sd => {
+                        const sdTotal = parseInt(sd.total_population) || 0;
+                        const sdSc = parseFloat(sd.sc_percent) || 0;
+                        const sdSt = parseFloat(sd.st_percent) || 0;
+                        const sdLit = parseFloat(sd.literacy_percent) || 0;
+                        return `
+                          <tr>
+                            <td>
+                              <a href="#/subdistrict/${districtCode}/${sd.subdistrict_code}" style="color: var(--ucost-blue); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 4px;" class="sd-dir-link">
+                                ${sd.subdistrict_name}
+                                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3; transition: transform 0.2s ease;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                              </a>
+                            </td>
+                            <td>${sdTotal.toLocaleString('en-IN')}</td>
+                            <td style="color: var(--ucost-blue-dark); font-weight: 600;">${sdSc.toFixed(1)}%</td>
+                            <td style="color: var(--green-accent); font-weight: 600;">${sdSt.toFixed(1)}%</td>
+                            <td>${sdLit.toFixed(1)}%</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </section>
           </div>
@@ -2330,17 +2437,11 @@
 
             <div class="card">
               <h3 class="card-title" data-en="SC/ST Concentration Rank" data-hi="अ.जा./अ.ज.जा. सांद्रता रैंकिंग">SC/ST Concentration Rank</h3>
-              <div id="district-rank-chart" style="width: 100%; height: 180px;"></div>
+              <div id="district-rank-display"></div>
             </div>
           </div>
         </div>
       `;
-
-      // Filter sub-districts
-      const localSubdistricts = {
-        type: 'FeatureCollection',
-        features: subdistrictsGeoJSON.features.filter(f => f.properties.district_code === districtCode)
-      };
 
       // Map Setup
       const map = L.map('map', { zoomControl: true, zoomSnap: 0.1 });
@@ -2508,11 +2609,7 @@
         ]
       });
 
-      // Rank chart for current district among all 13
-      const rankEl = document.getElementById('district-rank-chart');
-      const rankChart = echarts.init(rankEl);
-      APP.charts.rankChart = rankChart;
-
+      // Rank display for current district among all 13 (Creative & professional custom display)
       const rankedList = districtsGeoJSON.features.map(f => {
         const properties = f.properties;
         return {
@@ -2524,47 +2621,43 @@
 
       const rankIndex = rankedList.findIndex(d => d.code === districtCode) + 1;
 
-      rankChart.setOption({
-        series: [{
-          type: 'gauge',
-          startAngle: 180,
-          endAngle: 0,
-          min: 1,
-          max: 13,
-          splitNumber: 12,
-          radius: '95%',
-          center: ['50%', '80%'],
-          axisLine: {
-            lineStyle: {
-              width: 14,
-              color: [
-                [0.3, '#128807'],
-                [0.7, '#FF9933'],
-                [1.0, '#0B3D6E']
-              ]
-            }
-          },
-          pointer: { icon: 'path://M12.8,0.7l12,20.1c0.6,1,0.3,2.4-0.8,3c-0.3,0.2-0.7,0.2-1,0.2H1.6c-1.2,0-2.2-1-2.2-2.2c0-0.4,0.1-0.7,0.3-1L11.7,0.7C12,0.2,12.4,0,12.8,0.7z', length: '75%', width: 6, offsetCenter: [0, 5], itemStyle: { color: 'auto' } },
-          axisTick: { length: 4, lineStyle: { color: '#auto', width: 1 } },
-          splitLine: { length: 8, lineStyle: { color: '#auto', width: 1.5 } },
-          axisLabel: { show: false },
-          title: { offsetCenter: [0, '-20%'], fontSize: 13, fontWeight: 'bold' },
-          detail: {
-            offsetCenter: [0, '25%'],
-            valueAnimation: true,
-            formatter: function (value) {
-              return lang === 'hi' ? `रैंक: ${Math.round(value)}/13` : `Rank: ${Math.round(value)}/13`;
-            },
-            fontSize: 14,
-            fontWeight: '800',
-            color: 'var(--ucost-blue-dark)'
-          },
-          data: [{
-            value: rankIndex,
-            name: p.district_name
-          }]
-        }]
-      });
+      const rankDisplayEl = document.getElementById('district-rank-display');
+      if (rankDisplayEl) {
+        const idx = rankIndex - 1;
+        const start = Math.max(0, idx - 1);
+        const end = Math.min(rankedList.length - 1, idx + 1);
+        
+        let leaderboardHtml = '';
+        for (let i = start; i <= end; i++) {
+          const item = rankedList[i];
+          const isCurrent = item.code === districtCode;
+          leaderboardHtml += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; margin-bottom: 4px; ${isCurrent ? 'background: var(--saffron-light); border: 1.5px solid rgba(249,115,22,0.3);' : 'border: 1px solid transparent;'}">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
+                <span style="font-weight: 800; color: ${isCurrent ? 'var(--saffron-accent)' : 'var(--text-muted)'};">#${i + 1}</span>
+                <span style="font-weight: ${isCurrent ? '800' : '600'}; color: ${isCurrent ? 'var(--ucost-blue-dark)' : 'var(--text-primary)'};">${item.name}</span>
+              </div>
+              <span style="font-size: 0.8rem; font-weight: 700; color: ${isCurrent ? 'var(--saffron-accent)' : 'var(--text-secondary)'};">${item.combined.toFixed(1)}%</span>
+            </div>
+          `;
+        }
+
+        rankDisplayEl.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 8px 0;">
+            <!-- Big Rank Circular Badge -->
+            <div style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--saffron-accent); background: var(--bg-base); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); position: relative;">
+              <div style="font-size: 0.65rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;" data-en="Rank" data-hi="रैंक">${lang === 'hi' ? 'रैंक' : 'Rank'}</div>
+              <div style="font-size: 1.8rem; font-weight: 900; color: var(--ucost-blue-dark); line-height: 1;">#${rankIndex}</div>
+              <div style="font-size: 0.62rem; font-weight: 700; color: var(--text-muted); margin-top: 2px;">${lang === 'hi' ? '13 में से' : 'of 13'}</div>
+            </div>
+            
+            <!-- Mini Leaderboard -->
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 4px; background: rgba(0,0,0,0.02); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              ${leaderboardHtml}
+            </div>
+          </div>
+        `;
+      }
     }
 
     /* ===========================================
