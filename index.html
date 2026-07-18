@@ -144,14 +144,8 @@
     .nav-ticker{display:flex;align-items:center;overflow:hidden;background:rgba(0,0,0,.20);border-radius:var(--radius-sm);height:34px;flex-grow:1;max-width:650px;min-width:0;position:relative}
     .ticker-label{flex-shrink:0;background:var(--saffron-accent);color:var(--ucost-blue-dark);padding:0 12px;font-weight:700;font-size:.75rem;height:100%;display:flex;align-items:center;justify-content:center;letter-spacing:.04em;text-transform:uppercase;position:relative;z-index:2;box-shadow:2px 0 5px rgba(0,0,0,.15)}
     .ticker-content{overflow:hidden;display:flex;align-items:center;position:relative;height:100%;flex-grow:1;padding-left:16px}
-    .ticker-track{display:flex;white-space:nowrap;animation:marquee 30s linear infinite;flex-shrink:0;min-width:max-content}
-    .ticker-track:hover{animation-play-state:paused}
+    .ticker-track{display:flex;white-space:nowrap;flex-shrink:0;min-width:max-content}
     .ticker-item{font-size:.8rem;color:#fff;font-weight:500;display:flex;align-items:center;text-decoration:none;flex-shrink:0;white-space:nowrap;padding-right:50px}
-    
-    @keyframes marquee{
-      0%{transform:translate3d(100%,0,0)}
-      100%{transform:translate3d(-50%,0,0)}
-    }
 
     /* ===========================================
        PAGE TRANSITIONS & CORE LAYOUT
@@ -3329,9 +3323,27 @@
       }
     }
 
+    function getTranslateX(element) {
+      const style = window.getComputedStyle(element);
+      const transform = style.transform || style.webkitTransform;
+      if (!transform || transform === 'none') return 0;
+      const mat = transform.match(/^matrix\((.+)\)$/);
+      if (mat) {
+        return parseFloat(mat[1].split(',')[4]);
+      }
+      const mat3d = transform.match(/^matrix3d\((.+)\)$/);
+      if (mat3d) {
+        return parseFloat(mat3d[1].split(',')[12]);
+      }
+      return 0;
+    }
+
+    let tickerTimeoutId = null;
+
     function renderNewsTicker() {
       const track = document.getElementById('ticker-track');
       if (!track || !APP.newsTicker || !APP.newsTicker.length) return;
+      
       const itemsHtml = APP.newsTicker.map(item => {
         if (item.link) {
           return `<div class="ticker-item"><a href="${item.link}" target="_blank" rel="noopener">${item.text}</a></div>`;
@@ -3339,7 +3351,69 @@
           return `<div class="ticker-item">${item.text}</div>`;
         }
       }).join('');
-      track.innerHTML = itemsHtml + itemsHtml; // duplicate for loop wrapping
+      
+      track.innerHTML = itemsHtml;
+      
+      // Cancel any active timeouts
+      if (tickerTimeoutId) {
+        clearTimeout(tickerTimeoutId);
+        tickerTimeoutId = null;
+      }
+      
+      animateTicker();
+    }
+
+    function animateTicker() {
+      const track = document.getElementById('ticker-track');
+      if (!track) return;
+      
+      let isPaused = false;
+      const container = track.parentElement;
+      const containerWidth = container.offsetWidth;
+      const trackWidth = track.scrollWidth;
+      const speed = 90; // pixels per second
+      
+      function startScroll(fromX, durationSec) {
+        track.style.transition = 'none';
+        track.style.transform = `translateX(${fromX}px)`;
+        track.offsetHeight; // reflow
+        track.style.transition = `transform ${durationSec}s linear`;
+        track.style.transform = `translateX(-${trackWidth}px)`;
+      }
+      
+      const totalDistance = containerWidth + trackWidth;
+      const totalDuration = totalDistance / speed;
+      
+      startScroll(containerWidth, totalDuration);
+      
+      // Pause on mouse enter
+      track.onmouseenter = () => {
+        isPaused = true;
+        const currentX = getTranslateX(track);
+        track.style.transition = 'none';
+        track.style.transform = `translateX(${currentX}px)`;
+      };
+      
+      // Resume on mouse leave
+      track.onmouseleave = () => {
+        if (!isPaused) return;
+        isPaused = false;
+        const currentX = getTranslateX(track);
+        const remainingDistance = currentX - (-trackWidth);
+        if (remainingDistance > 0) {
+          const remainingDuration = remainingDistance / speed;
+          startScroll(currentX, remainingDuration);
+        }
+      };
+      
+      track.ontransitionend = () => {
+        if (isPaused) return;
+        
+        // Wait exactly 2 seconds after completely scrolling off-screen before starting again
+        tickerTimeoutId = setTimeout(() => {
+          animateTicker();
+        }, 2000);
+      };
     }
 
     /* ===========================================
