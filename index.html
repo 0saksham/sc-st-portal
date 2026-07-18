@@ -991,6 +991,270 @@
     }
 
     /* ===========================================
+       §1 — LEGEND GRADIENT HOVER READOUT
+    =========================================== */
+    .legend-gradient {
+      position: relative;
+      cursor: crosshair;
+    }
+    .legend-gradient-readout {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ucost-blue-dark);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 100ms ease;
+      z-index: 10;
+    }
+    .legend-gradient-readout.visible {
+      opacity: 1;
+    }
+
+    /* ===========================================
+       §2 — MAP SPOTLIGHT BADGES
+    =========================================== */
+    .map-spotlight-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 900;
+      color: #fff;
+      cursor: pointer;
+      z-index: 600;
+      letter-spacing: 0.02em;
+      border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: var(--shadow-md);
+      transform: scale(0);
+      opacity: 0;
+      transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 500ms ease-out;
+    }
+    .map-spotlight-badge.enter {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .badge-sc {
+      background: var(--saffron-accent);
+      animation: badgePulse-sc 3.2s ease-in-out infinite;
+    }
+    .badge-st {
+      background: var(--green-accent);
+      animation: badgePulse-st 3.2s ease-in-out infinite;
+    }
+    .badge-lit {
+      background: var(--ucost-blue-light);
+      animation: badgePulse-lit 3.2s ease-in-out infinite;
+    }
+    @keyframes badgePulse-sc {
+      0%, 100% { box-shadow: 0 0 6px rgba(255,153,51,0.4), var(--shadow-md); }
+      50% { box-shadow: 0 0 18px rgba(255,153,51,0.7), var(--shadow-md); }
+    }
+    @keyframes badgePulse-st {
+      0%, 100% { box-shadow: 0 0 6px rgba(18,136,7,0.4), var(--shadow-md); }
+      50% { box-shadow: 0 0 18px rgba(18,136,7,0.7), var(--shadow-md); }
+    }
+    @keyframes badgePulse-lit {
+      0%, 100% { box-shadow: 0 0 6px rgba(30,111,181,0.4), var(--shadow-md); }
+      50% { box-shadow: 0 0 18px rgba(30,111,181,0.7), var(--shadow-md); }
+    }
+
+    /* ===========================================
+       §4 — SKELETON / SHIMMER LOADING
+    =========================================== */
+    .map-skeleton {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #e8ecf1;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: opacity 200ms ease-out;
+    }
+    .map-skeleton.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .map-skeleton-shapes {
+      width: 70%;
+      height: 60%;
+      opacity: 0.35;
+    }
+    .map-skeleton::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; right: 0; bottom: 0;
+      width: 100%;
+      background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255,255,255,0.5) 50%,
+        transparent 70%
+      );
+      animation: shimmer 1.5s linear infinite;
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+
+    /* ===========================================
+       §5 — LOCATOR INSET MAP
+    =========================================== */
+    .locator-inset {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 120px;
+      height: 120px;
+      z-index: 500;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .locator-inset .leaflet-control-container {
+      display: none !important;
+    }
+
+    /* ===========================================
+       §6 — INTENTIONAL EMPTY STATES
+    =========================================== */
+    .empty-state-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .empty-state-ring svg {
+      width: 32px;
+      height: 32px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2.5;
+    }
+    .empty-state-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .empty-state-census-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px;
+    }
+
+    /* ===========================================
+       §8 — DOWNLOAD CONFIRMATION ANIMATION
+    =========================================== */
+    .download-btn .btn-icon,
+    .download-btn .btn-text {
+      transition: opacity 200ms ease;
+    }
+    .download-btn.downloaded {
+      border-color: var(--green-accent);
+      color: var(--green-accent);
+      pointer-events: none;
+    }
+    .download-btn .btn-icon-check {
+      display: none;
+    }
+    .download-btn.downloaded .btn-icon-check {
+      display: inline;
+    }
+    .download-btn.downloaded .btn-icon-dl {
+      display: none;
+    }
+
+    /* ===========================================
+       §9 — EXPANDABLE TRIBAL CARDS
+    =========================================== */
+    .tribe-desc-teaser {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .tribe-expand-area {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 300ms ease-in-out;
+    }
+    .tribe-card.expanded .tribe-expand-area {
+      max-height: 500px;
+    }
+    .tribe-card.expanded .tribe-desc-teaser {
+      -webkit-line-clamp: unset;
+      overflow: visible;
+    }
+    .tribe-expand-chevron {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      transition: transform 300ms ease-in-out;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .tribe-card.expanded .tribe-expand-chevron {
+      transform: rotate(180deg);
+    }
+    .tribe-extra-fields {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tribe-extra-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tribe-extra-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .tribe-extra-value {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    /* ===========================================
        RESPONSIVE BREAKPOINTS
     =========================================== */
     @media(max-width:1024px){
@@ -1776,7 +2040,7 @@
                 
                 <div class="legend-container ${APP.choroplethMode !== 'flat' ? 'active' : ''}" id="choropleth-legend">
                   <span id="legend-min">0%</span>
-                  <div class="legend-gradient" id="legend-gradient-bar"></div>
+                  <div class="legend-gradient" id="legend-gradient-bar"><div class="legend-gradient-readout" id="legend-readout">0%</div></div>
                   <span id="legend-max">100%</span>
                 </div>
                 
@@ -1845,62 +2109,112 @@
           </div>
           <div class="tribal-grid">
             <!-- Card 1: Bhotia -->
-            <div class="tribe-card" onclick="highlightTribeDistricts('bhotia', this)">
+            <div class="tribe-card" onclick="toggleTribeCard(this, 'bhotia')">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Bhotia.jpg" alt="Bhotia Tribe" class="tribe-img">
               </div>
               <div class="tribe-info">
-                <div class="tribe-name" data-en="Bhotia" data-hi="भोटिया">Bhotia</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="tribe-name" data-en="Bhotia" data-hi="भोटिया">Bhotia</div>
+                  <div class="tribe-expand-chevron"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
                 <div class="tribe-districts-badge" data-en="Chamoli, Pithoragarh, Uttarkashi" data-hi="चमोली, पिथौरागढ़, उत्तरकाशी">Chamoli, Pithoragarh, Uttarkashi</div>
-                <p class="tribe-desc" data-en="Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts. Traditionally engaged in trans-Himalayan trade, animal husbandry, and agriculture. Known for weaving woolen garments and carpets." data-hi="मुख्य रूप से चमोली, पिथौरागढ़ और उत्तरकाशी जिलों में पाए जाते हैं। पारंपरिक रूप से ट्रांस-हिमालयी व्यापार, पशुपालन और कृषि में लगे हुए हैं। ऊनी कपड़े और कालीन बुनने के लिए जाने जाते हैं।">Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts. Traditionally engaged in trans-Himalayan trade, animal husbandry, and agriculture. Known for weaving woolen garments and carpets.</p>
+                <p class="tribe-desc-teaser" data-en="Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts." data-hi="मुख्य रूप से चमोली, पिथौरागढ़ और उत्तरकाशी जिलों में पाए जाते हैं।">Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts.</p>
+                <div class="tribe-expand-area">
+                  <p class="tribe-desc" data-en="Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts. Traditionally engaged in trans-Himalayan trade, animal husbandry, and agriculture. Known for weaving woolen garments and carpets." data-hi="मुख्य रूप से चमोली, पिथौरागढ़ और उत्तरकाशी जिलों में पाए जाते हैं। पारंपरिक रूप से ट्रांस-हिमालयी व्यापार, पशुपालन और कृषि में लगे हुए हैं। ऊनी कपड़े और कालीन बुनने के लिए जाने जाते हैं।">Found mainly in Chamoli, Pithoragarh, and Uttarkashi districts. Traditionally engaged in trans-Himalayan trade, animal husbandry, and agriculture. Known for weaving woolen garments and carpets.</p>
+                  <div class="tribe-extra-fields">
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Primary Occupation" data-hi="प्राथमिक व्यवसाय">Primary Occupation</span><span class="tribe-extra-value" data-en="Trans-Himalayan trade, animal husbandry, agriculture" data-hi="ट्रांस-हिमालयी व्यापार, पशुपालन, कृषि">Trans-Himalayan trade, animal husbandry, agriculture</span></div>
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Cultural Notes" data-hi="सांस्कृतिक नोट्स">Cultural Notes</span><span class="tribe-extra-value" data-en="Known for weaving woolen garments and carpets" data-hi="ऊनी कपड़े और कालीन बुनने के लिए जाने जाते हैं">Known for weaving woolen garments and carpets</span></div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Card 2: Jaunsari -->
-            <div class="tribe-card" onclick="highlightTribeDistricts('jaunsari', this)">
+            <div class="tribe-card" onclick="toggleTribeCard(this, 'jaunsari')">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Jaunsari.jpg" alt="Jaunsari Tribe" class="tribe-img">
               </div>
               <div class="tribe-info">
-                <div class="tribe-name" data-en="Jaunsari" data-hi="जौनसारी">Jaunsari</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="tribe-name" data-en="Jaunsari" data-hi="जौनसारी">Jaunsari</div>
+                  <div class="tribe-expand-chevron"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
                 <div class="tribe-districts-badge" data-en="Dehradun (Jaunsar-Bawar)" data-hi="देहरादून (जौनसार-बावर)">Dehradun (Jaunsar-Bawar)</div>
-                <p class="tribe-desc" data-en="Primarily live in the Jaunsar-Bawar region of Dehradun district. Practice agriculture and livestock rearing. Have a distinct language (Jaunsari) and rich folk traditions." data-hi="मुख्य रूप से देहरादून जिले के जौनसार-बावर क्षेत्र में रहते हैं। कृषि और पशुपालन करते हैं। इनकी एक अलग भाषा (जौनसारी) और समृद्ध लोक परंपराएं हैं।">Primarily live in the Jaunsar-Bawar region of Dehradun district. Practice agriculture and livestock rearing. Have a distinct language (Jaunsari) and rich folk traditions.</p>
+                <p class="tribe-desc-teaser" data-en="Primarily live in the Jaunsar-Bawar region of Dehradun district." data-hi="मुख्य रूप से देहरादून जिले के जौनसार-बावर क्षेत्र में रहते हैं।">Primarily live in the Jaunsar-Bawar region of Dehradun district.</p>
+                <div class="tribe-expand-area">
+                  <p class="tribe-desc" data-en="Primarily live in the Jaunsar-Bawar region of Dehradun district. Practice agriculture and livestock rearing. Have a distinct language (Jaunsari) and rich folk traditions." data-hi="मुख्य रूप से देहरादून जिले के जौनसार-बावर क्षेत्र में रहते हैं। कृषि और पशुपालन करते हैं। इनकी एक अलग भाषा (जौनसारी) और समृद्ध लोक परंपराएं हैं।">Primarily live in the Jaunsar-Bawar region of Dehradun district. Practice agriculture and livestock rearing. Have a distinct language (Jaunsari) and rich folk traditions.</p>
+                  <div class="tribe-extra-fields">
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Primary Occupation" data-hi="प्राथमिक व्यवसाय">Primary Occupation</span><span class="tribe-extra-value" data-en="Agriculture, livestock rearing" data-hi="कृषि, पशुपालन">Agriculture, livestock rearing</span></div>
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Cultural Notes" data-hi="सांस्कृतिक नोट्स">Cultural Notes</span><span class="tribe-extra-value" data-en="Distinct Jaunsari language and rich folk traditions" data-hi="अलग जौनसारी भाषा और समृद्ध लोक परंपराएं">Distinct Jaunsari language and rich folk traditions</span></div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Card 3: Tharu -->
-            <div class="tribe-card" onclick="highlightTribeDistricts('tharu', this)">
+            <div class="tribe-card" onclick="toggleTribeCard(this, 'tharu')">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Tharu.jpg" alt="Tharu Tribe" class="tribe-img">
               </div>
               <div class="tribe-info">
-                <div class="tribe-name" data-en="Tharu" data-hi="थारू">Tharu</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="tribe-name" data-en="Tharu" data-hi="थारू">Tharu</div>
+                  <div class="tribe-expand-chevron"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
                 <div class="tribe-districts-badge" data-en="Udham Singh Nagar" data-hi="उधम सिंह नगर">Udham Singh Nagar</div>
-                <p class="tribe-desc" data-en="Inhabit the Terai region, especially Udham Singh Nagar district. Traditionally depend on farming, fishing, and forest resources. Famous for vibrant folk dances and festivals." data-hi="तराई क्षेत्र, विशेष रूप से उधम सिंह नगर जिले में निवास करते हैं। पारंपरिक रूप से खेती, मछली पकड़ने और वन संसाधनों पर निर्भर हैं। जीवंत लोक नृत्यों और त्योहारों के लिए प्रसिद्ध हैं।">Inhabit the Terai region, especially Udham Singh Nagar district. Traditionally depend on farming, fishing, and forest resources. Famous for vibrant folk dances and festivals.</p>
+                <p class="tribe-desc-teaser" data-en="Inhabit the Terai region, especially Udham Singh Nagar district." data-hi="तराई क्षेत्र, विशेष रूप से उधम सिंह नगर जिले में निवास करते हैं।">Inhabit the Terai region, especially Udham Singh Nagar district.</p>
+                <div class="tribe-expand-area">
+                  <p class="tribe-desc" data-en="Inhabit the Terai region, especially Udham Singh Nagar district. Traditionally depend on farming, fishing, and forest resources. Famous for vibrant folk dances and festivals." data-hi="तराई क्षेत्र, विशेष रूप से उधम सिंह नगर जिले में निवास करते हैं। पारंपरिक रूप से खेती, मछली पकड़ने और वन संसाधनों पर निर्भर हैं। जीवंत लोक नृत्यों और त्योहारों के लिए प्रसिद्ध हैं।">Inhabit the Terai region, especially Udham Singh Nagar district. Traditionally depend on farming, fishing, and forest resources. Famous for vibrant folk dances and festivals.</p>
+                  <div class="tribe-extra-fields">
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Primary Occupation" data-hi="प्राथमिक व्यवसाय">Primary Occupation</span><span class="tribe-extra-value" data-en="Farming, fishing, forest resources" data-hi="खेती, मछली पकड़ना, वन संसाधन">Farming, fishing, forest resources</span></div>
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Cultural Notes" data-hi="सांस्कृतिक नोट्स">Cultural Notes</span><span class="tribe-extra-value" data-en="Famous for vibrant folk dances and festivals" data-hi="जीवंत लोक नृत्यों और त्योहारों के लिए प्रसिद्ध">Famous for vibrant folk dances and festivals</span></div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Card 4: Buksa -->
-            <div class="tribe-card" onclick="highlightTribeDistricts('buksa', this)">
+            <div class="tribe-card" onclick="toggleTribeCard(this, 'buksa')">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Buksa.jpg" alt="Buksa Tribe" class="tribe-img">
               </div>
               <div class="tribe-info">
-                <div class="tribe-name" data-en="Buksa (Bhoksa)" data-hi="बुक्सा (भोक्सा)">Buksa (Bhoksa)</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="tribe-name" data-en="Buksa (Bhoksa)" data-hi="बुक्सा (भोक्सा)">Buksa (Bhoksa)</div>
+                  <div class="tribe-expand-chevron"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
                 <div class="tribe-districts-badge" data-en="Dehradun, Nainital, Udham Singh Nagar" data-hi="देहरादून, नैनीताल, उधम सिंह नगर">Dehradun, Nainital, Udham Singh Nagar</div>
-                <p class="tribe-desc" data-en="Found in Dehradun, Nainital, and Udham Singh Nagar districts. Mainly involved in agriculture and wage labor. Recognized as one of the Scheduled Tribes of Uttarakhand." data-hi="देहरादून, नैनीताल और उधम सिंह नगर जिलों में पाए जाते हैं। मुख्य रूप से कृषि और दैनिक मजदूरी में शामिल हैं। उत्तराखंड की अनुसूचित जनजातियों में से एक के रूप में मान्यता प्राप्त है।">Found in Dehradun, Nainital, and Udham Singh Nagar districts. Mainly involved in agriculture and wage labor. Recognized as one of the Scheduled Tribes of Uttarakhand.</p>
+                <p class="tribe-desc-teaser" data-en="Found in Dehradun, Nainital, and Udham Singh Nagar districts." data-hi="देहरादून, नैनीताल और उधम सिंह नगर जिलों में पाए जाते हैं।">Found in Dehradun, Nainital, and Udham Singh Nagar districts.</p>
+                <div class="tribe-expand-area">
+                  <p class="tribe-desc" data-en="Found in Dehradun, Nainital, and Udham Singh Nagar districts. Mainly involved in agriculture and wage labor. Recognized as one of the Scheduled Tribes of Uttarakhand." data-hi="देहरादून, नैनीताल और उधम सिंह नगर जिलों में पाए जाते हैं। मुख्य रूप से कृषि और दैनिक मजदूरी में शामिल हैं। उत्तराखंड की अनुसूचित जनजातियों में से एक के रूप में मान्यता प्राप्त है।">Found in Dehradun, Nainital, and Udham Singh Nagar districts. Mainly involved in agriculture and wage labor. Recognized as one of the Scheduled Tribes of Uttarakhand.</p>
+                  <div class="tribe-extra-fields">
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Primary Occupation" data-hi="प्राथमिक व्यवसाय">Primary Occupation</span><span class="tribe-extra-value" data-en="Agriculture, wage labor" data-hi="कृषि, दैनिक मजदूरी">Agriculture, wage labor</span></div>
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Cultural Notes" data-hi="सांस्कृतिक नोट्स">Cultural Notes</span><span class="tribe-extra-value" data-en="One of Uttarakhand's recognized Scheduled Tribes" data-hi="उत्तराखंड की मान्यता प्राप्त अनुसूचित जनजातियों में से एक">One of Uttarakhand's recognized Scheduled Tribes</span></div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Card 5: Raji -->
-            <div class="tribe-card" onclick="highlightTribeDistricts('raji', this)">
+            <div class="tribe-card" onclick="toggleTribeCard(this, 'raji')">
               <div class="tribe-img-wrap">
                 <img src="./tribe/Raji.jpg" alt="Raji Tribe" class="tribe-img">
               </div>
               <div class="tribe-info">
-                <div class="tribe-name" data-en="Raji" data-hi="राजी">Raji</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="tribe-name" data-en="Raji" data-hi="राजी">Raji</div>
+                  <div class="tribe-expand-chevron"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
                 <div class="tribe-districts-badge" data-en="Pithoragarh, Champawat" data-hi="पिथौरागढ़, चंपावत">Pithoragarh, Champawat</div>
-                <p class="tribe-desc" data-en="Live in Pithoragarh and Champawat districts. One of India's Particularly Vulnerable Tribal Groups (PVTGs). Traditionally depended on hunting, gathering, and forest produce, though many now practice settled agriculture." data-hi="पिथौरागढ़ और चंपावत जिलों में रहते हैं। भारत के विशेष रूप से कमजोर जनजातीय समूहों (PVTGs) में से एक। पारंपरिक रूप से शिकार, संग्रहण और वनोपज पर निर्भर थे, हालांकि अब कई लोग व्यवस्थित कृषि करते हैं।">Live in Pithoragarh and Champawat districts. One of India's Particularly Vulnerable Tribal Groups (PVTGs). Traditionally depended on hunting, gathering, and forest produce, though many now practice settled agriculture.</p>
+                <p class="tribe-desc-teaser" data-en="Live in Pithoragarh and Champawat districts." data-hi="पिथौरागढ़ और चंपावत जिलों में रहते हैं।">Live in Pithoragarh and Champawat districts.</p>
+                <div class="tribe-expand-area">
+                  <p class="tribe-desc" data-en="Live in Pithoragarh and Champawat districts. One of India's Particularly Vulnerable Tribal Groups (PVTGs). Traditionally depended on hunting, gathering, and forest produce, though many now practice settled agriculture." data-hi="पिथौरागढ़ और चंपावत जिलों में रहते हैं। भारत के विशेष रूप से कमजोर जनजातीय समूहों (PVTGs) में से एक। पारंपरिक रूप से शिकार, संग्रहण और वनोपज पर निर्भर थे, हालांकि अब कई लोग व्यवस्थित कृषि करते हैं।">Live in Pithoragarh and Champawat districts. One of India's Particularly Vulnerable Tribal Groups (PVTGs). Traditionally depended on hunting, gathering, and forest produce, though many now practice settled agriculture.</p>
+                  <div class="tribe-extra-fields">
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Primary Occupation" data-hi="प्राथमिक व्यवसाय">Primary Occupation</span><span class="tribe-extra-value" data-en="Settled agriculture (traditionally hunting and gathering)" data-hi="व्यवस्थित कृषि (पारंपरिक रूप से शिकार और संग्रहण)">Settled agriculture (traditionally hunting and gathering)</span></div>
+                    <div class="tribe-extra-field"><span class="tribe-extra-label" data-en="Cultural Notes" data-hi="सांस्कृतिक नोट्स">Cultural Notes</span><span class="tribe-extra-value" data-en="One of India's Particularly Vulnerable Tribal Groups (PVTGs)" data-hi="भारत के विशेष रूप से कमजोर जनजातीय समूहों (PVTGs) में से एक">One of India's Particularly Vulnerable Tribal Groups (PVTGs)</span></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2039,6 +2353,12 @@
 
       APP.districtsLayer = districtsLayer;
       updateChoroplethColors(false);
+
+      // §2 — Spotlight badges for top 3 districts
+      addSpotlightBadges(map, districtsGeoJSON, isLangSwitch);
+
+      // §1 — Legend readout hover
+      initLegendReadout();
 
       // Counters Animation Delay
       const animationWait = isLangSwitch ? 0 : 900 + (13 * 80) + 300;
@@ -2192,6 +2512,25 @@
           if (el) el.classList.remove('clicked-confirm');
         });
       });
+
+      // §3 — Clickable ranking bars navigate to district page
+      rankChart.getZr().setCursorStyle('pointer');
+      rankChart.on('click', (params) => {
+        if (params.dataIndex !== undefined) {
+          const item = districtRankData[params.dataIndex];
+          if (item) {
+            districtsLayer.eachLayer(layer => {
+              if (layer.districtCode === item.code) {
+                const el = layer.getElement();
+                if (el) el.classList.add('clicked-confirm');
+              }
+            });
+            setTimeout(() => {
+              window.location.hash = '#/district/' + item.code;
+            }, 220);
+          }
+        }
+      });
     }
 
     // Dynamic Color Mode Recolor trigger
@@ -2229,10 +2568,14 @@
           gradient.style.background = 'linear-gradient(to right, #FCE7F3, #9D174D)';
           minEl.textContent = `${UI_TRANSLATIONS[lang].minLabel}: 12.3%`;
           maxEl.textContent = `${UI_TRANSLATIONS[lang].maxLabel}: 32.5%`;
+          APP.legendMin = 12.3;
+          APP.legendMax = 32.5;
         } else {
           gradient.style.background = 'linear-gradient(to right, #E8F5E3, #0b5704)';
           minEl.textContent = `${UI_TRANSLATIONS[lang].minLabel}: 0.1%`;
           maxEl.textContent = `${UI_TRANSLATIONS[lang].maxLabel}: 22.0%`;
+          APP.legendMin = 0.1;
+          APP.legendMax = 22.0;
         }
       }
 
@@ -2372,6 +2715,7 @@
                 <div class="map-dir-badge map-dir-e" title="East / पूर्व" data-en="E" data-hi="पू">E</div>
                 <div id="map"></div>
                 <div class="loader-overlay" id="loader-overlay"><div class="spinner"></div></div>
+                ${createMapSkeleton()}
               </div>
 
               <!-- Sub-districts Directory Table -->
@@ -2577,6 +2921,13 @@
       APP.subdistrictsLayer = subdistrictsLayer;
       applyActiveMapStyles();
 
+      // §4 — Fade out skeleton
+      fadeOutSkeleton();
+
+      // §5 — Locator inset map
+      const mapWrapperEl = document.querySelector('.map-wrapper');
+      if (mapWrapperEl) addLocatorInset(mapWrapperEl, districtCode);
+
       // Stagger entrance children
       let idx = 0;
       subdistrictsLayer.eachLayer(layer => {
@@ -2761,6 +3112,7 @@
                 <div class="map-dir-badge map-dir-e" title="East / पूर्व" data-en="E" data-hi="पू">E</div>
                 <div id="map"></div>
                 <div class="loader-overlay" id="loader-overlay"><div class="spinner"></div></div>
+                ${createMapSkeleton()}
               </div>
             </section>
 
@@ -2799,10 +3151,15 @@
       const statsPanel = document.getElementById('subdistrict-stats-panel');
       if (isCensusAvail === false || isCensusAvail === "false") {
         statsPanel.innerHTML = `
-          <div class="card" style="border-color: var(--saffron-accent); background: var(--saffron-light);">
-            <p style="font-size: 0.85rem; font-weight: 600; color: var(--ucost-blue-dark); text-align: center;">
-              ${UI_TRANSLATIONS[lang].notAvailable}
-            </p>
+          <div class="card">
+            <div class="empty-state-census-card">
+              <div class="empty-state-ring">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <p class="empty-state-note" data-en="2011 census data not available for this sub-district (created after 2011)." data-hi="इस उप-जिले के लिए 2011 की जनगणना के आंकड़े उपलब्ध नहीं हैं (2011 के बाद निर्मित)।">
+                ${UI_TRANSLATIONS[lang].notAvailable}
+              </p>
+            </div>
           </div>
         `;
       } else {
@@ -2893,6 +3250,13 @@
       }).addTo(map);
       APP.subdistrictBoundary = subdistrictBoundary;
       applyActiveMapStyles();
+
+      // §4 — Fade out skeleton
+      fadeOutSkeleton();
+
+      // §5 — Locator inset map (show parent district)
+      const mapWrapperEl = document.querySelector('.map-wrapper');
+      if (mapWrapperEl) addLocatorInset(mapWrapperEl, districtCode);
 
       map.fitBounds(subdistrictBoundary.getBounds(), { padding: [50, 50] });
 
@@ -3054,13 +3418,15 @@
             </div>
             
             <div class="download-btn-cluster" style="margin-top:0;">
-              <button class="download-btn" onclick="exportVillageCSV()">
-                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                <span data-en="${UI_TRANSLATIONS.en.downloadCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadCsv}">${UI_TRANSLATIONS[lang].downloadCsv}</span>
+              <button class="download-btn" id="btn-dl-village" onclick="exportVillageCSV(this)">
+                <svg class="btn-icon-dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <svg class="btn-icon-check" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"/></svg>
+                <span class="btn-text" data-en="${UI_TRANSLATIONS.en.downloadCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadCsv}">${UI_TRANSLATIONS[lang].downloadCsv}</span>
               </button>
-              <button class="download-btn" onclick="exportSubdistrictCSV()">
-                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                <span data-en="${UI_TRANSLATIONS.en.downloadSubdistrictCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadSubdistrictCsv}">${UI_TRANSLATIONS[lang].downloadSubdistrictCsv}</span>
+              <button class="download-btn" id="btn-dl-sd" onclick="exportSubdistrictCSV(this)">
+                <svg class="btn-icon-dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <svg class="btn-icon-check" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"/></svg>
+                <span class="btn-text" data-en="${UI_TRANSLATIONS.en.downloadSubdistrictCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadSubdistrictCsv}">${UI_TRANSLATIONS[lang].downloadSubdistrictCsv}</span>
               </button>
             </div>
           </div>
@@ -3107,6 +3473,17 @@
 
             <!-- Right Side: Micro charts & comparison -->
             <div style="display: flex; gap: 16px; flex-grow: 1; align-items: stretch;">
+              ${(scPop === 0 && stPop === 0) ? `
+              <!-- §6 — Zero SC/ST empty state -->
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 140px;">
+                <div class="empty-state-ring" style="width:70px;height:70px;">
+                  <svg viewBox="0 0 24 24" style="width:24px;height:24px;"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+              </div>
+              <div style="flex: 1.2; display: flex; align-items: center; justify-content: center; background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <p class="empty-state-note" data-en="This village has no recorded SC/ST population." data-hi="इस गांव में कोई दर्ज अनुसूचित जाति/जनजाति जनसंख्या नहीं है।">This village has no recorded SC/ST population.</p>
+              </div>
+              ` : `
               <!-- SC/ST Share Donut -->
               <div class="micro-chart-container" style="flex: 1; height: 140px; position: relative;">
                 <div id="micro-donut" style="width: 100%; height: 100%;"></div>
@@ -3156,6 +3533,7 @@
                 </div>
 
               </div>
+              `}
             </div>
           </div>
 
@@ -3167,22 +3545,25 @@
         </div>
       `;
 
-      // Set Up Mini Donut Chart
-      const miniDonut = echarts.init(document.getElementById('micro-donut'));
-      APP.charts.miniDonut = miniDonut;
-      miniDonut.setOption({
-        tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-        series: [{
-          type: 'pie', radius: ['45%', '65%'], center: ['50%', '50%'],
-          avoidLabelOverlap: false, label: { show: false }, labelLine: { show: false },
-          data: [
-            { value: scPop, name: UI_TRANSLATIONS[lang].scPop, itemStyle: { color: '#0B3D6E' } },
-            { value: stPop, name: UI_TRANSLATIONS[lang].stPop, itemStyle: { color: '#128807' } },
-            { value: totalPop - scPop - stPop, name: UI_TRANSLATIONS[lang].otherPop, itemStyle: { color: '#D0D5DD' } }
-          ],
-          animationType: 'scale', animationEasing: 'elasticOut', animationDuration: 700
-        }]
-      });
+      // §6 — Only init micro donut if SC/ST data exists
+      if (scPop > 0 || stPop > 0) {
+        // Set Up Mini Donut Chart
+        const miniDonut = echarts.init(document.getElementById('micro-donut'));
+        APP.charts.miniDonut = miniDonut;
+        miniDonut.setOption({
+          tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+          series: [{
+            type: 'pie', radius: ['45%', '65%'], center: ['50%', '50%'],
+            avoidLabelOverlap: false, label: { show: false }, labelLine: { show: false },
+            data: [
+              { value: scPop, name: UI_TRANSLATIONS[lang].scPop, itemStyle: { color: '#0B3D6E' } },
+              { value: stPop, name: UI_TRANSLATIONS[lang].stPop, itemStyle: { color: '#128807' } },
+              { value: totalPop - scPop - stPop, name: UI_TRANSLATIONS[lang].otherPop, itemStyle: { color: '#D0D5DD' } }
+            ],
+            animationType: 'scale', animationEasing: 'elasticOut', animationDuration: 700
+          }]
+        });
+      }
 
       // Custom animated gauge progress bar trigger
       setTimeout(() => {
@@ -3229,6 +3610,11 @@
         v.census_village_name
       ];
 
+      // §7 — Population-based color gradient for scatter dots
+      const allPops = scatterDataPoints.map(d => d[2]);
+      const popMin = Math.min(...allPops, 1);
+      const popMax = Math.max(...allPops, 1);
+
       const scatterOption = {
         grid: { left: 45, right: 25, top: 15, bottom: 40 },
         tooltip: {
@@ -3265,9 +3651,19 @@
               return Math.min(25, Math.max(6, 6 + (data[2] / 5000) * 19));
             },
             itemStyle: {
-              color: '#1E6FB5',
-              opacity: 0.4
-            }
+              color: function(params) {
+                // §7 — Gradient from light to dark based on population
+                const popVal = params.data[2];
+                const factor = Math.min(1, Math.max(0, (popVal - popMin) / (popMax - popMin + 1)));
+                return interpolateColor('#93C5FD', '#0B3D6E', factor);
+              },
+              opacity: 0.6
+            },
+            animationDelay: function(idx) {
+              return idx * (10 + Math.random() * 30);
+            },
+            animationDuration: 400,
+            animationEasing: 'cubicOut'
           },
           {
             id: 'selected-village',
@@ -3418,7 +3814,7 @@
       document.body.removeChild(link);
     }
 
-    window.exportVillageCSV = function() {
+    window.exportVillageCSV = function(btnEl) {
       if (!APP.selectedVillage) return;
       const v = APP.selectedVillage.properties;
       const filename = `${v.census_village_name.toLowerCase().replace(/\s+/g, '_')}_census_data.csv`;
@@ -3443,9 +3839,11 @@
       ];
 
       downloadCSV(filename, rows);
+      // §8 — Download confirmation animation
+      animateDownloadBtn(btnEl);
     };
 
-    window.exportSubdistrictCSV = function() {
+    window.exportSubdistrictCSV = function(btnEl) {
       if (!APP.activeSubdistrict) return;
       const sd = APP.activeSubdistrict.properties;
       const filename = `${sd.subdistrict_name.toLowerCase().replace(/\s+/g, '_')}_villages_dataset.csv`;
@@ -3479,6 +3877,8 @@
       });
 
       downloadCSV(filename, rows);
+      // §8 — Download confirmation animation
+      animateDownloadBtn(btnEl);
     };
 
     /* ===========================================
@@ -3650,6 +4050,215 @@
     /* ===========================================
        APPLICATION CONTEXT INITIALIZATION
     =========================================== */
+    /* ===========================================
+       §1 — LEGEND GRADIENT HOVER READOUT LOGIC
+    =========================================== */
+    APP.legendMin = 0;
+    APP.legendMax = 100;
+
+    function initLegendReadout() {
+      const bar = document.getElementById('legend-gradient-bar');
+      const readout = document.getElementById('legend-readout');
+      if (!bar || !readout) return;
+
+      bar.addEventListener('mousemove', function(e) {
+        const rect = bar.getBoundingClientRect();
+        const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const val = APP.legendMin + fraction * (APP.legendMax - APP.legendMin);
+        readout.textContent = '~' + val.toFixed(1) + '%';
+        readout.style.left = (fraction * 100) + '%';
+        readout.classList.add('visible');
+      });
+
+      bar.addEventListener('mouseleave', function() {
+        readout.classList.remove('visible');
+      });
+    }
+
+    /* ===========================================
+       §2 — MAP SPOTLIGHT BADGES LOGIC
+    =========================================== */
+    function addSpotlightBadges(map, districtsGeoJSON, isLangSwitch) {
+      const features = districtsGeoJSON.features;
+      // Find top SC, ST, Literacy districts
+      const topSC = features.reduce((best, f) => (parseFloat(f.properties.sc_percent)||0) > (parseFloat(best.properties.sc_percent)||0) ? f : best, features[0]);
+      const topST = features.reduce((best, f) => (parseFloat(f.properties.st_percent)||0) > (parseFloat(best.properties.st_percent)||0) ? f : best, features[0]);
+      const topLit = features.reduce((best, f) => (parseFloat(f.properties.literacy_percent)||0) > (parseFloat(best.properties.literacy_percent)||0) ? f : best, features[0]);
+
+      const badges = [
+        { feature: topSC, cls: 'badge-sc', label: 'SC', stat: topSC.properties.district_name + ' (' + (parseFloat(topSC.properties.sc_percent)||0).toFixed(1) + '% SC)', code: topSC.properties.district_code },
+        { feature: topST, cls: 'badge-st', label: 'ST', stat: topST.properties.district_name + ' (' + (parseFloat(topST.properties.st_percent)||0).toFixed(1) + '% ST)', code: topST.properties.district_code },
+        { feature: topLit, cls: 'badge-lit', label: 'LIT', stat: topLit.properties.district_name + ' (' + (parseFloat(topLit.properties.literacy_percent)||0).toFixed(1) + '% Literacy)', code: topLit.properties.district_code }
+      ];
+
+      // Track placed positions for collision detection
+      const placed = [];
+
+      badges.forEach(b => {
+        // Compute center from GeoJSON bounds
+        const layer = L.geoJSON(b.feature);
+        const center = layer.getBounds().getCenter();
+        let latLng = [center.lat, center.lng];
+
+        // Check for overlap with already-placed badges
+        for (const p of placed) {
+          const dist = Math.abs(p[0] - latLng[0]) + Math.abs(p[1] - latLng[1]);
+          if (dist < 0.05) {
+            latLng = [latLng[0] + 0.04, latLng[1] + 0.04]; // offset by ~8px equivalent
+          }
+        }
+        placed.push(latLng);
+
+        const icon = L.divIcon({
+          className: '',
+          html: '<div class="map-spotlight-badge ' + b.cls + '">' + b.label + '</div>',
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+
+        const marker = L.marker(latLng, { icon: icon, interactive: true }).addTo(map);
+
+        // Tooltip on hover
+        marker.bindTooltip(b.stat, {
+          direction: 'top',
+          offset: [0, -18],
+          className: 'custom-tooltip visible',
+          opacity: 1
+        });
+
+        // Click to navigate
+        marker.on('click', () => {
+          if (APP.districtsLayer) {
+            APP.districtsLayer.eachLayer(l => {
+              if (l.districtCode === b.code) {
+                const el = l.getElement();
+                if (el) el.classList.add('clicked-confirm');
+              }
+            });
+          }
+          setTimeout(() => {
+            window.location.hash = '#/district/' + b.code;
+          }, 220);
+        });
+
+        // Stagger entrance delay synchronized with district boundary animation
+        const featureIdx = features.findIndex(f => f.properties.district_code === b.code);
+        const idx = featureIdx !== -1 ? featureIdx : 0;
+        const delay = isLangSwitch ? 0 : 900 + (idx * 80) + 150;
+
+        setTimeout(() => {
+          const markerEl = marker.getElement();
+          if (markerEl) {
+            const badgeEl = markerEl.querySelector('.map-spotlight-badge');
+            if (badgeEl) badgeEl.classList.add('enter');
+          }
+        }, delay);
+      });
+    }
+
+    /* ===========================================
+       §4 — SKELETON LOADER HELPERS
+    =========================================== */
+    function createMapSkeleton() {
+      return `<div class="map-skeleton" id="map-skeleton">
+        <svg class="map-skeleton-shapes" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="80" cy="60" rx="55" ry="40" fill="#d0d5dd" rx="10"/>
+          <ellipse cx="140" cy="90" rx="40" ry="35" fill="#c8cdd3"/>
+          <ellipse cx="60" cy="110" rx="30" ry="22" fill="#d0d5dd"/>
+        </svg>
+      </div>`;
+    }
+
+    function fadeOutSkeleton() {
+      const skeleton = document.getElementById('map-skeleton');
+      if (skeleton) {
+        skeleton.classList.add('fade-out');
+        setTimeout(() => skeleton.remove(), 200);
+      }
+    }
+
+    /* ===========================================
+       §5 — LOCATOR INSET MAP HELPER
+    =========================================== */
+    function addLocatorInset(mapWrapper, districtCode) {
+      // Remove existing inset if present
+      const existing = mapWrapper.querySelector('.locator-inset');
+      if (existing) existing.remove();
+
+      const insetContainer = document.createElement('div');
+      insetContainer.className = 'locator-inset';
+      const insetMapDiv = document.createElement('div');
+      insetMapDiv.style.cssText = 'width:100%;height:100%;';
+      insetContainer.appendChild(insetMapDiv);
+      mapWrapper.appendChild(insetContainer);
+
+      // Small static inset map
+      const insetMap = L.map(insetMapDiv, {
+        zoomControl: false,
+        attributionControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        tap: false,
+        touchZoom: false
+      });
+
+      // Load and render state outline
+      loadGeoJSON('uttarakhand_state').then(stateGeo => {
+        L.geoJSON(stateGeo, {
+          style: { color: '#9CA3AF', weight: 1.5, fillColor: '#E5E7EB', fillOpacity: 0.3, interactive: false }
+        }).addTo(insetMap);
+
+        // Highlight the current district
+        loadGeoJSON('uttarakhand_districts').then(districtsGeo => {
+          const districtFeature = districtsGeo.features.find(f => f.properties.district_code === districtCode);
+          if (districtFeature) {
+            L.geoJSON(districtFeature, {
+              style: { color: '#FF9933', weight: 2, fillColor: '#FF9933', fillOpacity: 0.5, interactive: false }
+            }).addTo(insetMap);
+          }
+
+          // Fit to state bounds
+          const stateBounds = L.geoJSON(stateGeo).getBounds();
+          insetMap.fitBounds(stateBounds, { padding: [4, 4] });
+        });
+      });
+    }
+
+    /* ===========================================
+       §8 — DOWNLOAD CONFIRMATION ANIMATION
+    =========================================== */
+    function animateDownloadBtn(btnElement) {
+      if (!btnElement) return;
+      const iconDl = btnElement.querySelector('.btn-icon-dl');
+      const iconCheck = btnElement.querySelector('.btn-icon-check');
+      const textEl = btnElement.querySelector('.btn-text');
+      const originalText = textEl ? textEl.textContent : '';
+
+      btnElement.classList.add('downloaded');
+      if (textEl) textEl.textContent = 'Downloaded';
+
+      setTimeout(() => {
+        btnElement.classList.remove('downloaded');
+        if (textEl) textEl.textContent = originalText;
+      }, 1500);
+    }
+
+    /* ===========================================
+       §9 — TRIBAL CARD EXPAND/COLLAPSE
+    =========================================== */
+    window.toggleTribeCard = function(cardElement, tribeKey) {
+      const wasExpanded = cardElement.classList.contains('expanded');
+
+      // Toggle expand
+      cardElement.classList.toggle('expanded');
+
+      // Also trigger the map highlight
+      highlightTribeDistricts(tribeKey, cardElement);
+    };
+
     async function init() {
       await loadTickerData();
       renderNewsTicker();
