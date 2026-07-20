@@ -1593,7 +1593,7 @@
   <div class="utility-bar">
     <div class="utility-inner">
       <div class="utility-left">
-        <span class="gov-text">Government of</span>
+        <span class="gov-text">Government of Uttarakhand</span>
       </div>
       <div class="utility-right">
         <div class="lang-cluster" role="group" aria-label="Language selection">
@@ -1637,13 +1637,6 @@
   <!-- ========== NAVIGATION (NAV BAR WITH BREADCRUMBS & TICKER) ========== -->
   <nav class="main-nav" id="main-nav" role="navigation" aria-label="Main Navigation">
     <div class="nav-inner">
-      <!-- Breadcrumbs -->
-      <div class="breadcrumb-container" id="nav-breadcrumbs" aria-label="Breadcrumb navigation">
-        <!-- Dynamically rendered -->
-      </div>
-      
-      <!-- News Ticker -->
-      
       <!-- Navigation Links (Exact CS Style) -->
       <ul class="nav-list" id="nav-list" role="menubar">
         <li class="nav-item" role="none">
@@ -1662,6 +1655,11 @@
           <a class="nav-link nav-contact" href="#/contact" role="menuitem" data-en="Contact Us" data-hi="संपर्क करें">Contact Us</a>
         </li>
       </ul>
+
+      <!-- Breadcrumbs -->
+      <div class="breadcrumb-container" id="nav-breadcrumbs" aria-label="Breadcrumb navigation">
+        <!-- Dynamically rendered -->
+      </div>
 
       <div class="nav-ticker" id="nav-ticker" tabindex="0">
         <div class="ticker-label" data-en="Advisory" data-hi="सलाह">Advisory</div>
@@ -2216,24 +2214,23 @@
       const parts = hash.split('/');
       const lang = APP.currentLang;
 
-      let html = `<a href="#/state" data-en="Uttarakhand" data-hi="उत्तराखंड">${UI_TRANSLATIONS[lang].stateCrumb}</a>`;
+      let html = '';
 
       if (parts[1] === 'district' && parts[2]) {
         const dCode = parts[2];
         const dName = APP.activeDistrict ? APP.activeDistrict.properties.district_name : dCode;
-        html += ` <span class="sep">›</span> <span class="active-crumb">${dName}</span>`;
+        html = `<a href="#/state">${lang === 'hi' ? 'राज्य' : 'State'}</a> <span class="sep">›</span> <span class="active-crumb">${dName}</span>`;
       } else if (parts[1] === 'subdistrict' && parts[2] && parts[3]) {
         const dCode = parts[2];
         const sdCode = parts[3];
         const dName = APP.activeDistrict ? APP.activeDistrict.properties.district_name : dCode;
         const sdName = APP.activeSubdistrict ? APP.activeSubdistrict.properties.subdistrict_name : sdCode;
-        html += ` <span class="sep">›</span> <a href="#/district/${dCode}">${dName}</a>`;
-        html += ` <span class="sep">›</span> <span class="active-crumb">${sdName}</span>`;
+        html = `<a href="#/district/${dCode}">${dName}</a> <span class="sep">›</span> <span class="active-crumb">${sdName}</span>`;
       } else if (parts[1] === 'about') {
         const sub = parts[2] === 'scst-cell' ? (lang === 'hi' ? 'अनु.जाति/जनजाति प्रकोष्ठ' : 'SC/ST Cell') : (lang === 'hi' ? 'यूकोस्ट' : 'UCOST');
-        html += ` <span class="sep">›</span> <span class="active-crumb">${lang === 'hi' ? 'हमारे बारे में' : 'About Us'} (${sub})</span>`;
+        html = `<span class="active-crumb">${lang === 'hi' ? 'हमारे बारे में' : 'About Us'} (${sub})</span>`;
       } else if (parts[1] === 'contact') {
-        html += ` <span class="sep">›</span> <span class="active-crumb">${lang === 'hi' ? 'संपर्क करें' : 'Contact Us'}</span>`;
+        html = `<span class="active-crumb">${lang === 'hi' ? 'संपर्क करें' : 'Contact Us'}</span>`;
       }
 
       container.innerHTML = html;
