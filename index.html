@@ -1299,6 +1299,374 @@
       .footer-bottom{flex-direction:column;text-align:center}
       .compare-drawer {width:100%}
     }
+  
+    /* ===========================================
+       HEADER NAV MENU (LEFT OF ADVISORY)
+    =========================================== */
+    .header-nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .header-nav-item {
+      position: relative;
+    }
+    .header-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-xs);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .header-nav-btn:hover, .header-nav-btn.active {
+      background: var(--saffron-accent);
+      color: var(--ucost-blue-dark);
+      border-color: var(--saffron-accent);
+      box-shadow: 0 2px 8px rgba(255, 153, 51, 0.3);
+    }
+    .header-nav-btn svg {
+      transition: transform var(--transition);
+      flex-shrink: 0;
+    }
+    .header-nav-btn:hover svg {
+      transform: translateY(-1px);
+    }
+    .dropdown-arrow {
+      font-size: 0.75rem;
+      margin-left: 2px;
+      transition: transform var(--transition);
+    }
+    .header-dropdown:hover .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* Header Dropdown Menu */
+    .header-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 190px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      padding: 6px 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition: all var(--transition);
+      z-index: 250;
+    }
+    .header-dropdown:hover .header-dropdown-menu,
+    .header-dropdown:focus-within .header-dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .header-dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background var(--transition), color var(--transition);
+    }
+    .header-dropdown-item:hover {
+      background: var(--saffron-light);
+      color: var(--ucost-blue);
+      font-weight: 600;
+    }
+
+    /* High Contrast Mode for Header Nav */
+    body.high-contrast .header-nav-btn {
+      background: #222;
+      border-color: #555;
+      color: #fff;
+    }
+    body.high-contrast .header-nav-btn:hover {
+      background: #fff;
+      color: #000;
+    }
+    body.high-contrast .header-dropdown-menu {
+      background: #111;
+      border-color: #555;
+    }
+    body.high-contrast .header-dropdown-item {
+      color: #fff;
+    }
+    body.high-contrast .header-dropdown-item:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    /* About & Contact Page Styling */
+    .about-page-container, .contact-page-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 24px 0;
+    }
+    .page-banner-card {
+      background: linear-gradient(135deg, var(--ucost-blue-dark), var(--ucost-blue));
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-banner-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--saffron-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-banner-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+    .page-banner-sub {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 800px;
+      line-height: 1.6;
+    }
+    .about-tab-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+    .about-tab-btn {
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all var(--transition);
+      text-decoration: none;
+    }
+    .about-tab-btn.active, .about-tab-btn:hover {
+      background: var(--ucost-blue);
+      color: #ffffff;
+      border-color: var(--ucost-blue);
+      box-shadow: var(--shadow-sm);
+    }
+    .about-body-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      line-height: 1.8;
+      font-size: 0.98rem;
+      color: var(--text-primary);
+      margin-bottom: 28px;
+    }
+    .about-body-card p {
+      margin-bottom: 16px;
+    }
+    .about-body-card p:last-child {
+      margin-bottom: 0;
+    }
+    .info-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .info-card-item {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .info-card-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .info-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ucost-blue);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .info-card-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .info-card-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .info-card-list li::before {
+      content: '•';
+      color: var(--saffron-accent);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Contact Cards */
+    .contact-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    .person-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .person-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+    .role-badge.pi {
+      background: var(--saffron-light);
+      color: #D97706;
+      border: 1px solid rgba(217, 119, 6, 0.3);
+    }
+    .role-badge.copi {
+      background: #E0F2FE;
+      color: #0284C7;
+      border: 1px solid rgba(2, 132, 199, 0.3);
+    }
+    .role-badge.staff {
+      background: var(--green-light);
+      color: var(--green-accent);
+      border: 1px solid rgba(18, 136, 7, 0.3);
+    }
+    .person-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ucost-blue-dark);
+      margin-bottom: 4px;
+    }
+    .person-designation {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .contact-item-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    .contact-item-row svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--ucost-blue-light);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+    .contact-item-row a {
+      color: var(--ucost-blue);
+      font-weight: 600;
+    }
+    .staff-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .staff-member-item {
+      background: var(--bg-base);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+    .staff-member-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ucost-blue-dark);
+    }
+    .staff-member-title {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .social-links-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .social-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--ucost-blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      text-decoration: none;
+    }
+    .social-btn:hover {
+      background: var(--saffron-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 153, 51, 0.4);
+    }
+    .social-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
   </style>
 </head>
 <body>
@@ -1362,6 +1730,38 @@
       </div>
       
       <!-- News Ticker -->
+      
+      <!-- Navigation Links Menu (Left side of Advisory) -->
+      <ul class="header-nav-menu" role="menubar">
+        <li class="header-nav-item" role="none">
+          <a class="header-nav-btn nav-home-btn" href="https://uttarakhand-sc-st-dashboard.vercel.app/c" target="_blank" rel="noopener" role="menuitem" data-en="Home" data-hi="होम">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span data-en="Home" data-hi="होम">Home</span>
+          </a>
+        </li>
+        <li class="header-nav-item header-dropdown" role="none">
+          <a class="header-nav-btn nav-about-btn" href="#/about" role="menuitem" aria-haspopup="true" aria-expanded="false" id="about-nav-toggle">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span data-en="About Us" data-hi="हमारे बारे में">About Us</span>
+            <span class="dropdown-arrow">▾</span>
+          </a>
+          <div class="header-dropdown-menu" role="menu" aria-label="About Us Submenu">
+            <a class="header-dropdown-item" href="#/about/ucost" role="menuitem">
+              <span data-en="UCOST" data-hi="यूकोस्ट">UCOST</span>
+            </a>
+            <a class="header-dropdown-item" href="#/about/scst-cell" role="menuitem">
+              <span data-en="SC/ST Cell" data-hi="अनु.जाति/जनजाति प्रकोष्ठ">SC/ST Cell</span>
+            </a>
+          </div>
+        </li>
+        <li class="header-nav-item" role="none">
+          <a class="header-nav-btn nav-contact-btn" href="#/contact" role="menuitem" data-en="Contact Us" data-hi="संपर्क करें">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span data-en="Contact Us" data-hi="संपर्क करें">Contact Us</span>
+          </a>
+        </li>
+      </ul>
+
       <div class="nav-ticker" id="nav-ticker" tabindex="0">
         <div class="ticker-label" data-en="Advisory" data-hi="सलाह">Advisory</div>
         <div class="ticker-content">
@@ -1928,6 +2328,11 @@
         const sdName = APP.activeSubdistrict ? APP.activeSubdistrict.properties.subdistrict_name : sdCode;
         html += ` <span class="sep">›</span> <a href="#/district/${dCode}">${dName}</a>`;
         html += ` <span class="sep">›</span> <span class="active-crumb">${sdName}</span>`;
+      } else if (parts[1] === 'about') {
+        const sub = parts[2] === 'scst-cell' ? (lang === 'hi' ? 'अनु.जाति/जनजाति प्रकोष्ठ' : 'SC/ST Cell') : (lang === 'hi' ? 'यूकोस्ट' : 'UCOST');
+        html += ` <span class="sep">›</span> <span class="active-crumb">${lang === 'hi' ? 'हमारे बारे में' : 'About Us'} (${sub})</span>`;
+      } else if (parts[1] === 'contact') {
+        html += ` <span class="sep">›</span> <span class="active-crumb">${lang === 'hi' ? 'संपर्क करें' : 'Contact Us'}</span>`;
       }
 
       container.innerHTML = html;
@@ -1962,6 +2367,253 @@
       }, 200);
     }
 
+    
+    /* ===========================================
+       ABOUT US & CONTACT DATA & BUILDERS (FROM CS)
+    =========================================== */
+    const ABOUT_DATA = {
+      ucost: {
+        title_en: 'Uttarakhand State Council for Science and Technology (UCOST)',
+        title_hi: 'उत्तराखंड राज्य विज्ञान एवं प्रौद्योगिकी परिषद (यूकोस्ट)',
+        sub_en: 'Autonomous body under Dept. of Information & Science Technology, Govt. of Uttarakhand',
+        sub_hi: 'उत्तराखंड सरकार, सूचना एवं विज्ञान प्रौद्योगिकी विभाग का स्वायत्त निकाय',
+        body_en: `<p>Uttarakhand State Council for Science and Technology is an autonomous body of the Government of Uttarakhand, Department of Information & Science Technology. UCOST started its activities from last quarter of year 2005, However it was registered under the Registration of Societies Act, 1860 in November 2002.</p>
+<p>The apex body of the Council is the General Body which is chaired by the Hon'ble Chief Secretary. This body comprises of the Principal Secretary & Secretaries from various departments, Vice Chancellors, eminent scientists, representatives from Industries and NGO's.</p>
+<p>The day to day business is held by the Director General. The Secretary of the department is the chairman of its executive committee. The Council plays a catalytic role for the promotion of S&T in the state and supplement/complement the developmental programmes of the state in different sectors. The overall incharge of the Council is the Director General.</p>`,
+        body_hi: `<p>उत्तराखंड राज्य विज्ञान और प्रौद्योगिकी परिषद उत्तराखंड सरकार, सूचना और विज्ञान प्रौद्योगिकी विभाग का एक स्वायत्त निकाय है। यूकोस्ट ने वर्ष 2005 की अंतिम तिमाही से अपनी गतिविधियाँ शुरू कीं, हालांकि यह नवंबर 2002 में सोसायटी पंजीकरण अधिनियम, 1860 के तहत पंजीकृत किया गया था।</p>
+<p>परिषद का सर्वोच्च निकाय जनरल बॉडी है जिसकी अध्यक्षता माननीय मुख्य सचिव करते हैं। इस निकाय में विभिन्न विभागों के प्रधान सचिव और सचिव, कुलपति, प्रतिष्ठित वैज्ञानिक, उद्योगों और गैर सरकारी संगठनों के प्रतिनिधि शामिल हैं।</p>
+<p>दैनिक कार्य महानिदेशक द्वारा संचालित किए जाते हैं। विभाग के सचिव इसकी कार्यकारी समिति के अध्यक्ष होते हैं। परिषद राज्य में विज्ञान एवं प्रौद्योगिकी को बढ़ावा देने के लिए एक उत्प्रेरक भूमिका निभाती है और विभिन्न क्षेत्रों में राज्य के विकासात्मक कार्यक्रमों को पूरा करती है।</p>`
+      },
+      'scst-cell': {
+        title_en: 'SC/ST Cell — UCOST',
+        title_hi: 'अनु.जाति/जनजाति प्रकोष्ठ — यूकोस्ट',
+        sub_en: 'Established under SEED-DST Project, Government of India',
+        sub_hi: 'विज्ञान एवं प्रौद्योगिकी विभाग (DST), भारत सरकार की SEED योजना के तहत स्थापित',
+        body_en: `<p>The SC/ST Cell of the Uttarakhand State Council for Science & Technology (UCOST) has been established under the project "Establishment of SC/ST Cell in Uttarakhand State Council for Science & Technology," funded by the Science for Equity, Empowerment and Development (SEED) Division, Department of Science and Technology (DST), Government of India.</p>
+<p>The project has been implemented in two phases to promote the socio-economic development and technological empowerment of the Scheduled Caste (SC) and Scheduled Tribe (ST) communities residing in the hilly regions of Uttarakhand. The initiative primarily covers districts including Dehradun, Champawat, Chamoli, Nainital, Pithoragarh, Udham Singh Nagar, and Uttarkashi, while establishing a coordinated network across all 13 districts of the state.</p>
+<p>According to the Census 2011, SCs constitute 18.76% and STs 2.89% of Uttarakhand's total population, making focused interventions essential for inclusive development.</p>
+<p>The SC/ST Cell serves as a coordination and facilitation platform for identifying, promoting, adapting, and scaling up appropriate science and technology-based solutions that enhance sustainable livelihoods and improve the quality of life of target communities. It works towards strengthening human and institutional capacities through skill development, technology deployment, and capacity-building programmes.</p>
+<p>The Cell also assesses local livelihood systems, documents and promotes traditional and indigenous knowledge, supports local innovations, develops databases of promising technologies for wider adoption, and undertakes spatial mapping of resources to facilitate evidence-based planning.</p>
+<p>In its second phase, the project further emphasizes human resource development, establishment of site-based skill development centres, replication of successful technology interventions, and identification of gaps in existing government and non-government schemes to ensure effective delivery of developmental benefits to SC/ST communities.</p>`,
+        body_hi: `<p>उत्तराखंड राज्य विज्ञान एवं प्रौद्योगिकी परिषद (यूकोस्ट) के अनु.जाति/जनजाति प्रकोष्ठ की स्थापना भारत सरकार के विज्ञान और प्रौद्योगिकी विभाग (DST) के इक्विटी सशक्तिकरण और विकास के लिए विज्ञान (SEED) प्रभाग द्वारा वित्त पोषित परियोजना "उत्तराखंड राज्य विज्ञान एवं प्रौद्योगिकी परिषद में अनु.जाति/जनजाति प्रकोष्ठ की स्थापना" के तहत की गई है।</p>
+<p>यह परियोजना उत्तराखंड के पहाड़ी क्षेत्रों में रहने वाले अनुसूचित जाति (एससी) और अनुसूचित जनजाति (एसटी) समुदायों के सामाजिक-आर्थिक विकास और तकनीकी सशक्तिकरण को बढ़ावा देने के लिए दो चरणों में लागू की गई है। यह पहल मुख्य रूप से देहरादून, चंपावत, चमोली, नैनीताल, पिथौरागढ़, ऊधम सिंह नगर और उत्तरकाशी जिलों को कवर करती है, जबकि राज्य के सभी 13 जिलों में एक समन्वित नेटवर्क स्थापित करती है।</p>
+<p>जनगणना 2011 के अनुसार, एससी उत्तराखंड की कुल जनसंख्या का 18.76% और एसटी 2.89% है, जिससे समावेशी विकास के लिए केंद्रित हस्तक्षेप आवश्यक हो जाता है।</p>
+<p>अनु.जाति/जनजाति प्रकोष्ठ उपयुक्त विज्ञान और प्रौद्योगिकी-आधारित समाधानों की पहचान करने, उन्हें बढ़ावा देने और लागू करने के लिए एक समन्वय मंच के रूप में कार्य करता है जो सतत आजीविका को बढ़ाते हैं। यह कौशल विकास और क्षमता निर्माण कार्यक्रमों के माध्यम से मानवीय और संस्थागत क्षमताओं को मजबूत करने की दिशा में काम करता है।</p>`
+      }
+    };
+
+    async function buildAboutPage(subType = 'ucost', isLangSwitch = false) {
+      const lang = APP.currentLang;
+      const appContainer = document.getElementById('app-container');
+      const data = ABOUT_DATA[subType] || ABOUT_DATA['ucost'];
+      
+      const title = lang === 'hi' ? data.title_hi : data.title_en;
+      const sub = lang === 'hi' ? data.sub_hi : data.sub_en;
+      const body = lang === 'hi' ? data.body_hi : data.body_en;
+
+      appContainer.innerHTML = `
+        <div class="about-page-container">
+          <div class="page-banner-card">
+            <h1 class="page-banner-title">${title}</h1>
+            <p class="page-banner-sub">${sub}</p>
+          </div>
+
+          <div class="about-tab-bar">
+            <a href="#/about/ucost" class="about-tab-btn ${subType === 'ucost' ? 'active' : ''}">
+              ${lang === 'hi' ? 'यूकोस्ट (UCOST)' : 'UCOST Overview'}
+            </a>
+            <a href="#/about/scst-cell" class="about-tab-btn ${subType === 'scst-cell' ? 'active' : ''}">
+              ${lang === 'hi' ? 'अनु.जाति/जनजाति प्रकोष्ठ (SC/ST Cell)' : 'SC/ST Cell Details'}
+            </a>
+            <a href="#/state" class="about-tab-btn" style="margin-left: auto; background: var(--saffron-accent); color: var(--ucost-blue-dark); border-color: var(--saffron-accent);">
+              ← ${lang === 'hi' ? 'डैशबोर्ड पर लौटें' : 'Back to Dashboard'}
+            </a>
+          </div>
+
+          <div class="about-body-card">
+            ${body}
+          </div>
+
+          <!-- Key Objectives, Methodology & Deliverables Grid -->
+          <div class="info-grid-3">
+            <div class="info-card-item">
+              <div class="info-card-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                ${lang === 'hi' ? 'मुख्य उद्देश्य (Key Objectives)' : 'Key Objectives'}
+              </div>
+              <ul class="info-card-list">
+                <li>${lang === 'hi' ? 'सतत आजीविका नियोजन हेतु विज्ञान एवं प्रौद्योगिकी का उपयोग' : 'Assess livelihood systems for sustainable planning via science & tech.'}</li>
+                <li>${lang === 'hi' ? 'पारंपरिक एवं स्वदेशी ज्ञान का प्रलेखन एवं कौशल उन्नयन' : 'Capture traditional/indigenous knowledge & upgrade local skills.'}</li>
+                <li>${lang === 'hi' ? 'उपयुक्त प्रौद्योगिकियों का डेटाबेस एवं जीआईएस मैपिंग' : 'Database of promising technologies & spatial GIS mapping.'}</li>
+                <li>${lang === 'hi' ? 'अनु.जाति/जनजाति समुदाय का मानव संसाधन विकास' : 'Human resource development & skill centres for SC/ST communities.'}</li>
+              </ul>
+            </div>
+
+            <div class="info-card-item">
+              <div class="info-card-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                ${lang === 'hi' ? 'कार्यप्रणाली (Methodology)' : 'Implementation Methodology'}
+              </div>
+              <ul class="info-card-list">
+                <li>${lang === 'hi' ? 'आवश्यकता-आधारित ज्ञान एवं खाद्य प्रसंस्करण इकाइयाँ' : 'Need-based knowledge units for Food Preservation & Handicrafts.'}</li>
+                <li>${lang === 'hi' ? 'उत्पाद गुणवत्ता सत्यापन एवं बाजार सहबद्धता' : 'Product quality validation & sustainable market linkage.'}</li>
+                <li>${lang === 'hi' ? 'सुदूर संवेदन (RS) एवं भौगोलिक सूचना प्रणाली (GIS)' : 'Spatial Mapping through Remote Sensing & GIS Technology.'}</li>
+                <li>${lang === 'hi' ? 'प्रौद्योगिकी संसाधन केंद्रों (TRC) का सुदृढ़ीकरण' : 'Strengthening Technology Resource Centres (TRCs) state-wide.'}</li>
+              </ul>
+            </div>
+
+            <div class="info-card-item">
+              <div class="info-card-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                ${lang === 'hi' ? 'संस्थागत सहबद्धता (Institutional Support)' : 'Institutional Links'}
+              </div>
+              <ul class="info-card-list">
+                <li><strong>SEED-DST:</strong> Department of Science & Technology, Govt. of India</li>
+                <li><strong>UCOST:</strong> Uttarakhand State Council for Science & Technology</li>
+                <li><strong>Network:</strong> Coordinated network across all 13 districts</li>
+                <li><strong>Target Groups:</strong> SC (18.76%) & ST (2.89%) Census 2011 population</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Social Links Row -->
+          <div style="background: var(--bg-card); border-radius: var(--radius); padding: 20px 24px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+            <div style="font-weight: 700; color: var(--ucost-blue-dark);">
+              ${lang === 'hi' ? 'सोशल मीडिया पर यूकोस्ट से जुड़ें:' : 'Connect with UCOST on Social Media:'}
+            </div>
+            <div class="social-links-row">
+              <a href="https://www.facebook.com/ucostpage" target="_blank" rel="noopener" class="social-btn" title="Facebook">
+                <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              </a>
+              <a href="https://x.com/ucostdehradun" target="_blank" rel="noopener" class="social-btn" title="X (Twitter)">
+                <svg viewBox="0 0 24 24"><path d="M4 4l11.733 16h4.267l-11.733-16zM4 20l6.768-6.768M20 4l-6.768 6.768"/></svg>
+              </a>
+              <a href="https://www.youtube.com/@ucostdehradun" target="_blank" rel="noopener" class="social-btn" title="YouTube">
+                <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+              </a>
+              <a href="https://www.linkedin.com/in/ucostdehradun/" target="_blank" rel="noopener" class="social-btn" title="LinkedIn">
+                <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function buildContactPage(isLangSwitch = false) {
+      const lang = APP.currentLang;
+      const appContainer = document.getElementById('app-container');
+
+      appContainer.innerHTML = `
+        <div class="contact-page-container">
+          <div class="page-banner-card">
+            <h1 class="page-banner-title">${lang === 'hi' ? 'संपर्क करें — यूकोस्ट एवं अनु.जाति/जनजाति प्रकोष्ठ' : 'Contact Us — UCOST & SC/ST Cell'}</h1>
+            <p class="page-banner-sub">
+              ${lang === 'hi' ? 'उत्तराखंड राज्य विज्ञान एवं प्रौद्योगिकी परिषद (यूकोस्ट), विज्ञान धाम, झाझरा, देहरादून' : 'Uttarakhand State Council for Science & Technology (UCOST), Vigyan Dham, Jhajra, Dehradun'}
+            </p>
+          </div>
+
+          <div style="margin-bottom: 20px; display: flex; justify-content: flex-end;">
+            <a href="#/state" class="about-tab-btn" style="background: var(--saffron-accent); color: var(--ucost-blue-dark); border-color: var(--saffron-accent);">
+              ← ${lang === 'hi' ? 'डैशबोर्ड पर लौटें' : 'Back to Dashboard'}
+            </a>
+          </div>
+
+          <div class="contact-cards-grid">
+            <!-- PI -->
+            <div class="person-card">
+              <span class="role-badge pi">${lang === 'hi' ? 'प्रधान अन्वेषक (PI)' : 'Principal Investigator (PI)'}</span>
+              <h3 class="person-name">Prof. (Dr.) Durgesh Pant</h3>
+              <p class="person-designation">${lang === 'hi' ? 'महानिदेशक, यूकोस्ट' : 'Director General, UCOST'}</p>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Vigyan Sadan Block, Vigyan Dham, Dehradun – 248007, Uttarakhand, India</span>
+              </div>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a href="tel:+911352976266">+91-0135-2976266</a>
+              </div>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <a href="mailto:dg@ucost.in">dg@ucost.in</a>
+              </div>
+            </div>
+
+            <!-- Co-PI 1 -->
+            <div class="person-card">
+              <span class="role-badge copi">${lang === 'hi' ? 'सह-प्रधान अन्वेषक (Co-PI)' : 'Co-Principal Investigator (Co-PI)'}</span>
+              <h3 class="person-name">Dr. Devi Prashad Uniyal</h3>
+              <p class="person-designation">${lang === 'hi' ? 'संयुक्त निदेशक, यूकोस्ट' : 'Joint Director, UCOST'}</p>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Vigyan Sadan Block, Vigyan Dham, Dehradun – 248007</span>
+              </div>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a href="tel:+919837862069">+91-9837862069</a>
+              </div>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <a href="mailto:dpuniyal.ucost@gmail.com">dpuniyal.ucost@gmail.com</a>
+              </div>
+            </div>
+
+            <!-- Co-PI 2 -->
+            <div class="person-card">
+              <span class="role-badge copi">${lang === 'hi' ? 'सह-प्रधान अन्वेषक (Co-PI)' : 'Co-Principal Investigator (Co-PI)'}</span>
+              <h3 class="person-name">Dr. Manmohan Singh Rawat</h3>
+              <p class="person-designation">${lang === 'hi' ? 'वैज्ञानिक अधिकारी, यूकोस्ट' : 'Scientific Officer, UCOST'}</p>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Vigyan Sadan Block, Vigyan Dham, Dehradun – 248007</span>
+              </div>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a href="tel:+919368399447">+91-9368399447</a>
+              </div>
+              <div class="contact-item-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <a href="mailto:dg@ucost.in">dg@ucost.in</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Staff Card -->
+          <div class="person-card" style="margin-bottom: 28px;">
+            <span class="role-badge staff">${lang === 'hi' ? 'परियोजना टीम (Project Staff)' : 'Project Staff Team'}</span>
+            <h3 class="person-name" style="margin-bottom: 12px;">${lang === 'hi' ? 'अनु.जाति/जनजाति प्रकोष्ठ प्रोजेक्ट टीम' : 'SC/ST Cell Associated Staff'}</h3>
+            <div class="staff-list-grid">
+              <div class="staff-member-item">
+                <div class="staff-member-name">Mr. Nalin Sharma</div>
+                <div class="staff-member-title">Principal Project Associate</div>
+              </div>
+              <div class="staff-member-item">
+                <div class="staff-member-name">Mr. Devendra Singh</div>
+                <div class="staff-member-title">Principal Project Associate</div>
+              </div>
+              <div class="staff-member-item">
+                <div class="staff-member-name">Mr. Ankit Kandiyal</div>
+                <div class="staff-member-title">Senior Project Associate</div>
+              </div>
+              <div class="staff-member-item">
+                <div class="staff-member-name">Mr. Kumar Roshan</div>
+                <div class="staff-member-title">Project Associate</div>
+              </div>
+              <div class="staff-member-item">
+                <div class="staff-member-name">Ms. Rukhsar</div>
+                <div class="staff-member-title">Project Associate</div>
+              </div>
+              <div class="staff-member-item">
+                <div class="staff-member-name">Mr. Shailender Rautela</div>
+                <div class="staff-member-title">Project Assistant</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+
     async function renderRoute(hash, isLangSwitch = false) {
       const parts = hash.split('/');
       
@@ -1980,6 +2632,10 @@
         await buildDistrictPage(parts[2], isLangSwitch);
       } else if (parts[1] === 'subdistrict' && parts[2] && parts[3]) {
         await buildSubdistrictPage(parts[2], parts[3], isLangSwitch);
+      } else if (parts[1] === 'about') {
+        await buildAboutPage(parts[2] || 'ucost', isLangSwitch);
+      } else if (parts[1] === 'contact') {
+        await buildContactPage(isLangSwitch);
       } else {
         window.location.hash = '#/state';
       }
