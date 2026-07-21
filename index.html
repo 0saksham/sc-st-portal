@@ -2908,17 +2908,9 @@
                   <div class="donut-center-sub">${UI_TRANSLATIONS[lang].overallPop}</div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Under Map Rankings & Concentration Charts Row -->
-        <div class="under-map-rankings-wrapper" style="max-width: var(--max-width); margin: 24px auto 0; padding: 0 24px;">
-          <div class="under-map-grid">
-            <div id="state-cat-rank-list"></div>
-            <div class="card" style="height: 100%; margin-bottom: 0;">
+            <div class="card">
               <h3 class="card-title" data-en="${UI_TRANSLATIONS.en.rankCardTitle}" data-hi="${UI_TRANSLATIONS.hi.rankCardTitle}">${UI_TRANSLATIONS[lang].rankCardTitle}</h3>
-              <div id="state-rank-chart" style="width: 100%; height: 380px;"></div>
+              <div id="state-rank-chart" style="width: 100%; height: 320px;"></div>
             </div>
           </div>
         </div>
@@ -3237,10 +3229,6 @@
         ]
       };
       donutChart.setOption(donutOption);
-
-      // Category Ranked List — between Overall SC/ST Population and Districts Ranked
-      buildCategoryRankList('state', document.getElementById('state-cat-rank-list'),
-        districtsGeoJSON.features.map(f => f.properties));
 
       // Ranking Chart build (Staggered grow horizontal bar chart)
       const rankEl = document.getElementById('state-rank-chart');
