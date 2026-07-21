@@ -197,6 +197,18 @@
     .card:hover{box-shadow:0 8px 28px rgba(0,0,0,.13);border-color:var(--border-strong);transform:translateY(-4px)}
     .card-title{font-size:1.1rem;font-weight:700;color:var(--ucost-blue);margin-bottom:18px;display:flex;align-items:center;justify-content:between;gap:8px}
 
+    .under-map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .under-map-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* ===========================================
        LOADING OVERLAY
     =========================================== */
@@ -2897,12 +2909,16 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
+        <!-- Under Map Rankings & Concentration Charts Row -->
+        <div class="under-map-rankings-wrapper" style="max-width: var(--max-width); margin: 24px auto 0; padding: 0 24px;">
+          <div class="under-map-grid">
             <div id="state-cat-rank-list"></div>
-
-            <div class="card">
+            <div class="card" style="height: 100%; margin-bottom: 0;">
               <h3 class="card-title" data-en="${UI_TRANSLATIONS.en.rankCardTitle}" data-hi="${UI_TRANSLATIONS.hi.rankCardTitle}">${UI_TRANSLATIONS[lang].rankCardTitle}</h3>
-              <div id="state-rank-chart" style="width: 100%; height: 320px;"></div>
+              <div id="state-rank-chart" style="width: 100%; height: 380px;"></div>
             </div>
           </div>
         </div>
