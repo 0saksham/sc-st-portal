@@ -1920,7 +1920,10 @@
         stateCrumb: "Uttarakhand",
         malePop: "Male Population",
         femalePop: "Female Population",
-        compareHeaderLabel: "Select districts to compare:"
+        compareHeaderLabel: "Select districts to compare:",
+        allVillages: "All Villages",
+        villagesWithData: "Villages with Data",
+        villagesWithoutData: "Villages without Data"
       },
       hi: {
         title: "अनुसूचित जाति/जनजाति जनसंख्या मानचित्रण",
@@ -1958,7 +1961,10 @@
         stateCrumb: "उत्तराखंड",
         malePop: "पुरुष जनसंख्या",
         femalePop: "महिला जनसंख्या",
-        compareHeaderLabel: "तुलना के लिए जिलों का चयन करें:"
+        compareHeaderLabel: "तुलना के लिए जिलों का चयन करें:",
+        allVillages: "सभी ग्राम",
+        villagesWithData: "डेटा वाले ग्राम",
+        villagesWithoutData: "बिना डेटा वाले ग्राम"
       }
     };
 
@@ -3917,8 +3923,9 @@
       // Filter villages for this sub-district
       allSubdistrictVillages = villagesGeoJSON.features.filter(f => f.properties.district_code === districtCode && f.properties.subdistrict_local_code === subdistrictCode);
 
-      // Reset selected village state
+      // Reset selected village & filter state
       APP.selectedVillage = null;
+      APP.villageFilterMode = 'all';
       let activeVillageLayer = null;
 
       appContainer.innerHTML = `
@@ -3933,6 +3940,21 @@
                     </span>
                     <span>${UI_TRANSLATIONS[lang].subdistrictTitle}${p.subdistrict_name}</span>
                   </h2>
+                </div>
+              </div>
+
+              <!-- Option just above map: All Villages, Villages with Data, Villages without Data -->
+              <div class="controls-row" style="margin-bottom: 16px;">
+                <div class="segmented-control" id="village-filter-control">
+                  <button class="segmented-btn active" data-filter="all" onclick="setVillageFilter('all')">
+                    <span data-en="${UI_TRANSLATIONS.en.allVillages}" data-hi="${UI_TRANSLATIONS.hi.allVillages}">${UI_TRANSLATIONS[lang].allVillages}</span>
+                  </button>
+                  <button class="segmented-btn" data-filter="with_data" onclick="setVillageFilter('with_data')">
+                    <span data-en="${UI_TRANSLATIONS.en.villagesWithData}" data-hi="${UI_TRANSLATIONS.hi.villagesWithData}">${UI_TRANSLATIONS[lang].villagesWithData}</span>
+                  </button>
+                  <button class="segmented-btn" data-filter="no_data" onclick="setVillageFilter('no_data')">
+                    <span data-en="${UI_TRANSLATIONS.en.villagesWithoutData}" data-hi="${UI_TRANSLATIONS.hi.villagesWithoutData}">${UI_TRANSLATIONS[lang].villagesWithoutData}</span>
+                  </button>
                 </div>
               </div>
 
@@ -4081,77 +4103,115 @@
       }).addTo(map);
       APP.subdistrictBoundary = subdistrictBoundary;
 
-      // Render Village Polygon Layer
-      const villagesLayer = L.geoJSON({
-        type: 'FeatureCollection',
-        features: allSubdistrictVillages
-      }, {
-        style: function(feature) {
-          const isAvail = feature.properties.census_data_available;
-          if (isAvail === false || isAvail === "false" || isAvail == null) {
-            return {
-              color: '#9CA3AF',
-              weight: 1,
-              fillColor: '#E5E7EB',
-              fillOpacity: 0.35,
-              dashArray: '2, 2'
-            };
-          }
-          return {
-            color: '#1E6FB5',
-            weight: 1,
-            fillColor: '#38BDF8',
-            fillOpacity: 0.35
-          };
-        },
-        onEachFeature: function(feature, layer) {
-          const vProps = feature.properties;
-          const isAvail = vProps.census_data_available;
-
-          layer.on('mousemove', function(e) {
-            updateMapTooltipPos(e);
-          });
-
-          layer.on('mouseover', function(e) {
-            if (activeVillageLayer !== layer) {
-              layer.setStyle({
-                weight: 2.5,
-                color: '#FF6B00',
-                fillColor: '#FF6B00',
-                fillOpacity: 0.55
-              });
-            }
-            if (isAvail === false || isAvail === "false" || isAvail == null) {
-              tooltipEl.innerHTML = `
-                <div class="custom-tooltip-title">${vProps.village_name || ''}</div>
-                <div style="font-size:0.72rem; color:var(--text-muted);">${vProps.subdistrict_name || ''} · ${vProps.district_name || ''}</div>
-                <div style="font-size:0.75rem; color:var(--saffron-accent); font-weight:600; margin-top:3px;">${UI_TRANSLATIONS[lang].notAvailable}</div>
-              `;
-              tooltipEl.classList.add('visible');
-              updateMapTooltipPos(e);
-            } else {
-              const pop = vProps.total_population != null ? parseInt(vProps.total_population).toLocaleString('en-IN') : UI_TRANSLATIONS[lang].notAvailable;
-              const scPct = vProps.sc_percent != null ? parseFloat(vProps.sc_percent).toFixed(1) + '%' : 'N/A';
-              const stPct = vProps.st_percent != null ? parseFloat(vProps.st_percent).toFixed(1) + '%' : 'N/A';
-              showMapTooltip(e, `${vProps.village_name} (${vProps.subdistrict_name})`, pop, scPct, stPct);
-            }
-          });
-
-          layer.on('mouseout', function() {
-            if (activeVillageLayer !== layer) {
-              villagesLayer.resetStyle(layer);
-            }
-            hideMapTooltip();
-          });
-
-          layer.on('click', function() {
-            selectVillage(feature, layer);
-          });
+      // Helper to get filtered villages array based on selected mode
+      function getFilteredSubdistrictVillages(mode = APP.villageFilterMode || 'all') {
+        if (mode === 'with_data') {
+          return allSubdistrictVillages.filter(v => v.properties.census_data_available === true || v.properties.census_data_available === "true");
         }
-      }).addTo(map);
+        if (mode === 'no_data') {
+          return allSubdistrictVillages.filter(v => v.properties.census_data_available === false || v.properties.census_data_available === "false" || v.properties.census_data_available == null);
+        }
+        return allSubdistrictVillages;
+      }
 
+      // Render Village Polygon Layer helper
+      function createVillagesLayer(featuresToRender) {
+        return L.geoJSON({
+          type: 'FeatureCollection',
+          features: featuresToRender
+        }, {
+          style: function(feature) {
+            const isAvail = feature.properties.census_data_available;
+            if (isAvail === false || isAvail === "false" || isAvail == null) {
+              return {
+                color: '#9CA3AF',
+                weight: 1,
+                fillColor: '#E5E7EB',
+                fillOpacity: 0.35,
+                dashArray: '2, 2'
+              };
+            }
+            return {
+              color: '#1E6FB5',
+              weight: 1,
+              fillColor: '#38BDF8',
+              fillOpacity: 0.35
+            };
+          },
+          onEachFeature: function(feature, layer) {
+            const vProps = feature.properties;
+            const isAvail = vProps.census_data_available;
+
+            layer.on('mousemove', function(e) {
+              updateMapTooltipPos(e);
+            });
+
+            layer.on('mouseover', function(e) {
+              if (activeVillageLayer !== layer) {
+                layer.setStyle({
+                  weight: 2.5,
+                  color: '#FF6B00',
+                  fillColor: '#FF6B00',
+                  fillOpacity: 0.55
+                });
+              }
+              if (isAvail === false || isAvail === "false" || isAvail == null) {
+                tooltipEl.innerHTML = `
+                  <div class="custom-tooltip-title">${vProps.village_name || ''}</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">${vProps.subdistrict_name || ''} · ${vProps.district_name || ''}</div>
+                  <div style="font-size:0.75rem; color:var(--saffron-accent); font-weight:600; margin-top:3px;">${UI_TRANSLATIONS[lang].notAvailable}</div>
+                `;
+                tooltipEl.classList.add('visible');
+                updateMapTooltipPos(e);
+              } else {
+                const pop = vProps.total_population != null ? parseInt(vProps.total_population).toLocaleString('en-IN') : UI_TRANSLATIONS[lang].notAvailable;
+                const scPct = vProps.sc_percent != null ? parseFloat(vProps.sc_percent).toFixed(1) + '%' : 'N/A';
+                const stPct = vProps.st_percent != null ? parseFloat(vProps.st_percent).toFixed(1) + '%' : 'N/A';
+                showMapTooltip(e, `${vProps.village_name} (${vProps.subdistrict_name})`, pop, scPct, stPct);
+              }
+            });
+
+            layer.on('mouseout', function() {
+              if (activeVillageLayer !== layer) {
+                if (APP.villagesLayer) APP.villagesLayer.resetStyle(layer);
+              }
+              hideMapTooltip();
+            });
+
+            layer.on('click', function() {
+              selectVillage(feature, layer);
+            });
+          }
+        }).addTo(map);
+      }
+
+      let villagesLayer = createVillagesLayer(getFilteredSubdistrictVillages());
       APP.villagesLayer = villagesLayer;
       applyActiveMapStyles();
+
+      // Expose setVillageFilter globally for segmented control clicks
+      window.setVillageFilter = function(filterMode) {
+        APP.villageFilterMode = filterMode;
+
+        // Update active class on segmented buttons
+        document.querySelectorAll('#village-filter-control .segmented-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-filter') === filterMode);
+        });
+
+        // Remove old village layer from map if exists
+        if (APP.villagesLayer) {
+          map.removeLayer(APP.villagesLayer);
+        }
+
+        activeVillageLayer = null;
+        villagesLayer = createVillagesLayer(getFilteredSubdistrictVillages(filterMode));
+        APP.villagesLayer = villagesLayer;
+        applyActiveMapStyles();
+
+        // Refresh search list according to active filterMode & text input
+        const searchBox = document.getElementById('village-search-box');
+        renderVillageList(searchBox ? searchBox.value : '');
+      };
 
       // §4 — Fade out skeleton
       fadeOutSkeleton();
@@ -4209,7 +4269,9 @@
         const listContainer = document.getElementById('village-list-rows');
         if (!listContainer) return;
 
-        const filtered = allSubdistrictVillages.filter(v => 
+        const baseList = getFilteredSubdistrictVillages();
+
+        const filtered = baseList.filter(v => 
           (v.properties.village_name || '').toLowerCase().includes(filterQuery.toLowerCase())
         );
 
@@ -4261,7 +4323,7 @@
         APP.selectedVillage = village;
         
         // Reset previous active polygon style if any
-        if (activeVillageLayer && activeVillageLayer !== targetLayer) {
+        if (activeVillageLayer && activeVillageLayer !== targetLayer && villagesLayer) {
           villagesLayer.resetStyle(activeVillageLayer);
         }
 
