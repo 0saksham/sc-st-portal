@@ -442,6 +442,125 @@
       color: var(--ucost-blue-dark);
       box-shadow: var(--shadow-sm);
     }
+
+    /* ===========================================
+       CATEGORY RANKED LIST — SHARED COMPONENT
+    =========================================== */
+    .cat-rank-card { padding: 20px !important; }
+    .cat-rank-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .cat-rank-toggle {
+      width: 100%;
+      margin-bottom: 12px;
+      justify-content: stretch;
+    }
+    .cat-rank-toggle .segmented-btn { flex: 1; text-align: center; padding: 6px 6px; }
+    .sort-dir-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-base);
+      transition: all var(--transition);
+      cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .sort-dir-btn:hover {
+      border-color: var(--ucost-blue-light);
+      color: var(--ucost-blue);
+      background: #fff;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    .cat-rank-list {
+      height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cat-rank-list::-webkit-scrollbar { width: 4px; }
+    .cat-rank-list::-webkit-scrollbar-track { background: transparent; }
+    .cat-rank-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+    .cat-rank-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.82rem;
+      border: 1px solid transparent;
+      background: transparent;
+      text-align: left;
+      width: 100%;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+      opacity: 0;
+      animation: rankRowIn 280ms ease-out forwards;
+      font-family: inherit;
+    }
+    .cat-rank-row:hover {
+      background: var(--bg-base);
+      border-color: var(--border-color);
+      transform: translateX(2px);
+    }
+    .rank-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .rank-area-name {
+      flex: 1;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+    .rank-values {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
+      flex-shrink: 0;
+    }
+    .rank-value-primary {
+      font-size: 0.84rem;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .rank-value-secondary {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    @keyframes rankRowIn {
+      from { opacity: 0; transform: translateX(-6px); }
+      to   { opacity: 1; transform: translateX(0);    }
+    }
+
     .legend-container {
       display: flex;
       align-items: center;
@@ -2542,6 +2661,149 @@
     window.addEventListener('hashchange', handleHashChange);
 
     /* ===========================================
+       SHARED: CATEGORY RANKED LIST COMPONENT
+       Parameterised by level: 'state' | 'district' | 'subdistrict'
+    =========================================== */
+    function buildCategoryRankList(level, containerEl, items, opts) {
+      if (!containerEl || !items || !items.length) return;
+      opts = opts || {};
+
+      let activeCategory = 'sc'; // 'sc' | 'st' | 'literacy'
+      let sortDir = 'desc';      // 'desc' | 'asc'
+
+      /* Colour map — matches existing app SC/ST/Literacy conventions */
+      const CAT_COLORS = { sc: '#0B3D6E', st: '#128807', literacy: '#1E6FB5' };
+
+      /* ── Value extractors (property objects, not feature wrappers) ── */
+      function getPrimary(item, cat) {
+        if (cat === 'sc')       return parseInt(item.sc_population)      || 0;
+        if (cat === 'st')       return parseInt(item.st_population)      || 0;
+        return parseFloat(item.literacy_percent) || 0;
+      }
+      function getSecondary(item, cat) {
+        if (cat === 'sc')       return parseFloat(item.sc_percent)         || 0;
+        if (cat === 'st')       return parseFloat(item.st_percent)         || 0;
+        return parseInt(item.literate_population) || 0;
+      }
+      function fmtPrimary(v, cat) {
+        return cat === 'literacy' ? v.toFixed(1) + '%' : v.toLocaleString('en-IN');
+      }
+      function fmtSecondary(v, cat, lang) {
+        if (cat === 'literacy') return v.toLocaleString('en-IN') + ' ' + (lang === 'hi' ? 'साक्षर' : 'literate');
+        return v.toFixed(1) + '% ' + (lang === 'hi' ? 'कुल में से' : 'of total');
+      }
+      function getName(item) {
+        return item.district_name || item.subdistrict_name || item.census_village_name || '';
+      }
+      function getCode(item) {
+        return item.district_code || item.subdistrict_code || item.village_code || '';
+      }
+
+      /* ── Row click → navigation + map confirm-flash ── */
+      function handleClick(code) {
+        const dc = opts.districtCode ||
+          (APP.activeDistrict && APP.activeDistrict.properties && APP.activeDistrict.properties.district_code) || '';
+        if (level === 'state') {
+          if (APP.districtsLayer) {
+            APP.districtsLayer.eachLayer(l => {
+              if (l.districtCode === code) { const el = l.getElement(); if (el) el.classList.add('clicked-confirm'); }
+            });
+          }
+          setTimeout(() => { window.location.hash = '#/district/' + code; }, 220);
+        } else if (level === 'district') {
+          if (APP.subdistrictsLayer) {
+            APP.subdistrictsLayer.eachLayer(l => {
+              if (l.subdistrictCode === code) { const el = l.getElement(); if (el) el.classList.add('clicked-confirm'); }
+            });
+          }
+          setTimeout(() => { window.location.hash = '#/subdistrict/' + dc + '/' + code; }, 220);
+        } else if (level === 'subdistrict') {
+          if (typeof window.selectVillageByCode === 'function') window.selectVillageByCode(code);
+        }
+      }
+
+      /* ── Hover cross-highlight helpers ── */
+      function applyHoverHighlight(code) {
+        if (level === 'state' && APP.districtsLayer) {
+          APP.districtsLayer.eachLayer(l => {
+            if (l.districtCode === code) { const el = l.getElement(); if (el) el.classList.add('subdistrict-segment-hover'); }
+          });
+        } else if (level === 'district' && APP.subdistrictsLayer) {
+          APP.subdistrictsLayer.eachLayer(l => {
+            if (l.subdistrictCode === code) { const el = l.getElement(); if (el) el.classList.add('subdistrict-segment-hover'); }
+          });
+        }
+      }
+      function clearHoverHighlight() {
+        [APP.districtsLayer, APP.subdistrictsLayer].forEach(lyr => {
+          if (lyr) lyr.eachLayer(l => { const el = l.getElement(); if (el) el.classList.remove('subdistrict-segment-hover'); });
+        });
+      }
+
+      /* ── Main render ── */
+      function render() {
+        const lang = APP.currentLang;
+        const color = CAT_COLORS[activeCategory];
+
+        const sorted = [...items].sort((a, b) => {
+          const va = getPrimary(a, activeCategory), vb = getPrimary(b, activeCategory);
+          return sortDir === 'desc' ? vb - va : va - vb;
+        });
+
+        const catBtns = [
+          { key: 'sc',       label: lang === 'hi' ? 'अ.जा.'    : 'SC' },
+          { key: 'st',       label: lang === 'hi' ? 'अ.ज.जा.'  : 'ST' },
+          { key: 'literacy', label: lang === 'hi' ? 'साक्षरता' : 'Literacy' }
+        ];
+        const titleTxt = lang === 'hi' ? 'श्रेणी रैंकिंग सूची' : 'Category Ranked List';
+        const sortTxt  = sortDir === 'desc'
+          ? (lang === 'hi' ? '↓ अवरोही' : '↓ Desc')
+          : (lang === 'hi' ? '↑ आरोही'  : '↑ Asc');
+
+        const rowsHtml = sorted.map((item, i) => {
+          const name = getName(item), code = getCode(item);
+          const pVal = getPrimary(item, activeCategory);
+          const sVal = getSecondary(item, activeCategory);
+          return `<button class="cat-rank-row" data-code="${code}" style="animation-delay:${i * 25}ms" aria-label="Rank ${i + 1}: ${name}">
+            <span class="rank-badge" style="background:${color}18;color:${color};">${i + 1}</span>
+            <span class="rank-area-name">${name}</span>
+            <span class="rank-values">
+              <span class="rank-value-primary" style="color:${color};">${fmtPrimary(pVal, activeCategory)}</span>
+              <span class="rank-value-secondary">${fmtSecondary(sVal, activeCategory, lang)}</span>
+            </span>
+          </button>`;
+        }).join('');
+
+        containerEl.innerHTML = `<div class="card cat-rank-card">
+          <div class="cat-rank-header">
+            <h3 class="card-title" style="margin-bottom:0;font-size:1rem;">${titleTxt}</h3>
+            <button class="sort-dir-btn" id="crl-sort-${level}">${sortTxt}</button>
+          </div>
+          <div class="segmented-control cat-rank-toggle">${catBtns.map(b =>
+            `<button class="segmented-btn${activeCategory === b.key ? ' active' : ''}" data-cat="${b.key}"
+              style="${activeCategory === b.key ? `color:${CAT_COLORS[b.key]};` : ''}">${b.label}</button>`).join('')}
+          </div>
+          <div class="cat-rank-list" role="list">${rowsHtml}</div>
+        </div>`;
+
+        /* Attach listeners after innerHTML is replaced */
+        containerEl.querySelectorAll('[data-cat]').forEach(btn => {
+          btn.addEventListener('click', () => { activeCategory = btn.dataset.cat; render(); });
+        });
+        const sortBtn = containerEl.querySelector('#crl-sort-' + level);
+        if (sortBtn) sortBtn.addEventListener('click', () => { sortDir = sortDir === 'desc' ? 'asc' : 'desc'; render(); });
+        containerEl.querySelectorAll('.cat-rank-row').forEach(row => {
+          const code = row.dataset.code;
+          row.addEventListener('click',      () => handleClick(code));
+          row.addEventListener('mouseenter', () => applyHoverHighlight(code));
+          row.addEventListener('mouseleave', clearHoverHighlight);
+        });
+      }
+
+      render(); /* initial render */
+    }
+
+    /* ===========================================
        PAGE 1: STATE LEVEL BUILDER
     =========================================== */
     async function buildStatePage(isLangSwitch) {
@@ -2647,6 +2909,8 @@
                 </div>
               </div>
             </div>
+
+            <div id="state-cat-rank-list"></div>
 
             <div class="card">
               <h3 class="card-title" data-en="${UI_TRANSLATIONS.en.rankCardTitle}" data-hi="${UI_TRANSLATIONS.hi.rankCardTitle}">${UI_TRANSLATIONS[lang].rankCardTitle}</h3>
@@ -2969,6 +3233,10 @@
         ]
       };
       donutChart.setOption(donutOption);
+
+      // Category Ranked List — between Overall SC/ST Population and Districts Ranked
+      buildCategoryRankList('state', document.getElementById('state-cat-rank-list'),
+        districtsGeoJSON.features.map(f => f.properties));
 
       // Ranking Chart build (Staggered grow horizontal bar chart)
       const rankEl = document.getElementById('state-rank-chart');
@@ -3347,6 +3615,8 @@
               </div>
             </div>
 
+            <div id="district-cat-rank-list"></div>
+
             <div class="card">
               <h3 class="card-title" data-en="SC/ST Concentration Rank" data-hi="अ.जा./अ.ज.जा. सांद्रता रैंकिंग">SC/ST Concentration Rank</h3>
               <div id="district-rank-display"></div>
@@ -3602,6 +3872,10 @@
           </div>
         `;
       }
+
+      // Category Ranked List — between Overall SC/ST Population and Concentration Rank
+      buildCategoryRankList('district', document.getElementById('district-cat-rank-list'),
+        uniqueSubdistricts, { districtCode });
     }
 
     /* ===========================================
@@ -3696,6 +3970,8 @@
                 </div>
               </div>
             </div>
+
+            <div id="subdistrict-cat-rank-list"></div>
 
             <!-- Stats Panel -->
             <div id="subdistrict-stats-panel">
@@ -3891,6 +4167,10 @@
       });
 
       renderVillageList();
+
+      // Category Ranked List — between Villages Search and Overall SC/ST Population
+      buildCategoryRankList('subdistrict', document.getElementById('subdistrict-cat-rank-list'),
+        allSubdistrictVillages.map(v => v.properties), { districtCode, subdistrictCode });
 
       // Expose globally for list triggers
       window.selectVillageByCode = function(villageCode) {
