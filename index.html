@@ -2681,7 +2681,7 @@
         return v.toFixed(1) + '% ' + (lang === 'hi' ? 'कुल में से' : 'of total');
       }
       function getName(item) {
-        return item.district_name || item.subdistrict_name || item.census_village_name || '';
+        return item.district_name || item.subdistrict_name || item.village_name || item.census_village_name || '';
       }
       function getCode(item) {
         return item.district_code || item.subdistrict_code || item.village_code || '';
@@ -3903,12 +3903,11 @@
       const isCensusAvail = p.census_2011_data_available;
 
       // Filter villages for this sub-district
-      allSubdistrictVillages = villagesGeoJSON.features.filter(f => f.properties.district_code === districtCode && f.properties.subdistrict_code === subdistrictCode);
+      allSubdistrictVillages = villagesGeoJSON.features.filter(f => f.properties.district_code === districtCode && f.properties.subdistrict_local_code === subdistrictCode);
 
       // Reset selected village state
       APP.selectedVillage = null;
-      let activeMarker = null;
-      let activePing = null;
+      let activeVillageLayer = null;
 
       appContainer.innerHTML = `
         <div class="page-layout">
@@ -4071,6 +4070,77 @@
         }
       }).addTo(map);
       APP.subdistrictBoundary = subdistrictBoundary;
+
+      // Render Village Polygon Layer
+      const villagesLayer = L.geoJSON({
+        type: 'FeatureCollection',
+        features: allSubdistrictVillages
+      }, {
+        style: function(feature) {
+          const isAvail = feature.properties.census_data_available;
+          if (isAvail === false || isAvail === "false" || isAvail == null) {
+            return {
+              color: '#9CA3AF',
+              weight: 1,
+              fillColor: '#E5E7EB',
+              fillOpacity: 0.35,
+              dashArray: '2, 2'
+            };
+          }
+          return {
+            color: '#1E6FB5',
+            weight: 1,
+            fillColor: '#38BDF8',
+            fillOpacity: 0.35
+          };
+        },
+        onEachFeature: function(feature, layer) {
+          const vProps = feature.properties;
+          const isAvail = vProps.census_data_available;
+
+          layer.on('mousemove', function(e) {
+            updateMapTooltipPos(e);
+          });
+
+          layer.on('mouseover', function(e) {
+            if (activeVillageLayer !== layer) {
+              layer.setStyle({
+                weight: 2.5,
+                color: '#FF6B00',
+                fillColor: '#FF6B00',
+                fillOpacity: 0.55
+              });
+            }
+            if (isAvail === false || isAvail === "false" || isAvail == null) {
+              tooltipEl.innerHTML = `
+                <div class="custom-tooltip-title">${vProps.village_name || ''}</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">${vProps.subdistrict_name || ''} · ${vProps.district_name || ''}</div>
+                <div style="font-size:0.75rem; color:var(--saffron-accent); font-weight:600; margin-top:3px;">${UI_TRANSLATIONS[lang].notAvailable}</div>
+              `;
+              tooltipEl.classList.add('visible');
+              updateMapTooltipPos(e);
+            } else {
+              const pop = vProps.total_population != null ? parseInt(vProps.total_population).toLocaleString('en-IN') : UI_TRANSLATIONS[lang].notAvailable;
+              const scPct = vProps.sc_percent != null ? parseFloat(vProps.sc_percent).toFixed(1) + '%' : 'N/A';
+              const stPct = vProps.st_percent != null ? parseFloat(vProps.st_percent).toFixed(1) + '%' : 'N/A';
+              showMapTooltip(e, `${vProps.village_name} (${vProps.subdistrict_name})`, pop, scPct, stPct);
+            }
+          });
+
+          layer.on('mouseout', function() {
+            if (activeVillageLayer !== layer) {
+              villagesLayer.resetStyle(layer);
+            }
+            hideMapTooltip();
+          });
+
+          layer.on('click', function() {
+            selectVillage(feature, layer);
+          });
+        }
+      }).addTo(map);
+
+      APP.villagesLayer = villagesLayer;
       applyActiveMapStyles();
 
       // §4 — Fade out skeleton
@@ -4130,7 +4200,7 @@
         if (!listContainer) return;
 
         const filtered = allSubdistrictVillages.filter(v => 
-          v.properties.census_village_name.toLowerCase().includes(filterQuery.toLowerCase())
+          (v.properties.village_name || '').toLowerCase().includes(filterQuery.toLowerCase())
         );
 
         if (filtered.length === 0) {
@@ -4141,10 +4211,14 @@
         listContainer.innerHTML = filtered.map(v => {
           const props = v.properties;
           const isSelected = APP.selectedVillage && APP.selectedVillage.properties.village_code === props.village_code;
+          const isAvail = props.census_data_available;
+          const popStr = (isAvail && props.total_population != null)
+            ? `Pop: ${parseInt(props.total_population).toLocaleString('en-IN')}`
+            : (lang === 'hi' ? 'डेटा उपलब्ध नहीं' : 'Data not available');
           return `
             <div class="village-row ${isSelected ? 'selected' : ''}" onclick="selectVillageByCode('${props.village_code}')">
-              <span>${props.census_village_name}</span>
-              <span class="vol">Pop: ${parseInt(props.total_population).toLocaleString('en-IN')}</span>
+              <span>${props.village_name}</span>
+              <span class="vol" style="${!isAvail ? 'font-size:0.68rem; color:var(--text-muted);' : ''}">${popStr}</span>
             </div>
           `;
         }).join('');
@@ -4163,49 +4237,53 @@
       // Expose globally for list triggers
       window.selectVillageByCode = function(villageCode) {
         const village = allSubdistrictVillages.find(v => v.properties.village_code === villageCode);
-        if (village) selectVillage(village);
+        if (village) {
+          let targetLayer = null;
+          if (villagesLayer) {
+            villagesLayer.eachLayer(l => {
+              if (l.feature && l.feature.properties.village_code === villageCode) {
+                targetLayer = l;
+              }
+            });
+          }
+          selectVillage(village, targetLayer);
+        }
       };
 
       // Select Village Handler
-      function selectVillage(village) {
+      function selectVillage(village, targetLayer = null) {
         APP.selectedVillage = village;
         
-        // Highlight active list row
-        const rows = document.querySelectorAll('.village-row');
-        rows.forEach(r => r.classList.remove('selected'));
-        renderVillageList(searchBox.value); // keep search filter, but refresh selected indicators
-        
-        const coords = [village.geometry.coordinates[1], village.geometry.coordinates[0]];
-        
-        // Fade-out previous marker if exists
-        if (activeMarker) {
-          const el = activeMarker.getElement();
-          if (el) {
-            el.style.transition = 'opacity 200ms ease-out';
-            el.style.opacity = '0';
-          }
-          const oldMarker = activeMarker;
-          setTimeout(() => oldMarker.remove(), 200);
+        // Reset previous active polygon style if any
+        if (activeVillageLayer && activeVillageLayer !== targetLayer) {
+          villagesLayer.resetStyle(activeVillageLayer);
         }
 
-        // Add Saffron pulsing point pin marker
-        const pingIcon = L.divIcon({
-          className: 'village-ping-container',
-          html: `
-            <div class="ping-ring"></div>
-            <div class="ping-dot"></div>
-          `,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12]
-        });
+        // Find target layer if not passed
+        if (!targetLayer && villagesLayer) {
+          villagesLayer.eachLayer(l => {
+            if (l.feature && l.feature.properties.village_code === village.properties.village_code) {
+              targetLayer = l;
+            }
+          });
+        }
 
-        activeMarker = L.marker(coords, { icon: pingIcon }).addTo(map);
+        activeVillageLayer = targetLayer;
+        if (activeVillageLayer) {
+          activeVillageLayer.setStyle({
+            weight: 3,
+            color: '#D97706',
+            fillColor: '#F59E0B',
+            fillOpacity: 0.7
+          });
+          activeVillageLayer.bringToFront();
+          if (activeVillageLayer.getBounds && activeVillageLayer.getBounds().isValid()) {
+            map.fitBounds(activeVillageLayer.getBounds(), { maxZoom: 14, padding: [30, 30] });
+          }
+        }
 
-        // Smooth FlyTo Pan centering, keeping boundary context
-        const maxFitZoom = Math.min(map.getBoundsZoom(subdistrictBoundary.getBounds()), 11);
-        map.flyTo(coords, maxFitZoom, {
-          duration: 0.6
-        });
+        // Highlight active list row
+        renderVillageList(searchBox.value);
 
         // Update Village Detail Card
         buildVillageDetailCard(village, p);
@@ -4217,6 +4295,44 @@
       const lang = APP.currentLang;
       const container = document.getElementById('village-detail-section');
       const v = village.properties;
+      const isAvail = v.census_data_available;
+
+      if (isAvail === false || isAvail === "false" || isAvail == null) {
+        container.innerHTML = `
+          <div class="card village-detail-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+              <div>
+                <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${v.village_name || ''}</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                  ${parentSubProps.subdistrict_name || ''} · ${APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''}
+                </span>
+              </div>
+              
+              <div class="download-btn-cluster" style="margin-top:0;">
+                <button class="download-btn" id="btn-dl-village" onclick="exportVillageCSV(this)">
+                  <svg class="btn-icon-dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  <svg class="btn-icon-check" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span class="btn-text" data-en="${UI_TRANSLATIONS.en.downloadCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadCsv}">${UI_TRANSLATIONS[lang].downloadCsv}</span>
+                </button>
+                <button class="download-btn" id="btn-dl-sd" onclick="exportSubdistrictCSV(this)">
+                  <svg class="btn-icon-dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  <svg class="btn-icon-check" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span class="btn-text" data-en="${UI_TRANSLATIONS.en.downloadSubdistrictCsv}" data-hi="${UI_TRANSLATIONS.hi.downloadSubdistrictCsv}">${UI_TRANSLATIONS[lang].downloadSubdistrictCsv}</span>
+                </button>
+              </div>
+            </div>
+            <div class="empty-state-census-card" style="padding: 36px 16px; margin-top: 20px; text-align: center;">
+              <div class="empty-state-ring" style="margin: 0 auto 12px auto;">
+                <svg viewBox="0 0 24 24" style="width:24px;height:24px;"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <p class="empty-state-note" style="font-weight: 600; font-size: 0.95rem;">
+                ${lang === 'hi' ? 'इस गांव के लिए जनगणना के आंकड़े उपलब्ध नहीं हैं' : 'Census data not available for this village'}
+              </p>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
       const totalPop = parseInt(v.total_population) || 0;
       const malePop = parseInt(v.male_population) || 0;
@@ -4226,7 +4342,6 @@
       const stPop = parseInt(v.st_population) || 0;
       const scPct = parseFloat(v.sc_percent) || 0;
       const stPct = parseFloat(v.st_percent) || 0;
-      const workers = parseInt(v.total_workers) || 0;
       const litPop = parseInt(v.literate_population) || 0;
       const litPct = parseFloat(v.literacy_percent) || 0;
 
@@ -4237,9 +4352,9 @@
         <div class="card village-detail-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
             <div>
-              <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${v.census_village_name}</h3>
+              <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${v.village_name || ''}</h3>
               <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
-                ${parentSubProps.subdistrict_name} · ${APP.activeDistrict.properties.district_name}
+                ${parentSubProps.subdistrict_name} · ${APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''}
               </span>
             </div>
             
@@ -4269,8 +4384,8 @@
                 <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${households.toLocaleString('en-IN')}</span>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 8px;">
-                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);" data-en="Total Workers" data-hi="कुल श्रमिक">Total Workers</span>
-                <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${workers.toLocaleString('en-IN')}</span>
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);" data-en="Literate Population" data-hi="साक्षर जनसंख्या">Literate Population</span>
+                <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${litPop.toLocaleString('en-IN')}</span>
               </div>
               
               <!-- Gender Split Indicator -->
@@ -4416,15 +4531,17 @@
       const scatterChart = echarts.init(scatterEl);
       APP.charts.scatterChart = scatterChart;
 
-      // Group village data
-      const scatterDataPoints = allSubdistrictVillages.map(item => {
+      // Group village data (only villages with census data available)
+      const validScatterVillages = allSubdistrictVillages.filter(item => item.properties.census_data_available);
+
+      const scatterDataPoints = validScatterVillages.map(item => {
         const properties = item.properties;
         const comb = (parseFloat(properties.sc_percent) || 0) + (parseFloat(properties.st_percent) || 0);
         return [
           parseFloat(properties.literacy_percent) || 0,
           comb,
           parseInt(properties.total_population) || 0,
-          properties.census_village_name,
+          properties.village_name || '',
           item // store reference to village object
         ];
       });
@@ -4433,7 +4550,7 @@
         litPct,
         scPct + stPct,
         totalPop,
-        v.census_village_name
+        v.village_name || ''
       ];
 
       // §7 — Population-based color gradient for scatter dots
@@ -4643,25 +4760,26 @@
     window.exportVillageCSV = function(btnEl) {
       if (!APP.selectedVillage) return;
       const v = APP.selectedVillage.properties;
-      const filename = `${v.census_village_name.toLowerCase().replace(/\s+/g, '_')}_census_data.csv`;
-      
+      const filename = `${(v.village_name || 'village').toLowerCase().replace(/\s+/g, '_')}_census_data.csv`;
+      const isAvail = v.census_data_available;
+
       const rows = [
         ["Census Indicator", "Value"],
         ["Village Code", v.village_code],
-        ["Village Name", v.census_village_name],
-        ["Sub-district", APP.activeSubdistrict.properties.subdistrict_name],
-        ["District", APP.activeDistrict.properties.district_name],
-        ["Households", v.households],
-        ["Total Population", v.total_population],
-        ["Male Population", v.male_population],
-        ["Female Population", v.female_population],
-        ["SC Population", v.sc_population],
-        ["SC %", `${(parseFloat(v.sc_percent)||0).toFixed(2)}%`],
-        ["ST Population", v.st_population],
-        ["ST %", `${(parseFloat(v.st_percent)||0).toFixed(2)}%`],
-        ["Literate Population", v.literate_population],
-        ["Literacy Rate %", `${(parseFloat(v.literacy_percent)||0).toFixed(2)}%`],
-        ["Total Workers", v.total_workers]
+        ["Village Name", v.village_name || ''],
+        ["Sub-district", APP.activeSubdistrict ? APP.activeSubdistrict.properties.subdistrict_name : ''],
+        ["District", APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''],
+        ["Census Data Available", isAvail ? "Yes" : "No"],
+        ["Households", isAvail && v.households != null ? v.households : "Data not available"],
+        ["Total Population", isAvail && v.total_population != null ? v.total_population : "Data not available"],
+        ["Male Population", isAvail && v.male_population != null ? v.male_population : "Data not available"],
+        ["Female Population", isAvail && v.female_population != null ? v.female_population : "Data not available"],
+        ["SC Population", isAvail && v.sc_population != null ? v.sc_population : "Data not available"],
+        ["SC %", isAvail && v.sc_percent != null ? `${(parseFloat(v.sc_percent)||0).toFixed(2)}%` : "Data not available"],
+        ["ST Population", isAvail && v.st_population != null ? v.st_population : "Data not available"],
+        ["ST %", isAvail && v.st_percent != null ? `${(parseFloat(v.st_percent)||0).toFixed(2)}%` : "Data not available"],
+        ["Literate Population", isAvail && v.literate_population != null ? v.literate_population : "Data not available"],
+        ["Literacy Rate %", isAvail && v.literacy_percent != null ? `${(parseFloat(v.literacy_percent)||0).toFixed(2)}%` : "Data not available"]
       ];
 
       downloadCSV(filename, rows);
@@ -4675,30 +4793,31 @@
       const filename = `${sd.subdistrict_name.toLowerCase().replace(/\s+/g, '_')}_villages_dataset.csv`;
 
       const headers = [
-        "Village Code", "Village Name", "Households", 
+        "Village Code", "Village Name", "Census Data Available", "Households", 
         "Total Population", "Male Population", "Female Population", 
         "SC Population", "SC %", "ST Population", "ST %", 
-        "Literate Population", "Literacy Rate %", "Total Workers"
+        "Literate Population", "Literacy Rate %"
       ];
 
       const rows = [headers];
 
       allSubdistrictVillages.forEach(item => {
         const v = item.properties;
+        const isAvail = v.census_data_available;
         rows.push([
           v.village_code,
-          v.census_village_name,
-          v.households,
-          v.total_population,
-          v.male_population,
-          v.female_population,
-          v.sc_population,
-          v.sc_percent,
-          v.st_population,
-          v.st_percent,
-          v.literate_population,
-          v.literacy_percent,
-          v.total_workers
+          v.village_name || '',
+          isAvail ? "Yes" : "No",
+          isAvail && v.households != null ? v.households : "Data not available",
+          isAvail && v.total_population != null ? v.total_population : "Data not available",
+          isAvail && v.male_population != null ? v.male_population : "Data not available",
+          isAvail && v.female_population != null ? v.female_population : "Data not available",
+          isAvail && v.sc_population != null ? v.sc_population : "Data not available",
+          isAvail && v.sc_percent != null ? v.sc_percent : "Data not available",
+          isAvail && v.st_population != null ? v.st_population : "Data not available",
+          isAvail && v.st_percent != null ? v.st_percent : "Data not available",
+          isAvail && v.literate_population != null ? v.literate_population : "Data not available",
+          isAvail && v.literacy_percent != null ? v.literacy_percent : "Data not available"
         ]);
       });
 
