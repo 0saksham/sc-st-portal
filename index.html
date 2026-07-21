@@ -1005,12 +1005,21 @@
     #scroll-progress{position:fixed;top:0;left:0;width:0%;height:3px;background:linear-gradient(90deg,var(--saffron-accent),var(--ucost-blue-light));z-index:99999;transition:width .1s linear;pointer-events:none;border-radius:0 2px 2px 0}
     .aria-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
-    /* Tribal Section Styles */
     .tribal-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 24px;
       margin-top: 16px;
+    }
+    @media (max-width: 1024px) {
+      .tribal-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .tribal-grid {
+        grid-template-columns: 1fr;
+      }
     }
     .tribe-card {
       display: flex;
@@ -2908,10 +2917,15 @@
                   <div class="donut-center-sub">${UI_TRANSLATIONS[lang].overallPop}</div>
                 </div>
               </div>
-            <div class="card">
-              <h3 class="card-title" data-en="${UI_TRANSLATIONS.en.rankCardTitle}" data-hi="${UI_TRANSLATIONS.hi.rankCardTitle}">${UI_TRANSLATIONS[lang].rankCardTitle}</h3>
-              <div id="state-rank-chart" style="width: 100%; height: 320px;"></div>
             </div>
+          </div>
+        </div>
+
+        <!-- Separate Section Block: Districts Ranked by SC/ST Concentration -->
+        <div class="rankings-section-wrapper" style="max-width: var(--max-width); margin: 32px auto 0; padding: 0 24px;">
+          <div class="card" style="margin-bottom: 0;">
+            <h3 class="card-title" data-en="${UI_TRANSLATIONS.en.rankCardTitle}" data-hi="${UI_TRANSLATIONS.hi.rankCardTitle}">${UI_TRANSLATIONS[lang].rankCardTitle}</h3>
+            <div id="state-rank-chart" style="width: 100%; height: 380px;"></div>
           </div>
         </div>
 
