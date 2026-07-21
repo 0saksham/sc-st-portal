@@ -3621,8 +3621,6 @@
               </div>
             </div>
 
-            <div id="district-cat-rank-list"></div>
-
             <div class="card">
               <h3 class="card-title" data-en="SC/ST Concentration Rank" data-hi="अ.जा./अ.ज.जा. सांद्रता रैंकिंग">SC/ST Concentration Rank</h3>
               <div id="district-rank-display"></div>
@@ -3878,10 +3876,6 @@
           </div>
         `;
       }
-
-      // Category Ranked List — between Overall SC/ST Population and Concentration Rank
-      buildCategoryRankList('district', document.getElementById('district-cat-rank-list'),
-        uniqueSubdistricts, { districtCode });
     }
 
     /* ===========================================
@@ -3975,8 +3969,6 @@
                 </div>
               </div>
             </div>
-
-            <div id="subdistrict-cat-rank-list"></div>
 
             <!-- Stats Panel -->
             <div id="subdistrict-stats-panel">
@@ -4247,10 +4239,6 @@
       });
 
       renderVillageList();
-
-      // Category Ranked List — between Villages Search and Overall SC/ST Population
-      buildCategoryRankList('subdistrict', document.getElementById('subdistrict-cat-rank-list'),
-        allSubdistrictVillages.map(v => v.properties), { districtCode, subdistrictCode });
 
       // Expose globally for list triggers
       window.selectVillageByCode = function(villageCode) {
