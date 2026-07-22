@@ -1720,6 +1720,304 @@
       fill: currentColor;
     }
 
+    /* ===========================================
+       SC/ST CELL CHAT BOT WIDGET STYLES
+    =========================================== */
+    .faq-launcher {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 90px;
+      height: 90px;
+      border-radius: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      cursor: pointer;
+      z-index: 9990;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+      outline: none;
+      user-select: none;
+    }
+    .faq-launcher:hover {
+      transform: scale(1.1) translateY(-4px);
+      filter: drop-shadow(0 14px 28px rgba(255, 153, 51, 0.6)) drop-shadow(0 8px 20px rgba(7, 30, 58, 0.45));
+    }
+    .faq-launcher:active {
+      transform: scale(0.95);
+    }
+    .faq-launcher img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 10px 20px rgba(7, 30, 58, 0.4));
+      transition: filter 0.25s ease;
+    }
+    
+    /* Custom sequence: 1st bounce 2cm (~70px) upward, then 2 cycles of 1cm (~35px) up & down, repeats every ~3.8s */
+    @keyframes faqCustomRobotBounce {
+      0%, 100% { transform: translateY(0); }
+      /* Bounce 1: 2cm (~70px) upward */
+      6% { transform: translateY(-70px); }
+      12% { transform: translateY(0); }
+      
+      /* Bounce 2 (Cycle 1): 1cm (~35px) up & down */
+      18% { transform: translateY(-35px); }
+      22% { transform: translateY(8px); }
+      26% { transform: translateY(0); }
+      
+      /* Bounce 3 (Cycle 2): 1cm (~35px) up & down */
+      32% { transform: translateY(-35px); }
+      36% { transform: translateY(8px); }
+      40% { transform: translateY(0); }
+      
+      /* 40% to 100%: Rest/pause for ~2.5s before repeating */
+    }
+    
+    .faq-launcher.animate-bounce img {
+      animation: faqCustomRobotBounce 3.8s ease-in-out infinite;
+    }
+
+    /* Stop bouncing when chat box is open */
+    .faq-launcher.popup-open img {
+      animation: none !important;
+      transform: translateY(0) !important;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .faq-launcher.animate-bounce img {
+        animation: none;
+      }
+    }
+
+    .faq-popup {
+      position: fixed;
+      bottom: 122px;
+      right: 24px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      max-height: 520px;
+      display: none;
+      flex-direction: column;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(7, 30, 58, 0.25), 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(11, 61, 110, 0.15);
+      z-index: 9995;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px) scale(0.94);
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .faq-popup.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .faq-header {
+      background: linear-gradient(135deg, #050F1E 0%, #071E3A 40%, #0B3D6E 100%);
+      color: #ffffff;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--saffron-accent);
+      flex-shrink: 0;
+    }
+    .faq-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .faq-bot-avatar-wrap {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+    }
+    .faq-bot-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .faq-bot-online-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: #10B981;
+      border: 2px solid #071E3A;
+      border-radius: 50%;
+    }
+    .faq-bot-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .faq-bot-name {
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+    }
+    .faq-bot-status {
+      font-size: 0.72rem;
+      color: var(--saffron-accent);
+      font-weight: 500;
+    }
+    .faq-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #ffffff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .faq-close-btn:hover {
+      background: rgba(255, 153, 51, 0.8);
+      color: #071E3A;
+      transform: scale(1.1);
+    }
+    .faq-body {
+      padding: 14px;
+      overflow-y: auto;
+      flex: 1;
+      font-size: 0.88rem;
+      background: #F8FAFC;
+    }
+
+    .faq-welcome-card {
+      background: linear-gradient(135deg, #FFF3E0 0%, #FFFFFF 100%);
+      border: 1px solid rgba(255, 153, 51, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+    .faq-welcome-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .faq-welcome-text {
+      font-size: 0.8rem;
+      color: var(--ucost-blue-dark);
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .faq-question-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      background: #ffffff;
+      font-size: 0.84rem;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      border-left: 4px solid var(--ucost-blue-mid);
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      line-height: 1.4;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .faq-question-btn:hover {
+      background: #ffffff;
+      color: var(--ucost-blue);
+      border-left-color: var(--saffron-accent);
+      border-color: rgba(255, 153, 51, 0.4);
+      box-shadow: 0 4px 12px rgba(11, 61, 110, 0.1);
+      transform: translateX(3px);
+    }
+    .faq-question-arrow {
+      color: var(--saffron-accent);
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+    .faq-question-btn:hover .faq-question-arrow {
+      transform: translateX(3px);
+    }
+
+    .faq-user-msg-bubble {
+      background: var(--ucost-blue-dark);
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 12px 12px 2px 12px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px rgba(7, 30, 58, 0.15);
+      border-left: 3px solid var(--saffron-accent);
+    }
+
+    .faq-bot-reply-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .faq-answer-text {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    .faq-answer-text ul {
+      margin: 8px 0;
+      padding-left: 18px;
+    }
+    .faq-answer-text li {
+      margin-bottom: 6px;
+    }
+
+    .faq-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      color: var(--ucost-blue-dark);
+      border: 1px solid var(--border-strong);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+      margin-top: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .faq-back-btn:hover {
+      background: var(--ucost-blue-dark);
+      color: #ffffff;
+      border-color: var(--ucost-blue-dark);
+    }
+
   </style>
 </head>
 <body>
@@ -1877,6 +2175,30 @@
   </footer>
 
   <div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
+
+  <!-- ========== SC/ST CELL CHAT BOT FLOATING WIDGET ========== -->
+  <button id="faq-launcher" class="faq-launcher animate-bounce" aria-label="SC/ST Cell CHAT BOT" aria-expanded="false" aria-controls="faq-popup" onclick="toggleFaqPopup()">
+    <img src="SCSTCell-BOT.png" alt="SC/ST Cell CHAT BOT">
+  </button>
+
+  <div id="faq-popup" class="faq-popup card" role="dialog" aria-label="SC/ST Cell CHAT BOT">
+    <div class="faq-header">
+      <div class="faq-header-left">
+        <div class="faq-bot-avatar-wrap">
+          <img src="SCSTCell-BOT.png" alt="Bot Avatar">
+          <span class="faq-bot-online-dot"></span>
+        </div>
+        <div class="faq-bot-title-group">
+          <span class="faq-bot-name" data-en="SC/ST Cell CHAT BOT" data-hi="एससी/एसटी सेल चैट बोट">SC/ST Cell CHAT BOT</span>
+          <span class="faq-bot-status" data-en="Online · Portal Guide" data-hi="ऑनलाइन · पोर्टल मार्गदर्शक">Online · Portal Guide</span>
+        </div>
+      </div>
+      <button class="faq-close-btn" aria-label="Close Chat Bot" onclick="toggleFaqPopup(false)">&times;</button>
+    </div>
+    <div id="faq-body" class="faq-body">
+      <!-- Chat Bot content rendered dynamically -->
+    </div>
+  </div>
 
   <!-- ========== JAVASCRIPT LOGIC ========== -->
   <script>
@@ -2238,6 +2560,11 @@
       // Update Compare Drawer contents if open
       if (APP.compareDrawerOpen) {
         renderCompareDrawer();
+      }
+
+      // Update FAQ Popup contents in-place
+      if (typeof window.renderFaqPopup === 'function') {
+        window.renderFaqPopup();
       }
     };
 
@@ -2671,9 +2998,564 @@
       } else {
         window.location.hash = '#/state';
       }
+
+      // Refresh FAQ popup questions if route changed
+      if (typeof window.renderFaqPopup === 'function') {
+        window.renderFaqPopup();
+      }
     }
 
     window.addEventListener('hashchange', handleHashChange);
+
+    /* ===========================================
+       FAQ WIDGET CONTROLLER & DATA ENGINE
+    =========================================== */
+    const FAQ_STATE = {
+      isOpen: false,
+      activeQuestionId: null
+    };
+
+    const DISTRICT_NAMES_HI = {
+      'Almora': 'अल्मोड़ा',
+      'Bageshwar': 'बागेश्वर',
+      'Champawat': 'चम्पावत',
+      'Dehradun': 'देहरादून',
+      'Haridwar': 'हरिद्वार',
+      'Nainital': 'नैनीताल',
+      'Garhwal': 'पौड़ी गढ़वाल',
+      'Pauri Garhwal': 'पौड़ी गढ़वाल',
+      'Rudraprayag': 'रुद्रप्रयाग',
+      'Tehri Garhwal': 'टिहरी गढ़वाल',
+      'Udham Singh Nagar': 'उधम सिंह नगर',
+      'Chamoli': 'चमोली',
+      'Pithoragarh': 'पिथौरागढ़',
+      'Uttarkashi': 'उत्तरकाशी'
+    };
+
+    function formatSubdistrictNameEn(name) {
+      if (!name) return '';
+      return name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    }
+
+    function formatSubdistrictNameHi(name) {
+      const SUB_HI_MAP = {
+        'CHAKRATA': 'चकराता',
+        'KALSI': 'कालसी',
+        'SRINAGAR': 'श्रीनगर',
+        'PURAULA': 'पुरोला',
+        'BHANOLI': 'भानोली',
+        'SITARGANJ': 'सितारगंज',
+        'PAURI': 'पौड़ी',
+        'ALMORA': 'अल्मोड़ा',
+        'DEHRADUN': 'देहरादून',
+        'HARIDWAR': 'हरिद्वार'
+      };
+      if (!name) return '';
+      const upper = name.toUpperCase().trim();
+      return SUB_HI_MAP[upper] || formatSubdistrictNameEn(name);
+    }
+
+    window.toggleFaqPopup = function(forceState) {
+      const popup = document.getElementById('faq-popup');
+      const launcher = document.getElementById('faq-launcher');
+      if (!popup || !launcher) return;
+
+      if (typeof forceState === 'boolean') {
+        FAQ_STATE.isOpen = forceState;
+      } else {
+        FAQ_STATE.isOpen = !FAQ_STATE.isOpen;
+      }
+
+      if (FAQ_STATE.isOpen) {
+        popup.classList.add('active');
+        launcher.classList.add('popup-open');
+        launcher.setAttribute('aria-expanded', 'true');
+        renderFaqPopup();
+      } else {
+        popup.classList.remove('active');
+        launcher.classList.remove('popup-open');
+        launcher.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    document.addEventListener('click', function(e) {
+      const popup = document.getElementById('faq-popup');
+      const launcher = document.getElementById('faq-launcher');
+      if (!popup || !launcher) return;
+
+      const path = e.composedPath ? e.composedPath() : [];
+      const clickedInside = path.includes(popup) || path.includes(launcher) || 
+                            (e.target && (popup.contains(e.target) || launcher.contains(e.target) || (e.target.closest && (e.target.closest('#faq-popup') || e.target.closest('#faq-launcher')))));
+
+      if (FAQ_STATE.isOpen && !clickedInside) {
+        toggleFaqPopup(false);
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && FAQ_STATE.isOpen) {
+        toggleFaqPopup(false);
+      }
+    });
+
+    window.openFaqQuestion = function(qId) {
+      FAQ_STATE.activeQuestionId = qId;
+      renderFaqPopup();
+    };
+
+    window.backToFaqQuestions = function() {
+      FAQ_STATE.activeQuestionId = null;
+      renderFaqPopup();
+    };
+
+    function getFaqPageContext() {
+      const hash = window.location.hash || '#/state';
+      const parts = hash.split('/');
+
+      if (parts[1] === 'district' && APP.activeDistrict) {
+        return { level: 'district', district: APP.activeDistrict };
+      } else if (parts[1] === 'subdistrict' && APP.activeSubdistrict) {
+        return { level: 'subdistrict', subdistrict: APP.activeSubdistrict, district: APP.activeDistrict };
+      }
+      return { level: 'state' };
+    }
+
+    async function getFaqQuestionsForContext(ctx, lang) {
+      const level = ctx.level;
+
+      if (level === 'state') {
+        const distsGeo = await loadGeoJSON('uttarakhand_districts');
+        const dists = distsGeo.features.map(f => f.properties);
+
+        const highestSCDist = dists.reduce((a, b) => (parseFloat(a.sc_percent)||0) > (parseFloat(b.sc_percent)||0) ? a : b);
+        const highestSTDist = dists.reduce((a, b) => (parseFloat(a.st_percent)||0) > (parseFloat(b.st_percent)||0) ? a : b);
+        const highestLitDist = dists.reduce((a, b) => (parseFloat(a.literacy_percent)||0) > (parseFloat(b.literacy_percent)||0) ? a : b);
+
+        const subdistsGeo = await loadGeoJSON('uttarakhand_subdistricts');
+        const subdists = subdistsGeo.features.map(f => f.properties).filter(p => p.census_2011_data_available === true || p.census_2011_data_available === 'true');
+
+        const highestSCSub = subdists.reduce((a, b) => (parseFloat(a.sc_percent)||0) > (parseFloat(b.sc_percent)||0) ? a : b);
+        const highestSTSub = subdists.reduce((a, b) => (parseFloat(a.st_percent)||0) > (parseFloat(b.st_percent)||0) ? a : b);
+        const highestLitSub = subdists.reduce((a, b) => (parseFloat(a.literacy_percent)||0) > (parseFloat(b.literacy_percent)||0) ? a : b);
+
+        const highestSCDistName = lang === 'hi' ? (DISTRICT_NAMES_HI[highestSCDist.district_name] || highestSCDist.district_name) : highestSCDist.district_name;
+        const highestSTDistName = lang === 'hi' ? (DISTRICT_NAMES_HI[highestSTDist.district_name] || highestSTDist.district_name) : highestSTDist.district_name;
+        const highestLitDistName = lang === 'hi' ? (DISTRICT_NAMES_HI[highestLitDist.district_name] || highestLitDist.district_name) : highestLitDist.district_name;
+
+        const highestSCSubName = lang === 'hi' ? formatSubdistrictNameHi(highestSCSub.subdistrict_name) : formatSubdistrictNameEn(highestSCSub.subdistrict_name);
+        const highestSCSubDistName = lang === 'hi' ? (DISTRICT_NAMES_HI[highestSCSub.district_name] || highestSCSub.district_name) : highestSCSub.district_name;
+
+        const highestSTSubName = lang === 'hi' ? formatSubdistrictNameHi(highestSTSub.subdistrict_name) : formatSubdistrictNameEn(highestSTSub.subdistrict_name);
+        const highestSTSubDistName = lang === 'hi' ? (DISTRICT_NAMES_HI[highestSTSub.district_name] || highestSTSub.district_name) : highestSTSub.district_name;
+
+        const highestLitSubName = lang === 'hi' ? formatSubdistrictNameHi(highestLitSub.subdistrict_name) : formatSubdistrictNameEn(highestLitSub.subdistrict_name);
+        const highestLitSubDistName = lang === 'hi' ? (DISTRICT_NAMES_HI[highestLitSub.district_name] || highestLitSub.district_name) : highestLitSub.district_name;
+
+        return [
+          {
+            id: 'state_q1',
+            q: lang === 'hi' ? "एससी/एसटी सेल पोर्टल क्या करता है?" : "What does the SC/ST Cell portal do?",
+            a: lang === 'hi' ? "यह पोर्टल उत्तराखंड में अनुसूचित जाति (एससी) और अनुसूचित जनजाति (एसटी) जनसंख्या के वितरण को राज्य, जिला और उप-जिला/ग्राम स्तर पर दर्शाता है। यह 2011 की जनगणना के आंकड़ों का उपयोग करते हुए एससी/एसटी सेल और आम जनता को प्रत्येक क्षेत्र में जनसंख्या घनत्व, साक्षरता और अन्य महत्वपूर्ण संकेतकों को सरल और दृश्यात्मक रूप में समझने में मदद करता है।"
+                             : "This portal shows how the Scheduled Caste (SC) and Scheduled Tribe (ST) population is spread across Uttarakhand — at the state, district, and sub-district/village level. It uses 2011 Census data to help the SC/ST Cell and the public understand population concentration, literacy, and other key indicators in each area, in an easy-to-read, visual way."
+          },
+          {
+            id: 'state_q2',
+            q: lang === 'hi' ? "अनुसूचित जाति (एससी) क्या है?" : "What is a Scheduled Caste (SC)?",
+            a: lang === 'hi' ? "अनुसूचित जातियाँ वे समुदाय हैं जिन्हें भारत के संविधान के अनुच्छेद 341 के तहत आधिकारिक रूप से अधिसूचित किया गया है। ऐतिहासिक सामाजिक और आर्थिक असमानताओं के कारण इन्हें विशेष मान्यता दी गई है, और संविधान इनके संरक्षण एवं विकास हेतु विशेष प्रावधान करता है।"
+                             : "Scheduled Castes are communities officially notified under Article 341 of the Constitution of India. They are recognised due to the historical social and economic disadvantages they have faced, and the Constitution provides for their protection and development through special provisions."
+          },
+          {
+            id: 'state_q3',
+            q: lang === 'hi' ? "अनुसूचित जनजाति (एसटी) क्या है?" : "What is a Scheduled Tribe (ST)?",
+            a: lang === 'hi' ? "अनुसूचित जनजातियाँ वे समुदाय हैं जिन्हें भारत के संविधान के अनुच्छेद 342 के तहत आधिकारिक रूप से अधिसूचित किया गया है, जो सामान्यतः अपनी विशिष्ट संस्कृति, भाषा और पारंपरिक जीवन-शैली के लिए पहचानी जाती हैं। अनुसूचित जातियों की तरह, इन्हें भी सामाजिक और आर्थिक विकास हेतु संवैधानिक संरक्षण एवं सहयोग प्रदान किया जाता है।"
+                             : "Scheduled Tribes are communities officially notified under Article 342 of the Constitution of India, generally distinguished by distinct culture, language, and traditional ways of life. Like Scheduled Castes, they are given constitutional protection and support for their social and economic development."
+          },
+          {
+            id: 'state_q4',
+            q: lang === 'hi' ? "किस जिले में सबसे अधिक एससी जनसंख्या है?" : "Which district has the highest SC population?",
+            a: lang === 'hi' ? `उत्तराखंड में ${highestSCDistName} में सबसे अधिक एससी सघनता है, जो इसकी जनसंख्या का ${(parseFloat(highestSCDist.sc_percent)||0).toFixed(1)}% है।`
+                             : `${highestSCDistName} has the highest SC concentration in Uttarakhand, at ${(parseFloat(highestSCDist.sc_percent)||0).toFixed(1)}% of its population.`
+          },
+          {
+            id: 'state_q5',
+            q: lang === 'hi' ? "किस जिले में सबसे अधिक एसटी जनसंख्या है?" : "Which district has the highest ST population?",
+            a: lang === 'hi' ? `उत्तराखंड में ${highestSTDistName} में सबसे अधिक एसटी सघनता है, जो इसकी जनसंख्या का ${(parseFloat(highestSTDist.st_percent)||0).toFixed(1)}% है।`
+                             : `${highestSTDistName} has the highest ST concentration in Uttarakhand, at ${(parseFloat(highestSTDist.st_percent)||0).toFixed(1)}% of its population.`
+          },
+          {
+            id: 'state_q6',
+            q: lang === 'hi' ? "किस जिले में साक्षरता दर सबसे अधिक है?" : "Which district has the highest literacy rate?",
+            a: lang === 'hi' ? `उत्तराखंड में ${highestLitDistName} में साक्षरता दर सबसे अधिक है, जो ${(parseFloat(highestLitDist.literacy_percent)||0).toFixed(1)}% है।`
+                             : `${highestLitDistName} has the highest literacy rate in Uttarakhand, at ${(parseFloat(highestLitDist.literacy_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'state_q7',
+            q: lang === 'hi' ? "उत्तराखंड की किस उप-तहसील में सबसे अधिक एससी जनसंख्या है?" : "Which sub-district in Uttarakhand has the highest SC population?",
+            a: lang === 'hi' ? `${highestSCSubName} (${highestSCSubDistName} जिले में) सभी उप-तहसीलों में सबसे अधिक एससी सघनता रखती है, जो ${(parseFloat(highestSCSub.sc_percent)||0).toFixed(1)}% है।`
+                             : `${highestSCSubName} (in ${highestSCSubDistName} district) has the highest SC concentration among all sub-districts, at ${(parseFloat(highestSCSub.sc_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'state_q8',
+            q: lang === 'hi' ? "उत्तराखंड की किस उप-तहसील में सबसे अधिक एसटी जनसंख्या है?" : "Which sub-district in Uttarakhand has the highest ST population?",
+            a: lang === 'hi' ? `${highestSTSubName} (${highestSTSubDistName} जिले में) सभी उप-तहसीलों में सबसे अधिक एसटी सघनता रखती है, जो ${(parseFloat(highestSTSub.st_percent)||0).toFixed(1)}% है।`
+                             : `${highestSTSubName} (in ${highestSTSubDistName} district) has the highest ST concentration among all sub-districts, at ${(parseFloat(highestSTSub.st_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'state_q9',
+            q: lang === 'hi' ? "उत्तराखंड की किस उप-तहसील में साक्षरता दर सबसे अधिक है?" : "Which sub-district in Uttarakhand has the highest literacy rate?",
+            a: lang === 'hi' ? `${highestLitSubName} (${highestLitSubDistName} जिले में) सभी उप-तहसीलों में सबसे अधिक साक्षरता दर रखती है, जो ${(parseFloat(highestLitSub.literacy_percent)||0).toFixed(1)}% है।`
+                             : `${highestLitSubName} (in ${highestLitSubDistName} district) has the highest literacy rate among all sub-districts, at ${(parseFloat(highestLitSub.literacy_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'state_q10',
+            q: lang === 'hi' ? "उत्तराखंड के किस गांव में सबसे अधिक एससी जनसंख्या है?" : "Which village in Uttarakhand has the highest SC population?",
+            a: lang === 'hi' ? "अल्मोड़ा जिले की भानोली उप-तहसील स्थित दियार खोली गांव में सत्यापित गांवों में सबसे अधिक एससी सघनता दर्ज है, जो 100% है।"
+                             : "Diyar Kholi, in Bhanoli sub-district (Almora district), has the highest recorded SC concentration among verified villages, at 100% SC."
+          },
+          {
+            id: 'state_q11',
+            q: lang === 'hi' ? "उत्तराखंड के किस गांव में सबसे अधिक एसटी जनसंख्या है?" : "Which village in Uttarakhand has the highest ST population?",
+            a: lang === 'hi' ? "उधम सिंह नगर जिले की सितारगंज उप-तहसील स्थित नवी नगर गांव में सत्यापित गांवों में सबसे अधिक एसटी सघनता दर्ज है, जो 100% एसटी है।"
+                             : "Navi Nagar, in Sitarganj sub-district (Udham Singh Nagar district), has the highest recorded ST concentration among verified villages, at 100% ST."
+          },
+          {
+            id: 'state_q12',
+            q: lang === 'hi' ? "उत्तराखंड के किस गांव में साक्षरता दर सबसे अधिक है?" : "Which village in Uttarakhand has the highest literacy rate?",
+            a: lang === 'hi' ? "गढ़वाल जिले की पौड़ी उप-तहसील स्थित भड़ाला गांव में सत्यापित गांवों में सबसे अधिक साक्षरता दर दर्ज है, जो 96.33% है।"
+                             : "Bhadala, in Pauri sub-district (Garhwal district), has the highest recorded literacy rate among verified villages, at 96.33%."
+          },
+          {
+            id: 'state_q13',
+            q: lang === 'hi' ? "मैं इस पृष्ठ का उपयोग कैसे करूं?" : "How do I use this page?",
+            a: lang === 'hi' ? "इस पृष्ठ पर आपको मिलेगा:\n- सबसे अधिक एससी सघनता वाला क्षेत्र\n- सबसे अधिक एसटी सघनता वाला क्षेत्र\n- सबसे अधिक साक्षरता दर वाला क्षेत्र\n- समग्र एससी/एसटी जनसंख्या\n- एससी/एसटी सघनता अनुसार जिलों की रैंकिंग\n- उत्तराखंड की अनुसूचित जनजातियाँ\nयहां एक मानचित्र भी है जहां आप एससी या एसटी सघनता दृश्य में बदल सकते हैं, और किसी भी जिले पर क्लिक करके उसकी विस्तृत जानकारी देख सकते हैं।"
+                             : "On this page, you can find:\n- Highest SC Concentration area\n- Highest ST Concentration area\n- Highest Literacy Rate area\n- Overall SC/ST Population\n- Districts Ranked by SC/ST Concentration\n- Scheduled Tribes of Uttarakhand\nThere is also a map where you can switch to SC or ST intensity view, and you can click on any district to see its detailed information."
+          }
+        ];
+      }
+
+      if (level === 'district') {
+        const dProps = ctx.district ? ctx.district.properties : {};
+        const dCode = dProps.district_code;
+        const dNameEn = dProps.district_name || 'District';
+        const dNameHi = DISTRICT_NAMES_HI[dNameEn] || dNameEn;
+
+        const subdistsGeo = await loadGeoJSON('uttarakhand_subdistricts');
+        const localSubdists = subdistsGeo.features
+          .filter(f => f.properties.district_code === dCode)
+          .map(f => f.properties);
+
+        const uniqueSubdistsMap = new Map();
+        localSubdists.forEach(s => {
+          if (!uniqueSubdistsMap.has(s.subdistrict_code)) {
+            uniqueSubdistsMap.set(s.subdistrict_code, s);
+          }
+        });
+        const uniqueSubdists = Array.from(uniqueSubdistsMap.values());
+        const availSubdists = uniqueSubdists.filter(s => s.census_2011_data_available === true || s.census_2011_data_available === 'true');
+
+        const highestSCSub = uniqueSubdists.length ? [...uniqueSubdists].sort((a,b) => (parseFloat(b.sc_percent)||0) - (parseFloat(a.sc_percent)||0))[0] : {};
+        const highestSTSub = uniqueSubdists.length ? [...uniqueSubdists].sort((a,b) => (parseFloat(b.st_percent)||0) - (parseFloat(a.st_percent)||0))[0] : {};
+        const highestLitSub = uniqueSubdists.length ? [...uniqueSubdists].sort((a,b) => (parseFloat(b.literacy_percent)||0) - (parseFloat(a.literacy_percent)||0))[0] : {};
+
+        const lowestSCSub = availSubdists.length ? [...availSubdists].sort((a,b) => (parseFloat(a.sc_percent)||0) - (parseFloat(b.sc_percent)||0))[0] : {};
+        const lowestSTSub = availSubdists.length ? [...availSubdists].sort((a,b) => (parseFloat(a.st_percent)||0) - (parseFloat(b.st_percent)||0))[0] : {};
+
+        const hSCName = lang === 'hi' ? formatSubdistrictNameHi(highestSCSub.subdistrict_name) : formatSubdistrictNameEn(highestSCSub.subdistrict_name);
+        const hSTName = lang === 'hi' ? formatSubdistrictNameHi(highestSTSub.subdistrict_name) : formatSubdistrictNameEn(highestSTSub.subdistrict_name);
+        const hLitName = lang === 'hi' ? formatSubdistrictNameHi(highestLitSub.subdistrict_name) : formatSubdistrictNameEn(highestLitSub.subdistrict_name);
+        const lSCName = lang === 'hi' ? formatSubdistrictNameHi(lowestSCSub.subdistrict_name) : formatSubdistrictNameEn(lowestSCSub.subdistrict_name);
+        const lSTName = lang === 'hi' ? formatSubdistrictNameHi(lowestSTSub.subdistrict_name) : formatSubdistrictNameEn(lowestSTSub.subdistrict_name);
+
+        const totalPop = (parseInt(dProps.total_population)||0).toLocaleString('en-IN');
+        const scPop = (parseInt(dProps.sc_population)||0).toLocaleString('en-IN');
+        const stPop = (parseInt(dProps.st_population)||0).toLocaleString('en-IN');
+        const scPct = (parseFloat(dProps.sc_percent)||0).toFixed(1);
+        const stPct = (parseFloat(dProps.st_percent)||0).toFixed(1);
+        const subCount = uniqueSubdists.length;
+
+        return [
+          {
+            id: 'dist_q1',
+            q: lang === 'hi' ? `${dNameHi} की किस उप-तहसील में सबसे अधिक एससी जनसंख्या है?` : `Which sub-district in ${dNameEn} has the highest SC population?`,
+            a: lang === 'hi' ? `${dNameHi} में ${hSCName} में सबसे अधिक एससी सघनता है, जो ${(parseFloat(highestSCSub.sc_percent)||0).toFixed(1)}% है।`
+                             : `${hSCName} has the highest SC concentration in ${dNameEn}, at ${(parseFloat(highestSCSub.sc_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'dist_q2',
+            q: lang === 'hi' ? `${dNameHi} की किस उप-तहसील में सबसे अधिक एसटी जनसंख्या है?` : `Which sub-district in ${dNameEn} has the highest ST population?`,
+            a: lang === 'hi' ? `${dNameHi} में ${hSTName} में सबसे अधिक एसटी सघनता है, जो ${(parseFloat(highestSTSub.st_percent)||0).toFixed(1)}% है।`
+                             : `${hSTName} has the highest ST concentration in ${dNameEn}, at ${(parseFloat(highestSTSub.st_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'dist_q3',
+            q: lang === 'hi' ? `${dNameHi} की किस उप-तहसील में साक्षरता दर सबसे अधिक है?` : `Which sub-district in ${dNameEn} has the highest literacy rate?`,
+            a: lang === 'hi' ? `${dNameHi} में ${hLitName} में सबसे अधिक साक्षरता दर है, जो ${(parseFloat(highestLitSub.literacy_percent)||0).toFixed(1)}% है।`
+                             : `${hLitName} has the highest literacy rate in ${dNameEn}, at ${(parseFloat(highestLitSub.literacy_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'dist_q4',
+            q: lang === 'hi' ? `${dNameHi} की किस उप-तहसील में सबसे कम एससी जनसंख्या है?` : `Which sub-district in ${dNameEn} has the lowest SC population?`,
+            a: lang === 'hi' ? `${dNameHi} में ${lSCName} में सबसे कम एससी सघनता है, जो ${(parseFloat(lowestSCSub.sc_percent)||0).toFixed(1)}% है।`
+                             : `${lSCName} has the lowest SC concentration in ${dNameEn}, at ${(parseFloat(lowestSCSub.sc_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'dist_q5',
+            q: lang === 'hi' ? `${dNameHi} की किस उप-तहसील में सबसे कम एसटी जनसंख्या है?` : `Which sub-district in ${dNameEn} has the lowest ST population?`,
+            a: lang === 'hi' ? `${dNameHi} में ${lSTName} में सबसे कम एसटी सघनता है, जो ${(parseFloat(lowestSTSub.st_percent)||0).toFixed(1)}% है।`
+                             : `${lSTName} has the lowest ST concentration in ${dNameEn}, at ${(parseFloat(lowestSTSub.st_percent)||0).toFixed(1)}%.`
+          },
+          {
+            id: 'dist_q6',
+            q: lang === 'hi' ? `${dNameHi} की कुल जनसंख्या कितनी है?` : `What is the total population of ${dNameEn}?`,
+            a: lang === 'hi' ? `${dNameHi} की कुल जनसंख्या ${totalPop} है।`
+                             : `The total population of ${dNameEn} is ${totalPop}.`
+          },
+          {
+            id: 'dist_q7',
+            q: lang === 'hi' ? `${dNameHi} की जनसंख्या का कितना प्रतिशत एससी है?` : `What percentage of ${dNameEn}'s population is SC?`,
+            a: lang === 'hi' ? `${dNameHi} की जनसंख्या का ${scPct}% एससी है (${scPop} लोग)।`
+                             : `${scPct}% of ${dNameEn}'s population is SC (${scPop} people).`
+          },
+          {
+            id: 'dist_q8',
+            q: lang === 'hi' ? `${dNameHi} की जनसंख्या का कितना प्रतिशत एसटी है?` : `What percentage of ${dNameEn}'s population is ST?`,
+            a: lang === 'hi' ? `${dNameHi} की जनसंख्या का ${stPct}% एसटी है (${stPop} लोग)।`
+                             : `${stPct}% of ${dNameEn}'s population is ST (${stPop} people).`
+          },
+          {
+            id: 'dist_q9',
+            q: lang === 'hi' ? `${dNameHi} में कुल कितनी उप-तहसीलें हैं?` : `How many sub-districts does ${dNameEn} have?`,
+            a: lang === 'hi' ? `${dNameHi} में ${subCount} उप-तहसीलें हैं।`
+                             : `${dNameEn} has ${subCount} sub-districts.`
+          },
+          {
+            id: 'dist_q10',
+            q: lang === 'hi' ? "मैं इस पृष्ठ का उपयोग कैसे करूं?" : "How do I use this page?",
+            a: lang === 'hi' ? `इस पृष्ठ पर आपको मिलेगा:\n- इस जिले की उप-तहसीलें मानचित्र पर दिखाई गई हैं — किसी भी उप-तहसील पर कर्सर ले जाने पर संक्षिप्त जानकारी दिखेगी, और क्लिक करने पर उसका विस्तृत पृष्ठ खुलेगा\n- ${dNameHi} की समग्र एससी/एसटी जनसंख्या जानकारी\n- सभी 13 जिलों की तुलना में इस जिले की एससी/एसटी सघनता रैंक\nमानचित्र पर किसी भी उप-तहसील के आकार पर क्लिक करके उसकी पूर्ण जनसंख्या जानकारी देखें।`
+                             : `On this page, you can find:\n- The sub-districts (tehsils) of this district, shown on the map — hover over any sub-district to see a quick summary, and click it to open its detailed page\n- ${dNameEn}'s overall SC/ST population panel\n- This district's SC/ST Concentration Rank compared to all 13 districts\nClick on any sub-district shape on the map to view its full population details.`
+          }
+        ];
+      }
+
+      if (level === 'subdistrict') {
+        const sdProps = ctx.subdistrict ? ctx.subdistrict.properties : {};
+        const dCode = sdProps.district_code;
+        const sdCode = sdProps.subdistrict_local_code || sdProps.subdistrict_code;
+        const sdNameRaw = sdProps.subdistrict_name || 'Sub-district';
+        const sdNameEn = formatSubdistrictNameEn(sdNameRaw);
+        const sdNameHi = formatSubdistrictNameHi(sdNameRaw);
+        const isCensusAvail = sdProps.census_2011_data_available === true || sdProps.census_2011_data_available === 'true';
+
+        const villagesGeo = await loadGeoJSON('villages');
+        const localVillages = villagesGeo.features
+          .filter(f => f.properties.district_code === dCode && f.properties.subdistrict_local_code === sdCode)
+          .map(f => f.properties);
+
+        const totalVillagesCount = localVillages.length;
+        const villagesWithData = localVillages.filter(v => v.census_data_available === true || (v.sc_percent !== null && v.sc_percent !== undefined));
+        const withDataCount = villagesWithData.length;
+
+        const maxSCVil = villagesWithData.length ? [...villagesWithData].sort((a,b) => (parseFloat(b.sc_percent)||0) - (parseFloat(a.sc_percent)||0))[0] : null;
+        const maxSTVil = villagesWithData.length ? [...villagesWithData].sort((a,b) => (parseFloat(b.st_percent)||0) - (parseFloat(a.st_percent)||0))[0] : null;
+        const maxLitVil = villagesWithData.length ? [...villagesWithData].sort((a,b) => (parseFloat(b.literacy_percent)||0) - (parseFloat(a.literacy_percent)||0))[0] : null;
+        const minLitVil = villagesWithData.length ? [...villagesWithData].sort((a,b) => (parseFloat(a.literacy_percent)||0) - (parseFloat(b.literacy_percent)||0))[0] : null;
+
+        const maxSCVilName = maxSCVil ? formatSubdistrictNameEn(maxSCVil.village_name) : '';
+        const maxSTVilName = maxSTVil ? formatSubdistrictNameEn(maxSTVil.village_name) : '';
+        const maxLitVilName = maxLitVil ? formatSubdistrictNameEn(maxLitVil.village_name) : '';
+        const minLitVilName = minLitVil ? formatSubdistrictNameEn(minLitVil.village_name) : '';
+
+        const totalPop = (parseInt(sdProps.total_population)||0).toLocaleString('en-IN');
+        const scPop = (parseInt(sdProps.sc_population)||0).toLocaleString('en-IN');
+        const stPop = (parseInt(sdProps.st_population)||0).toLocaleString('en-IN');
+        const scPct = (parseFloat(sdProps.sc_percent)||0).toFixed(1);
+        const stPct = (parseFloat(sdProps.st_percent)||0).toFixed(1);
+
+        let q1Ans = '';
+        if (maxSCVil) {
+          q1Ans = lang === 'hi' ? `${sdNameHi} में ${maxSCVilName} में सबसे अधिक एससी सघनता है, जो ${(parseFloat(maxSCVil.sc_percent)||0).toFixed(1)}% है।`
+                                : `${maxSCVilName} has the highest SC concentration in ${sdNameEn}, at ${(parseFloat(maxSCVil.sc_percent)||0).toFixed(1)}%.`;
+        } else {
+          q1Ans = lang === 'hi' ? `${sdNameHi} के लिए अभी कोई ग्राम डेटा उपलब्ध नहीं है।`
+                                : `No village data is available for ${sdNameEn} yet.`;
+        }
+
+        let q2Ans = '';
+        if (maxSTVil) {
+          q2Ans = lang === 'hi' ? `${sdNameHi} में ${maxSTVilName} में सबसे अधिक एसटी सघनता है, जो ${(parseFloat(maxSTVil.st_percent)||0).toFixed(1)}% है।`
+                                : `${maxSTVilName} has the highest ST concentration in ${sdNameEn}, at ${(parseFloat(maxSTVil.st_percent)||0).toFixed(1)}%.`;
+        } else {
+          q2Ans = lang === 'hi' ? `${sdNameHi} के लिए अभी कोई ग्राम डेटा उपलब्ध नहीं है।`
+                                : `No village data is available for ${sdNameEn} yet.`;
+        }
+
+        let q3Ans = '';
+        if (maxLitVil) {
+          q3Ans = lang === 'hi' ? `${sdNameHi} में ${maxLitVilName} में सबसे अधिक साक्षरता दर है, जो ${(parseFloat(maxLitVil.literacy_percent)||0).toFixed(1)}% है।`
+                                : `${maxLitVilName} has the highest literacy rate in ${sdNameEn}, at ${(parseFloat(maxLitVil.literacy_percent)||0).toFixed(1)}%.`;
+        } else {
+          q3Ans = lang === 'hi' ? `${sdNameHi} के लिए अभी कोई ग्राम डेटा उपलब्ध नहीं है।`
+                                : `No village data is available for ${sdNameEn} yet.`;
+        }
+
+        let q4Ans = '';
+        if (minLitVil) {
+          q4Ans = lang === 'hi' ? `${sdNameHi} में ${minLitVilName} में सबसे कम साक्षरता दर दर्ज है, जो ${(parseFloat(minLitVil.literacy_percent)||0).toFixed(1)}% है।`
+                                : `${minLitVilName} has the lowest recorded literacy rate in ${sdNameEn}, at ${(parseFloat(minLitVil.literacy_percent)||0).toFixed(1)}%.`;
+        } else {
+          q4Ans = lang === 'hi' ? `${sdNameHi} के लिए अभी कोई ग्राम डेटा उपलब्ध नहीं है।`
+                                : `No village data is available for ${sdNameEn} yet.`;
+        }
+
+        let q5Ans = '';
+        if (isCensusAvail) {
+          q5Ans = lang === 'hi' ? `${sdNameHi} की कुल जनसंख्या ${totalPop} है।`
+                                : `The total population of ${sdNameEn} is ${totalPop}.`;
+        } else {
+          q5Ans = lang === 'hi' ? `${sdNameHi} के लिए 2011 की जनगणना का डेटा उपलब्ध नहीं है (यह 2011 की जनगणना के बाद बनाई गई थी)।`
+                                : `2011 census data is not available for ${sdNameEn} (it was created after the 2011 census).`;
+        }
+
+        let q6Ans = '';
+        if (isCensusAvail) {
+          q6Ans = lang === 'hi' ? `${sdNameHi} की जनसंख्या का ${scPct}% एससी है (${scPop} लोग)।`
+                                : `${scPct}% of ${sdNameEn}'s population is SC (${scPop} people).`;
+        } else {
+          q6Ans = lang === 'hi' ? `${sdNameHi} के लिए 2011 की जनगणना का डेटा उपलब्ध नहीं है (यह 2011 की जनगणना के बाद बनाई गई थी)।`
+                                : `2011 census data is not available for ${sdNameEn} (it was created after the 2011 census).`;
+        }
+
+        let q7Ans = '';
+        if (isCensusAvail) {
+          q7Ans = lang === 'hi' ? `${sdNameHi} की जनसंख्या का ${stPct}% एसटी है (${stPop} लोग)।`
+                                : `${stPct}% of ${sdNameEn}'s population is ST (${stPop} people).`;
+        } else {
+          q7Ans = lang === 'hi' ? `${sdNameHi} के लिए 2011 की जनगणना का डेटा उपलब्ध नहीं है (यह 2011 की जनगणना के बाद बनाई गई थी)।`
+                                : `2011 census data is not available for ${sdNameEn} (it was created after the 2011 census).`;
+        }
+
+        return [
+          {
+            id: 'subdist_q1',
+            q: lang === 'hi' ? `${sdNameHi} के किस गांव में सबसे अधिक एससी जनसंख्या है?` : `Which village in ${sdNameEn} has the highest SC population?`,
+            a: q1Ans
+          },
+          {
+            id: 'subdist_q2',
+            q: lang === 'hi' ? `${sdNameHi} के किस गांव में सबसे अधिक एसटी जनसंख्या है?` : `Which village in ${sdNameEn} has the highest ST population?`,
+            a: q2Ans
+          },
+          {
+            id: 'subdist_q3',
+            q: lang === 'hi' ? `${sdNameHi} के किस गांव में साक्षरता दर सबसे अधिक है?` : `Which village in ${sdNameEn} has the highest literacy rate?`,
+            a: q3Ans
+          },
+          {
+            id: 'subdist_q4',
+            q: lang === 'hi' ? `${sdNameHi} के किस गांव में साक्षरता दर सबसे कम है?` : `Which village in ${sdNameEn} has the lowest literacy rate?`,
+            a: q4Ans
+          },
+          {
+            id: 'subdist_q5',
+            q: lang === 'hi' ? `${sdNameHi} की कुल जनसंख्या कितनी है?` : `What is the total population of ${sdNameEn}?`,
+            a: q5Ans
+          },
+          {
+            id: 'subdist_q6',
+            q: lang === 'hi' ? `${sdNameHi} की जनसंख्या का कितना प्रतिशत एससी है?` : `What percentage of ${sdNameEn}'s population is SC?`,
+            a: q6Ans
+          },
+          {
+            id: 'subdist_q7',
+            q: lang === 'hi' ? `${sdNameHi} की जनसंख्या का कितना प्रतिशत एसटी है?` : `What percentage of ${sdNameEn}'s population is ST?`,
+            a: q7Ans
+          },
+          {
+            id: 'subdist_q8',
+            q: lang === 'hi' ? `${sdNameHi} के लिए कुल कितने गांव सूचीबद्ध हैं?` : `How many villages are listed for ${sdNameEn}?`,
+            a: lang === 'hi' ? `${sdNameHi} में ${totalVillagesCount} गांव सूचीबद्ध हैं।`
+                             : `${sdNameEn} has ${totalVillagesCount} villages listed.`
+          },
+          {
+            id: 'subdist_q9',
+            q: lang === 'hi' ? `${sdNameHi} में वर्तमान में कितने गांवों का जनसंख्या डेटा उपलब्ध है?` : `How many villages in ${sdNameEn} currently have population data available?`,
+            a: lang === 'hi' ? `${sdNameHi} में कुल ${totalVillagesCount} गांवों में से ${withDataCount} गांवों का जनसंख्या डेटा वर्तमान में उपलब्ध है। जैसे-जैसे अधिक डेटा उपलब्ध होगा, इसे जोड़ा जाएगा।`
+                             : `${withDataCount} out of ${totalVillagesCount} villages in ${sdNameEn} currently have population data available. More will be added as data becomes available.`
+          },
+          {
+            id: 'subdist_q10',
+            q: lang === 'hi' ? "मैं इस पृष्ठ का उपयोग कैसे करूं?" : "How do I use this page?",
+            a: lang === 'hi' ? `इस पृष्ठ पर आपको मिलेगा:\n- इस उप-तहसील की सीमा का मानचित्र\n- इस उप-तहसील के सभी गांवों की खोजने योग्य सूची\n- सभी गांव, डेटा सहित गांव, या डेटा रहित गांव देखने का फ़िल्टर विकल्प\n- किसी गांव को खोजने या सूची में क्लिक करने पर मानचित्र पर उसका स्थान चिह्नित होगा और नीचे उसकी विस्तृत जनसंख्या जानकारी व चार्ट दिखाई देंगे\n- चयनित गांव का डेटा, या पूरे उप-तहसील का डेटा, CSV फ़ाइल के रूप में डाउनलोड करने हेतु बटन`
+                             : `On this page, you can find:\n- The boundary map of this sub-district\n- A searchable list of all villages in this sub-district\n- A filter to view All villages, Villages with data, or Villages without data\n- Click or search for a village to mark its location on the map and see its detailed population data and charts below\n- Buttons to download the selected village's data, or the full sub-district dataset, as a CSV file`
+          }
+        ];
+      }
+
+      return [];
+    }
+
+    window.renderFaqPopup = async function() {
+      const body = document.getElementById('faq-body');
+      if (!body) return;
+
+      const lang = APP.currentLang || 'en';
+      const ctx = getFaqPageContext();
+
+      let questions = [];
+      try {
+        questions = await getFaqQuestionsForContext(ctx, lang);
+      } catch (e) {
+        console.error('Error preparing FAQ questions:', e);
+      }
+
+      if (!questions.length) return;
+
+      if (FAQ_STATE.activeQuestionId) {
+        const item = questions.find(q => q.id === FAQ_STATE.activeQuestionId);
+        if (item) {
+          let formattedAnsHtml = '';
+          if (item.a.includes('\n- ')) {
+            const parts = item.a.split('\n- ');
+            const headerText = parts[0];
+            const bullets = parts.slice(1);
+            formattedAnsHtml = `<p style="margin-bottom:8px;">${headerText}</p><ul style="margin: 8px 0; padding-left: 18px;">${bullets.map(b => `<li style="margin-bottom: 6px;">${b}</li>`).join('')}</ul>`;
+          } else {
+            formattedAnsHtml = item.a.replace(/\n/g, '<br>');
+          }
+
+          body.innerHTML = `
+            <div class="faq-answer-container">
+              <div class="faq-user-msg-bubble">❓ ${item.q}</div>
+              <div class="faq-bot-reply-card">
+                <div class="faq-answer-text">${formattedAnsHtml}</div>
+              </div>
+              <button class="faq-back-btn" onclick="backToFaqQuestions()">
+                ${lang === 'hi' ? '← प्रश्नों पर वापस जाएं' : '← Back to questions'}
+              </button>
+            </div>
+          `;
+          return;
+        }
+      }
+
+      body.innerHTML = `
+        <div class="faq-welcome-card">
+          <span class="faq-welcome-icon">🤖</span>
+          <span class="faq-welcome-text" data-en="Hello! I am your SC/ST Portal Guide. Click any question below for an instant answer:" data-hi="नमस्ते! मैं आपका एससी/एसटी पोर्टल मार्गदर्शक हूँ। तुरंत उत्तर के लिए नीचे किसी भी प्रश्न पर क्लिक करें:">
+            ${lang === 'hi' ? 'नमस्ते! मैं आपका एससी/एसटी पोर्टल मार्गदर्शक हूँ। तुरंत उत्तर के लिए नीचे किसी भी प्रश्न पर क्लिक करें:' : 'Hello! I am your SC/ST Portal Guide. Click any question below for an instant answer:'}
+          </span>
+        </div>
+        <div class="faq-questions-list">
+          ${questions.map(item => `
+            <button class="faq-question-btn" onclick="openFaqQuestion('${item.id}')">
+              <span>${item.q}</span>
+              <span class="faq-question-arrow">➜</span>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    };
+
 
     /* ===========================================
        SHARED: CATEGORY RANKED LIST COMPONENT
