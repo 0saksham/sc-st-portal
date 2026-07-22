@@ -1781,24 +1781,20 @@
       pointer-events: none;
     }
     
-    /* Playful Disney/Pixar Elastic Bounce with Squash, Stretch & Air-Tilts */
+    /* Smooth, light & gentle floating bounce sequence */
     @keyframes faqRobotBounce {
-      0%, 100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
-      3% { transform: translateY(6px) scale(1.18, 0.82) rotate(0deg); }   /* Compress down before launch */
-      12% { transform: translateY(-75px) scale(0.85, 1.2) rotate(0deg); } /* High 2cm leap! */
-      21% { transform: translateY(0) scale(1.15, 0.85) rotate(0deg); }   /* Elastic landing squish */
-      26% { transform: translateY(-8px) scale(0.95, 1.05) rotate(0deg); } /* Rebound */
-      30% { transform: translateY(0) scale(1, 1) rotate(0deg); }
-      40% { transform: translateY(-36px) scale(0.92, 1.1) rotate(-8deg); } /* 1cm jump with left air-tilt */
-      49% { transform: translateY(0) scale(1.1, 0.9) rotate(0deg); }     /* Land */
-      59% { transform: translateY(-36px) scale(0.92, 1.1) rotate(8deg); }  /* 1cm jump with right air-tilt */
-      68% { transform: translateY(0) scale(1.08, 0.92) rotate(0deg); }   /* Land */
-      72% { transform: translateY(0) scale(1, 1) rotate(0deg); }          /* Settle */
-      /* 72% to 100%: Rest/pause */
+      0%, 100% { transform: translateY(0); }
+      10% { transform: translateY(-28px); } /* Smooth light float ~1cm */
+      20% { transform: translateY(0); }      /* Soft touch down */
+      28% { transform: translateY(-14px); } /* Gentle micro-float */
+      34% { transform: translateY(0); }      /* Soft touch down */
+      40% { transform: translateY(-14px); } /* Gentle micro-float */
+      46% { transform: translateY(0); }      /* Soft touch down */
+      /* 46% to 100%: Rest gently */
     }
     
     .faq-launcher.animate-bounce {
-      animation: faqRobotBounce 3.8s ease-in-out infinite !important;
+      animation: faqRobotBounce 4s ease-in-out infinite !important;
     }
 
     /* Stop bouncing when chat box is open */
@@ -3077,20 +3073,17 @@
 
       if (typeof launcher.animate === 'function') {
         launcher.animate([
-          { transform: 'translateY(0) scale(1, 1) rotate(0deg)' },
-          { transform: 'translateY(6px) scale(1.18, 0.82) rotate(0deg)', offset: 0.04 },
-          { transform: 'translateY(-75px) scale(0.85, 1.2) rotate(0deg)', offset: 0.14 },
-          { transform: 'translateY(0) scale(1.15, 0.85) rotate(0deg)', offset: 0.25 },
-          { transform: 'translateY(-8px) scale(0.95, 1.05) rotate(0deg)', offset: 0.30 },
-          { transform: 'translateY(0) scale(1, 1) rotate(0deg)', offset: 0.35 },
-          { transform: 'translateY(-36px) scale(0.92, 1.1) rotate(-8deg)', offset: 0.48 },
-          { transform: 'translateY(0) scale(1.1, 0.9) rotate(0deg)', offset: 0.60 },
-          { transform: 'translateY(-36px) scale(0.92, 1.1) rotate(8deg)', offset: 0.73 },
-          { transform: 'translateY(0) scale(1.08, 0.92) rotate(0deg)', offset: 0.85 },
-          { transform: 'translateY(0) scale(1, 1) rotate(0deg)', offset: 1.0 }
+          { transform: 'translateY(0)' },
+          { transform: 'translateY(-28px)', offset: 0.12 },
+          { transform: 'translateY(0)', offset: 0.24 },
+          { transform: 'translateY(-14px)', offset: 0.34 },
+          { transform: 'translateY(0)', offset: 0.42 },
+          { transform: 'translateY(-14px)', offset: 0.52 },
+          { transform: 'translateY(0)', offset: 0.60 },
+          { transform: 'translateY(0)', offset: 1.0 }
         ], {
           duration: 1800,
-          easing: 'cubic-bezier(0.28, 0.84, 0.42, 1)'
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
         });
       }
     }
