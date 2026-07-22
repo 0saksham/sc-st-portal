@@ -1781,20 +1781,20 @@
       pointer-events: none;
     }
     
-    /* Smooth, light & gentle floating bounce sequence */
+    /* Slow, smooth & gentle floating bounce sequence */
     @keyframes faqRobotBounce {
       0%, 100% { transform: translateY(0); }
-      10% { transform: translateY(-28px); } /* Smooth light float ~1cm */
-      20% { transform: translateY(0); }      /* Soft touch down */
-      28% { transform: translateY(-14px); } /* Gentle micro-float */
-      34% { transform: translateY(0); }      /* Soft touch down */
-      40% { transform: translateY(-14px); } /* Gentle micro-float */
-      46% { transform: translateY(0); }      /* Soft touch down */
-      /* 46% to 100%: Rest gently */
+      10% { transform: translateY(-28px); } /* Slow smooth rise ~1cm */
+      22% { transform: translateY(0); }      /* Soft touch down */
+      30% { transform: translateY(-14px); } /* Slow micro-float */
+      38% { transform: translateY(0); }      /* Soft touch down */
+      44% { transform: translateY(-14px); } /* Slow micro-float */
+      50% { transform: translateY(0); }      /* Soft touch down */
+      /* 50% to 100%: Rest for 3s */
     }
     
     .faq-launcher.animate-bounce {
-      animation: faqRobotBounce 4s ease-in-out infinite !important;
+      animation: faqRobotBounce 6s ease-in-out infinite !important;
     }
 
     /* Stop bouncing when chat box is open */
@@ -3074,22 +3074,22 @@
       if (typeof launcher.animate === 'function') {
         launcher.animate([
           { transform: 'translateY(0)' },
-          { transform: 'translateY(-28px)', offset: 0.12 },
-          { transform: 'translateY(0)', offset: 0.24 },
-          { transform: 'translateY(-14px)', offset: 0.34 },
-          { transform: 'translateY(0)', offset: 0.42 },
-          { transform: 'translateY(-14px)', offset: 0.52 },
-          { transform: 'translateY(0)', offset: 0.60 },
+          { transform: 'translateY(-28px)', offset: 0.15 },
+          { transform: 'translateY(0)', offset: 0.32 },
+          { transform: 'translateY(-14px)', offset: 0.48 },
+          { transform: 'translateY(0)', offset: 0.62 },
+          { transform: 'translateY(-14px)', offset: 0.78 },
+          { transform: 'translateY(0)', offset: 0.90 },
           { transform: 'translateY(0)', offset: 1.0 }
         ], {
-          duration: 1800,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+          duration: 3000,
+          easing: 'cubic-bezier(0.37, 0, 0.63, 1)'
         });
       }
     }
 
-    setInterval(triggerRobotBounce, 3800);
-    setTimeout(triggerRobotBounce, 600);
+    setInterval(triggerRobotBounce, 6000);
+    setTimeout(triggerRobotBounce, 800);
 
     window.toggleFaqPopup = function(forceState) {
       const popup = document.getElementById('faq-popup');
