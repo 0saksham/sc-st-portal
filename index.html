@@ -1725,10 +1725,10 @@
     =========================================== */
     .faq-launcher {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 90px;
-      height: 90px;
+      bottom: 20px;
+      right: 20px;
+      width: 110px;
+      height: 110px;
       border-radius: 0;
       background: transparent;
       border: none;
@@ -1739,16 +1739,16 @@
       align-items: center;
       justify-content: center;
       padding: 0;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
       outline: none;
       user-select: none;
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
     }
     .faq-launcher:hover {
-      transform: scale(1.1) translateY(-4px);
-      filter: drop-shadow(0 14px 28px rgba(255, 153, 51, 0.6)) drop-shadow(0 8px 20px rgba(7, 30, 58, 0.45));
+      filter: drop-shadow(0 14px 28px rgba(255, 153, 51, 0.65)) drop-shadow(0 8px 20px rgba(7, 30, 58, 0.5));
     }
     .faq-launcher:active {
-      transform: scale(0.95);
+      transform: scale(0.95) translate3d(0, 0, 0);
     }
     .faq-launcher img {
       width: 100%;
@@ -1756,48 +1756,57 @@
       object-fit: contain;
       display: block;
       filter: drop-shadow(0 10px 20px rgba(7, 30, 58, 0.4));
-      transition: filter 0.25s ease;
+      pointer-events: none;
     }
     
-    /* Custom sequence: 1st bounce 2cm (~70px) upward, then 2 cycles of 1cm (~35px) up & down, repeats every ~3.8s */
-    @keyframes faqCustomRobotBounce {
-      0%, 100% { transform: translateY(0); }
-      /* Bounce 1: 2cm (~70px) upward */
-      6% { transform: translateY(-70px); }
-      12% { transform: translateY(0); }
-      
-      /* Bounce 2 (Cycle 1): 1cm (~35px) up & down */
-      18% { transform: translateY(-35px); }
-      22% { transform: translateY(8px); }
-      26% { transform: translateY(0); }
-      
-      /* Bounce 3 (Cycle 2): 1cm (~35px) up & down */
-      32% { transform: translateY(-35px); }
-      36% { transform: translateY(8px); }
-      40% { transform: translateY(0); }
-      
-      /* 40% to 100%: Rest/pause for ~2.5s before repeating */
+    /* 1st bounce 2cm (~65px) upward, then 2 cycles of 1cm (~32px) up & down, repeats every ~3.5s */
+    @keyframes faqRobotBounce {
+      0%, 100% {
+        transform: translate3d(0, 0, 0);
+      }
+      /* Bounce 1: ~2cm (65px) upward */
+      8% {
+        transform: translate3d(0, -65px, 0);
+      }
+      16% {
+        transform: translate3d(0, 0, 0);
+      }
+      /* Bounce 2: ~1cm (32px) upward */
+      23% {
+        transform: translate3d(0, -32px, 0);
+      }
+      29% {
+        transform: translate3d(0, 0, 0);
+      }
+      /* Bounce 3: ~1cm (32px) upward */
+      36% {
+        transform: translate3d(0, -32px, 0);
+      }
+      42% {
+        transform: translate3d(0, 0, 0);
+      }
+      /* 42% to 100%: Rest/pause for ~2 seconds */
     }
     
-    .faq-launcher.animate-bounce img {
-      animation: faqCustomRobotBounce 3.8s ease-in-out infinite;
+    .faq-launcher.animate-bounce {
+      animation: faqRobotBounce 3.5s ease-in-out infinite !important;
     }
 
     /* Stop bouncing when chat box is open */
-    .faq-launcher.popup-open img {
+    .faq-launcher.popup-open {
       animation: none !important;
-      transform: translateY(0) !important;
+      transform: translate3d(0, 0, 0) !important;
     }
     
     @media (prefers-reduced-motion: reduce) {
-      .faq-launcher.animate-bounce img {
-        animation: none;
+      .faq-launcher.animate-bounce {
+        animation: none !important;
       }
     }
 
     .faq-popup {
       position: fixed;
-      bottom: 122px;
+      bottom: 136px;
       right: 24px;
       width: 360px;
       max-width: calc(100vw - 32px);
