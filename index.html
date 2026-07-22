@@ -1727,8 +1727,8 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 110px;
-      height: 110px;
+      width: 120px;
+      height: 120px;
       border-radius: 0;
       background: transparent;
       border: none;
@@ -1741,72 +1741,71 @@
       padding: 0;
       outline: none;
       user-select: none;
-      transform: translate3d(0, 0, 0);
-      will-change: transform;
     }
     .faq-launcher:hover {
-      filter: drop-shadow(0 14px 28px rgba(255, 153, 51, 0.65)) drop-shadow(0 8px 20px rgba(7, 30, 58, 0.5));
+      filter: drop-shadow(0 16px 32px rgba(255, 153, 51, 0.7)) drop-shadow(0 10px 24px rgba(7, 30, 58, 0.5));
+      transform: scale(1.05);
     }
     .faq-launcher:active {
-      transform: scale(0.95) translate3d(0, 0, 0);
+      transform: scale(0.95);
     }
     .faq-launcher img {
       width: 100%;
       height: 100%;
       object-fit: contain;
       display: block;
-      filter: drop-shadow(0 10px 20px rgba(7, 30, 58, 0.4));
+      filter: drop-shadow(0 10px 22px rgba(7, 30, 58, 0.45));
       pointer-events: none;
     }
     
-    /* 1st bounce 2cm (~65px) upward, then 2 cycles of 1cm (~32px) up & down, repeats every ~3.5s */
+    /* 1st bounce 2cm (~75px) upward, then 2 cycles of 1cm (~38px) up & down, repeats every ~3.8s */
     @keyframes faqRobotBounce {
       0%, 100% {
-        transform: translate3d(0, 0, 0);
+        transform: translateY(0);
       }
-      /* Bounce 1: ~2cm (65px) upward */
-      8% {
-        transform: translate3d(0, -65px, 0);
+      /* Bounce 1: ~2cm (75px) upward */
+      6% {
+        transform: translateY(-75px);
       }
-      16% {
-        transform: translate3d(0, 0, 0);
+      12% {
+        transform: translateY(0);
       }
-      /* Bounce 2: ~1cm (32px) upward */
-      23% {
-        transform: translate3d(0, -32px, 0);
+      /* Bounce 2: ~1cm (38px) upward */
+      18% {
+        transform: translateY(-38px);
       }
-      29% {
-        transform: translate3d(0, 0, 0);
+      22% {
+        transform: translateY(6px);
       }
-      /* Bounce 3: ~1cm (32px) upward */
+      26% {
+        transform: translateY(0);
+      }
+      /* Bounce 3: ~1cm (38px) upward */
+      32% {
+        transform: translateY(-38px);
+      }
       36% {
-        transform: translate3d(0, -32px, 0);
+        transform: translateY(6px);
       }
-      42% {
-        transform: translate3d(0, 0, 0);
+      40% {
+        transform: translateY(0);
       }
-      /* 42% to 100%: Rest/pause for ~2 seconds */
+      /* 40% to 100%: Rest/pause for ~2.3 seconds */
     }
     
     .faq-launcher.animate-bounce {
-      animation: faqRobotBounce 3.5s ease-in-out infinite !important;
+      animation: faqRobotBounce 3.8s ease-in-out infinite !important;
     }
 
     /* Stop bouncing when chat box is open */
     .faq-launcher.popup-open {
       animation: none !important;
-      transform: translate3d(0, 0, 0) !important;
-    }
-    
-    @media (prefers-reduced-motion: reduce) {
-      .faq-launcher.animate-bounce {
-        animation: none !important;
-      }
+      transform: translateY(0) !important;
     }
 
     .faq-popup {
       position: fixed;
-      bottom: 136px;
+      bottom: 146px;
       right: 24px;
       width: 360px;
       max-width: calc(100vw - 32px);
@@ -3063,6 +3062,31 @@
       const upper = name.toUpperCase().trim();
       return SUB_HI_MAP[upper] || formatSubdistrictNameEn(name);
     }
+
+    function triggerRobotBounce() {
+      const launcher = document.getElementById('faq-launcher');
+      if (!launcher || FAQ_STATE.isOpen) return;
+
+      if (typeof launcher.animate === 'function') {
+        launcher.animate([
+          { transform: 'translateY(0)' },
+          { transform: 'translateY(-75px)', offset: 0.12 },
+          { transform: 'translateY(0)', offset: 0.25 },
+          { transform: 'translateY(-38px)', offset: 0.40 },
+          { transform: 'translateY(6px)', offset: 0.52 },
+          { transform: 'translateY(0)', offset: 0.65 },
+          { transform: 'translateY(-38px)', offset: 0.78 },
+          { transform: 'translateY(6px)', offset: 0.88 },
+          { transform: 'translateY(0)', offset: 1.0 }
+        ], {
+          duration: 1600,
+          easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+        });
+      }
+    }
+
+    setInterval(triggerRobotBounce, 3800);
+    setTimeout(triggerRobotBounce, 600);
 
     window.toggleFaqPopup = function(forceState) {
       const popup = document.getElementById('faq-popup');
