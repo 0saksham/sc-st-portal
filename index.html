@@ -2393,6 +2393,23 @@
       }
     }
 
+    async function loadDistrictVillages(districtCode) {
+      if (!districtCode) return { type: 'FeatureCollection', features: [] };
+      const codeStr = String(districtCode).padStart(3, '0');
+      const cacheKey = `villages_${codeStr}`;
+      if (DATA_CACHE[cacheKey]) return DATA_CACHE[cacheKey];
+      try {
+        const response = await fetch(`./data/villages_by_district/villages_${codeStr}.geojson`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        DATA_CACHE[cacheKey] = data;
+        return data;
+      } catch (err) {
+        console.error(`Failed to load village data for district ${districtCode}:`, err);
+        return { type: 'FeatureCollection', features: [] };
+      }
+    }
+
     function showLoader(show) {
       const loader = document.getElementById('loader-overlay');
       if (loader) {
@@ -3382,13 +3399,13 @@
         const sdNameHi = formatSubdistrictNameHi(sdNameRaw);
         const isCensusAvail = sdProps.census_2011_data_available === true || sdProps.census_2011_data_available === 'true';
 
-        const villagesGeo = await loadGeoJSON('villages');
+        const villagesGeo = await loadDistrictVillages(dCode);
         const localVillages = villagesGeo.features
           .filter(f => f.properties.district_code === dCode && f.properties.subdistrict_local_code === sdCode)
           .map(f => f.properties);
 
         const totalVillagesCount = localVillages.length;
-        const villagesWithData = localVillages.filter(v => v.census_data_available === true || (v.sc_percent !== null && v.sc_percent !== undefined));
+        const villagesWithData = localVillages.filter(v => v.total_population !== null && v.total_population !== undefined);
         const withDataCount = villagesWithData.length;
 
         const maxSCVil = villagesWithData.length ? [...villagesWithData].sort((a,b) => (parseFloat(b.sc_percent)||0) - (parseFloat(a.sc_percent)||0))[0] : null;
@@ -3396,10 +3413,10 @@
         const maxLitVil = villagesWithData.length ? [...villagesWithData].sort((a,b) => (parseFloat(b.literacy_percent)||0) - (parseFloat(a.literacy_percent)||0))[0] : null;
         const minLitVil = villagesWithData.length ? [...villagesWithData].sort((a,b) => (parseFloat(a.literacy_percent)||0) - (parseFloat(b.literacy_percent)||0))[0] : null;
 
-        const maxSCVilName = maxSCVil ? formatSubdistrictNameEn(maxSCVil.village_name) : '';
-        const maxSTVilName = maxSTVil ? formatSubdistrictNameEn(maxSTVil.village_name) : '';
-        const maxLitVilName = maxLitVil ? formatSubdistrictNameEn(maxLitVil.village_name) : '';
-        const minLitVilName = minLitVil ? formatSubdistrictNameEn(minLitVil.village_name) : '';
+        const maxSCVilName = maxSCVil ? formatSubdistrictNameEn(maxSCVil.census_village_name || maxSCVil.village_name) : '';
+        const maxSTVilName = maxSTVil ? formatSubdistrictNameEn(maxSTVil.census_village_name || maxSTVil.village_name) : '';
+        const maxLitVilName = maxLitVil ? formatSubdistrictNameEn(maxLitVil.census_village_name || maxLitVil.village_name) : '';
+        const minLitVilName = minLitVil ? formatSubdistrictNameEn(minLitVil.census_village_name || minLitVil.village_name) : '';
 
         const totalPop = (parseInt(sdProps.total_population)||0).toLocaleString('en-IN');
         const scPop = (parseInt(sdProps.sc_population)||0).toLocaleString('en-IN');
@@ -4387,6 +4404,7 @@
       const stateGeoJSON = await loadGeoJSON('uttarakhand_state');
       const districtsGeoJSON = await loadGeoJSON('uttarakhand_districts');
       const subdistrictsGeoJSON = await loadGeoJSON('uttarakhand_subdistricts');
+      loadDistrictVillages(districtCode);
       showLoader(false);
 
       // Find selected district properties
@@ -4814,7 +4832,7 @@
       showLoader(true);
       const subdistrictsGeoJSON = await loadGeoJSON('uttarakhand_subdistricts');
       const districtsGeoJSON = await loadGeoJSON('uttarakhand_districts');
-      const villagesGeoJSON = await loadGeoJSON('villages');
+      const villagesGeoJSON = await loadDistrictVillages(districtCode);
       showLoader(false);
 
       // Find Sub-district Polygon(s) - support exclaves/duplicate features by grouping them
@@ -5024,29 +5042,41 @@
       // Helper to get filtered villages array based on selected mode
       function getFilteredSubdistrictVillages(mode = APP.villageFilterMode || 'all') {
         if (mode === 'with_data') {
-          return allSubdistrictVillages.filter(v => v.properties.census_data_available === true || v.properties.census_data_available === "true");
+          return allSubdistrictVillages.filter(v => v.properties.total_population !== null && v.properties.total_population !== undefined);
         }
         if (mode === 'no_data') {
-          return allSubdistrictVillages.filter(v => v.properties.census_data_available === false || v.properties.census_data_available === "false" || v.properties.census_data_available == null);
+          return allSubdistrictVillages.filter(v => v.properties.total_population == null || v.properties.total_population === undefined);
         }
         return allSubdistrictVillages;
       }
 
-      // Render Village Polygon Layer helper
+      // Render Village Layer helper (handles polygons & point_fallback markers)
       function createVillagesLayer(featuresToRender) {
         return L.geoJSON({
           type: 'FeatureCollection',
           features: featuresToRender
         }, {
+          pointToLayer: function(feature, latlng) {
+            const props = feature.properties;
+            const pt = (props.marker_lat != null && props.marker_lon != null)
+              ? [props.marker_lat, props.marker_lon]
+              : latlng;
+            return L.circleMarker(pt, {
+              radius: 6,
+              color: '#1E6FB5',
+              weight: 2,
+              fillColor: '#38BDF8',
+              fillOpacity: 0.85
+            });
+          },
           style: function(feature) {
-            const isAvail = feature.properties.census_data_available;
-            if (isAvail === false || isAvail === "false" || isAvail == null) {
+            if (feature.properties.geometry_type === 'point_fallback') {
               return {
-                color: '#9CA3AF',
-                weight: 1,
-                fillColor: '#E5E7EB',
-                fillOpacity: 0.35,
-                dashArray: '2, 2'
+                radius: 6,
+                color: '#1E6FB5',
+                weight: 2,
+                fillColor: '#38BDF8',
+                fillOpacity: 0.85
               };
             }
             return {
@@ -5058,7 +5088,7 @@
           },
           onEachFeature: function(feature, layer) {
             const vProps = feature.properties;
-            const isAvail = vProps.census_data_available;
+            const vilName = vProps.census_village_name || vProps.village_name || '';
 
             layer.on('mousemove', function(e) {
               updateMapTooltipPos(e);
@@ -5066,26 +5096,37 @@
 
             layer.on('mouseover', function(e) {
               if (activeVillageLayer !== layer) {
-                layer.setStyle({
-                  weight: 2.5,
-                  color: '#FF6B00',
-                  fillColor: '#FF6B00',
-                  fillOpacity: 0.55
-                });
+                if (vProps.geometry_type === 'point_fallback') {
+                  layer.setStyle({
+                    radius: 9,
+                    color: '#FF6B00',
+                    fillColor: '#FF6B00',
+                    fillOpacity: 0.95,
+                    weight: 3
+                  });
+                } else {
+                  layer.setStyle({
+                    weight: 2.5,
+                    color: '#FF6B00',
+                    fillColor: '#FF6B00',
+                    fillOpacity: 0.55
+                  });
+                }
               }
-              if (isAvail === false || isAvail === "false" || isAvail == null) {
+              const hasData = vProps.total_population !== null && vProps.total_population !== undefined;
+              if (!hasData) {
                 tooltipEl.innerHTML = `
-                  <div class="custom-tooltip-title">${vProps.village_name || ''}</div>
-                  <div style="font-size:0.72rem; color:var(--text-muted);">${vProps.subdistrict_name || ''} · ${vProps.district_name || ''}</div>
+                  <div class="custom-tooltip-title">${vilName}</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">${p.subdistrict_name || ''}</div>
                   <div style="font-size:0.75rem; color:var(--saffron-accent); font-weight:600; margin-top:3px;">${UI_TRANSLATIONS[lang].notAvailable}</div>
                 `;
                 tooltipEl.classList.add('visible');
                 updateMapTooltipPos(e);
               } else {
-                const pop = vProps.total_population != null ? parseInt(vProps.total_population).toLocaleString('en-IN') : UI_TRANSLATIONS[lang].notAvailable;
+                const pop = parseInt(vProps.total_population).toLocaleString('en-IN');
                 const scPct = vProps.sc_percent != null ? parseFloat(vProps.sc_percent).toFixed(1) + '%' : 'N/A';
                 const stPct = vProps.st_percent != null ? parseFloat(vProps.st_percent).toFixed(1) + '%' : 'N/A';
-                showMapTooltip(e, `${vProps.village_name} (${vProps.subdistrict_name})`, pop, scPct, stPct);
+                showMapTooltip(e, `${vilName} (${p.subdistrict_name})`, pop, scPct, stPct);
               }
             });
 
@@ -5189,9 +5230,10 @@
 
         const baseList = getFilteredSubdistrictVillages();
 
-        const filtered = baseList.filter(v => 
-          (v.properties.village_name || '').toLowerCase().includes(filterQuery.toLowerCase())
-        );
+        const filtered = baseList.filter(v => {
+          const vilName = v.properties.census_village_name || v.properties.village_name || '';
+          return vilName.toLowerCase().includes(filterQuery.toLowerCase());
+        });
 
         if (filtered.length === 0) {
           listContainer.innerHTML = `<div class="empty-state">${UI_TRANSLATIONS[lang].noVillageData}</div>`;
@@ -5201,14 +5243,15 @@
         listContainer.innerHTML = filtered.map(v => {
           const props = v.properties;
           const isSelected = APP.selectedVillage && APP.selectedVillage.properties.village_code === props.village_code;
-          const isAvail = props.census_data_available;
-          const popStr = (isAvail && props.total_population != null)
+          const hasData = props.total_population !== null && props.total_population !== undefined;
+          const vilName = props.census_village_name || props.village_name || '';
+          const popStr = hasData
             ? `Pop: ${parseInt(props.total_population).toLocaleString('en-IN')}`
             : (lang === 'hi' ? 'डेटा उपलब्ध नहीं' : 'Data not available');
           return `
             <div class="village-row ${isSelected ? 'selected' : ''}" onclick="selectVillageByCode('${props.village_code}')">
-              <span>${props.village_name}</span>
-              <span class="vol" style="${!isAvail ? 'font-size:0.68rem; color:var(--text-muted);' : ''}">${popStr}</span>
+              <span>${vilName}</span>
+              <span class="vol" style="${!hasData ? 'font-size:0.68rem; color:var(--text-muted);' : ''}">${popStr}</span>
             </div>
           `;
         }).join('');
@@ -5239,8 +5282,9 @@
       // Select Village Handler
       function selectVillage(village, targetLayer = null) {
         APP.selectedVillage = village;
+        const v = village.properties;
         
-        // Reset previous active polygon style if any
+        // Reset previous active polygon/marker style if any
         if (activeVillageLayer && activeVillageLayer !== targetLayer && villagesLayer) {
           villagesLayer.resetStyle(activeVillageLayer);
         }
@@ -5248,7 +5292,7 @@
         // Find target layer if not passed
         if (!targetLayer && villagesLayer) {
           villagesLayer.eachLayer(l => {
-            if (l.feature && l.feature.properties.village_code === village.properties.village_code) {
+            if (l.feature && l.feature.properties.village_code === v.village_code) {
               targetLayer = l;
             }
           });
@@ -5256,20 +5300,37 @@
 
         activeVillageLayer = targetLayer;
         if (activeVillageLayer) {
-          activeVillageLayer.setStyle({
-            weight: 3,
-            color: '#D97706',
-            fillColor: '#F59E0B',
-            fillOpacity: 0.7
-          });
-          activeVillageLayer.bringToFront();
-          if (activeVillageLayer.getBounds && activeVillageLayer.getBounds().isValid()) {
-            map.fitBounds(activeVillageLayer.getBounds(), { maxZoom: 14, padding: [30, 30] });
+          if (v.geometry_type === 'point_fallback') {
+            activeVillageLayer.setStyle({
+              radius: 10,
+              color: '#D97706',
+              fillColor: '#F59E0B',
+              fillOpacity: 1.0,
+              weight: 3
+            });
+          } else {
+            activeVillageLayer.setStyle({
+              weight: 3,
+              color: '#D97706',
+              fillColor: '#F59E0B',
+              fillOpacity: 0.7
+            });
           }
+          if (activeVillageLayer.bringToFront) activeVillageLayer.bringToFront();
+        }
+
+        if (v.marker_lat != null && v.marker_lon != null) {
+          if (v.geometry_type === 'polygon' && activeVillageLayer && activeVillageLayer.getBounds && activeVillageLayer.getBounds().isValid()) {
+            map.fitBounds(activeVillageLayer.getBounds(), { maxZoom: 15, padding: [30, 30] });
+          } else {
+            map.flyTo([v.marker_lat, v.marker_lon], 14, { animate: true });
+          }
+        } else if (activeVillageLayer && activeVillageLayer.getBounds && activeVillageLayer.getBounds().isValid()) {
+          map.fitBounds(activeVillageLayer.getBounds(), { maxZoom: 15, padding: [30, 30] });
         }
 
         // Highlight active list row
-        renderVillageList(searchBox.value);
+        renderVillageList(searchBox ? searchBox.value : '');
 
         // Update Village Detail Card
         buildVillageDetailCard(village, p);
@@ -5281,14 +5342,15 @@
       const lang = APP.currentLang;
       const container = document.getElementById('village-detail-section');
       const v = village.properties;
-      const isAvail = v.census_data_available;
+      const isAvail = v.total_population !== null && v.total_population !== undefined;
+      const vilName = v.census_village_name || v.village_name || '';
 
-      if (isAvail === false || isAvail === "false" || isAvail == null) {
+      if (!isAvail) {
         container.innerHTML = `
           <div class="card village-detail-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
               <div>
-                <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${v.village_name || ''}</h3>
+                <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${vilName}</h3>
                 <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
                   ${parentSubProps.subdistrict_name || ''} · ${APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''}
                 </span>
@@ -5338,7 +5400,7 @@
         <div class="card village-detail-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
             <div>
-              <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${v.village_name || ''}</h3>
+              <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${vilName}</h3>
               <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
                 ${parentSubProps.subdistrict_name} · ${APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''}
               </span>
@@ -5400,17 +5462,6 @@
 
             <!-- Right Side: Micro charts & comparison -->
             <div style="display: flex; gap: 16px; flex-grow: 1; align-items: stretch;">
-              ${(scPop === 0 && stPop === 0) ? `
-              <!-- §6 — Zero SC/ST empty state -->
-              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 140px;">
-                <div class="empty-state-ring" style="width:70px;height:70px;">
-                  <svg viewBox="0 0 24 24" style="width:24px;height:24px;"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              </div>
-              <div style="flex: 1.2; display: flex; align-items: center; justify-content: center; background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-                <p class="empty-state-note" data-en="This village has no recorded SC/ST population." data-hi="इस गांव में कोई दर्ज अनुसूचित जाति/जनजाति जनसंख्या नहीं है।">This village has no recorded SC/ST population.</p>
-              </div>
-              ` : `
               <!-- SC/ST Share Donut -->
               <div class="micro-chart-container" style="flex: 1; height: 140px; position: relative;">
                 <div id="micro-donut" style="width: 100%; height: 100%;"></div>
@@ -5460,7 +5511,6 @@
                 </div>
 
               </div>
-              `}
             </div>
           </div>
 
@@ -5518,7 +5568,7 @@
       APP.charts.scatterChart = scatterChart;
 
       // Group village data (only villages with census data available)
-      const validScatterVillages = allSubdistrictVillages.filter(item => item.properties.census_data_available);
+      const validScatterVillages = allSubdistrictVillages.filter(item => item.properties.total_population !== null && item.properties.total_population !== undefined);
 
       const scatterDataPoints = validScatterVillages.map(item => {
         const properties = item.properties;
@@ -5746,8 +5796,9 @@
     window.exportVillageCSV = function(btnEl) {
       if (!APP.selectedVillage) return;
       const v = APP.selectedVillage.properties;
-      const filename = `${(v.village_name || 'village').toLowerCase().replace(/\s+/g, '_')}_census_data.csv`;
-      const isAvail = v.census_data_available;
+      const vilName = v.census_village_name || v.village_name || 'village';
+      const filename = `${vilName.toLowerCase().replace(/\s+/g, '_')}_census_data.csv`;
+      const isAvail = v.total_population !== null && v.total_population !== undefined;
 
       const rows = [
         ["Census Indicator", "Value"],
@@ -5789,7 +5840,8 @@
 
       allSubdistrictVillages.forEach(item => {
         const v = item.properties;
-        const isAvail = v.census_data_available;
+        const isAvail = v.total_population !== null && v.total_population !== undefined;
+        const vilName = v.census_village_name || v.village_name || '';
         rows.push([
           v.village_code,
           v.village_name || '',
