@@ -3538,8 +3538,8 @@
           {
             id: 'subdist_q10',
             q: lang === 'hi' ? "मैं इस पृष्ठ का उपयोग कैसे करूं?" : "How do I use this page?",
-            a: lang === 'hi' ? `इस पृष्ठ पर आपको मिलेगा:\n- इस उप-तहसील की सीमा का मानचित्र\n- इस उप-तहसील के सभी गांवों की खोजने योग्य सूची\n- सभी गांव, डेटा सहित गांव, या डेटा रहित गांव देखने का फ़िल्टर विकल्प\n- किसी गांव को खोजने या सूची में क्लिक करने पर मानचित्र पर उसका स्थान चिह्नित होगा और नीचे उसकी विस्तृत जनसंख्या जानकारी व चार्ट दिखाई देंगे\n- चयनित गांव का डेटा, या पूरे उप-तहसील का डेटा, CSV फ़ाइल के रूप में डाउनलोड करने हेतु बटन`
-                             : `On this page, you can find:\n- The boundary map of this sub-district\n- A searchable list of all villages in this sub-district\n- A filter to view All villages, Villages with data, or Villages without data\n- Click or search for a village to mark its location on the map and see its detailed population data and charts below\n- Buttons to download the selected village's data, or the full sub-district dataset, as a CSV file`
+            a: lang === 'hi' ? `इस पृष्ठ पर आपको मिलेगा:\n- इस उप-तहसील की सीमा का मानचित्र\n- इस उप-तहसील के सभी गांवों की खोजने योग्य सूची\n- किसी गांव को खोजने या सूची में क्लिक करने पर मानचित्र पर उसका स्थान चिह्नित होगा और नीचे उसकी विस्तृत जनसंख्या जानकारी व चार्ट दिखाई देंगे\n- चयनित गांव का डेटा, या पूरे उप-तहसील का डेटा, CSV फ़ाइल के रूप में डाउनलोड करने हेतु बटन`
+                             : `On this page, you can find:\n- The boundary map of this sub-district\n- A searchable list of all villages in this sub-district\n- Click or search for a village to mark its location on the map and see its detailed population data and charts below\n- Buttons to download the selected village's data, or the full sub-district dataset, as a CSV file`
           }
         ];
       }
@@ -4879,20 +4879,7 @@
                 </div>
               </div>
 
-              <!-- Option just above map: All Villages, Villages with Data, Villages without Data -->
-              <div class="controls-row" style="margin-bottom: 16px;">
-                <div class="segmented-control" id="village-filter-control">
-                  <button class="segmented-btn active" data-filter="all" onclick="setVillageFilter('all')">
-                    <span data-en="${UI_TRANSLATIONS.en.allVillages}" data-hi="${UI_TRANSLATIONS.hi.allVillages}">${UI_TRANSLATIONS[lang].allVillages}</span>
-                  </button>
-                  <button class="segmented-btn" data-filter="with_data" onclick="setVillageFilter('with_data')">
-                    <span data-en="${UI_TRANSLATIONS.en.villagesWithData}" data-hi="${UI_TRANSLATIONS.hi.villagesWithData}">${UI_TRANSLATIONS[lang].villagesWithData}</span>
-                  </button>
-                  <button class="segmented-btn" data-filter="no_data" onclick="setVillageFilter('no_data')">
-                    <span data-en="${UI_TRANSLATIONS.en.villagesWithoutData}" data-hi="${UI_TRANSLATIONS.hi.villagesWithoutData}">${UI_TRANSLATIONS[lang].villagesWithoutData}</span>
-                  </button>
-                </div>
-              </div>
+
 
               <div class="map-wrapper">
                 <div class="map-dir-badge map-dir-n" title="North / उत्तर">▲ <span data-en="N" data-hi="उ">N</span></div>
@@ -5039,14 +5026,8 @@
       }).addTo(map);
       APP.subdistrictBoundary = subdistrictBoundary;
 
-      // Helper to get filtered villages array based on selected mode
-      function getFilteredSubdistrictVillages(mode = APP.villageFilterMode || 'all') {
-        if (mode === 'with_data') {
-          return allSubdistrictVillages.filter(v => v.properties.total_population !== null && v.properties.total_population !== undefined);
-        }
-        if (mode === 'no_data') {
-          return allSubdistrictVillages.filter(v => v.properties.total_population == null || v.properties.total_population === undefined);
-        }
+      // Helper to get all sub-district villages
+      function getFilteredSubdistrictVillages() {
         return allSubdistrictVillages;
       }
 
@@ -5148,29 +5129,7 @@
       APP.villagesLayer = villagesLayer;
       applyActiveMapStyles();
 
-      // Expose setVillageFilter globally for segmented control clicks
-      window.setVillageFilter = function(filterMode) {
-        APP.villageFilterMode = filterMode;
 
-        // Update active class on segmented buttons
-        document.querySelectorAll('#village-filter-control .segmented-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.getAttribute('data-filter') === filterMode);
-        });
-
-        // Remove old village layer from map if exists
-        if (APP.villagesLayer) {
-          map.removeLayer(APP.villagesLayer);
-        }
-
-        activeVillageLayer = null;
-        villagesLayer = createVillagesLayer(getFilteredSubdistrictVillages(filterMode));
-        APP.villagesLayer = villagesLayer;
-        applyActiveMapStyles();
-
-        // Refresh search list according to active filterMode & text input
-        const searchBox = document.getElementById('village-search-box');
-        renderVillageList(searchBox ? searchBox.value : '');
-      };
 
       // §4 — Fade out skeleton
       fadeOutSkeleton();
