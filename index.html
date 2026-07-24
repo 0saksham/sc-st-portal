@@ -15,11 +15,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Leaflet CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
   
   <!-- Apache ECharts JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/6.1.0/echarts.min.js" integrity="sha384-13dr0n74GC2jxfsmgkAq9bnH395lLo/3w9oj7vDso6Q1ibpbULAmLmxJRI6ckRmN" crossorigin="anonymous"></script>
 
   <style>
     /* ===========================================
@@ -2215,6 +2215,19 @@
   <!-- ========== JAVASCRIPT LOGIC ========== -->
   <script>
     /* ===========================================
+       SAFE DOM SANITIZER (XSS PREVENTION)
+    =========================================== */
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /* ===========================================
        DICTIONARY FOR HINDI TRANSLATION (CHROME ONLY)
     =========================================== */
     const UI_TRANSLATIONS = {
@@ -2644,7 +2657,7 @@
       const lang = APP.currentLang;
       tooltipTimeout = setTimeout(() => {
         tooltipEl.innerHTML = `
-          <div class="custom-tooltip-title">${name}</div>
+          <div class="custom-tooltip-title">${escapeHTML(name)}</div>
           <div class="custom-tooltip-row">
             <span>${UI_TRANSLATIONS[lang].overallPop}:</span>
             <span class="val">${parseInt(pop).toLocaleString('en-IN')}</span>
@@ -2721,16 +2734,16 @@
       if (parts[1] === 'district' && parts[2]) {
         const dCode = parts[2];
         const dName = APP.activeDistrict ? APP.activeDistrict.properties.district_name : dCode;
-        html = `<a href="#/state">${lang === 'hi' ? 'राज्य' : 'State'}</a> <span class="sep">›</span> <span class="active-crumb">${dName}</span>`;
+        html = `<a href="#/state">${lang === 'hi' ? 'राज्य' : 'State'}</a> <span class="sep">›</span> <span class="active-crumb">${escapeHTML(dName)}</span>`;
       } else if (parts[1] === 'subdistrict' && parts[2] && parts[3]) {
         const dCode = parts[2];
         const sdCode = parts[3];
         const dName = APP.activeDistrict ? APP.activeDistrict.properties.district_name : dCode;
         const sdName = APP.activeSubdistrict ? APP.activeSubdistrict.properties.subdistrict_name : sdCode;
-        html = `<a href="#/district/${dCode}">${dName}</a> <span class="sep">›</span> <span class="active-crumb">${sdName}</span>`;
+        html = `<a href="#/district/${encodeURIComponent(dCode)}">${escapeHTML(dName)}</a> <span class="sep">›</span> <span class="active-crumb">${escapeHTML(sdName)}</span>`;
       } else if (parts[1] === 'about') {
         const sub = parts[2] === 'scst-cell' ? (lang === 'hi' ? 'अनु.जाति/जनजाति प्रकोष्ठ' : 'SC/ST Cell') : (lang === 'hi' ? 'यूकोस्ट' : 'UCOST');
-        html = `<span class="active-crumb">${lang === 'hi' ? 'हमारे बारे में' : 'About Us'} (${sub})</span>`;
+        html = `<span class="active-crumb">${lang === 'hi' ? 'हमारे बारे में' : 'About Us'} (${escapeHTML(sub)})</span>`;
       } else if (parts[1] === 'contact') {
         html = `<span class="active-crumb">${lang === 'hi' ? 'संपर्क करें' : 'Contact Us'}</span>`;
       }
@@ -3569,16 +3582,16 @@
           let formattedAnsHtml = '';
           if (item.a.includes('\n- ')) {
             const parts = item.a.split('\n- ');
-            const headerText = parts[0];
+            const headerText = escapeHTML(parts[0]);
             const bullets = parts.slice(1);
-            formattedAnsHtml = `<p style="margin-bottom:8px;">${headerText}</p><ul style="margin: 8px 0; padding-left: 18px;">${bullets.map(b => `<li style="margin-bottom: 6px;">${b}</li>`).join('')}</ul>`;
+            formattedAnsHtml = `<p style="margin-bottom:8px;">${headerText}</p><ul style="margin: 8px 0; padding-left: 18px;">${bullets.map(b => `<li style="margin-bottom: 6px;">${escapeHTML(b)}</li>`).join('')}</ul>`;
           } else {
-            formattedAnsHtml = item.a.replace(/\n/g, '<br>');
+            formattedAnsHtml = escapeHTML(item.a).replace(/\n/g, '<br>');
           }
 
           body.innerHTML = `
             <div class="faq-answer-container">
-              <div class="faq-user-msg-bubble">❓ ${item.q}</div>
+              <div class="faq-user-msg-bubble">❓ ${escapeHTML(item.q)}</div>
               <div class="faq-bot-reply-card">
                 <div class="faq-answer-text">${formattedAnsHtml}</div>
               </div>
@@ -3600,8 +3613,8 @@
         </div>
         <div class="faq-questions-list">
           ${questions.map(item => `
-            <button class="faq-question-btn" onclick="openFaqQuestion('${item.id}')">
-              <span>${item.q}</span>
+            <button class="faq-question-btn" onclick="openFaqQuestion('${escapeHTML(item.id)}')">
+              <span>${escapeHTML(item.q)}</span>
               <span class="faq-question-arrow">➜</span>
             </button>
           `).join('')}
@@ -5195,7 +5208,7 @@
         });
 
         if (filtered.length === 0) {
-          listContainer.innerHTML = `<div class="empty-state">${UI_TRANSLATIONS[lang].noVillageData}</div>`;
+          listContainer.innerHTML = `<div class="empty-state">${escapeHTML(UI_TRANSLATIONS[lang].noVillageData)}</div>`;
           return;
         }
 
@@ -5208,9 +5221,9 @@
             ? `Pop: ${parseInt(props.total_population).toLocaleString('en-IN')}`
             : (lang === 'hi' ? 'डेटा उपलब्ध नहीं' : 'Data not available');
           return `
-            <div class="village-row ${isSelected ? 'selected' : ''}" onclick="selectVillageByCode('${props.village_code}')">
-              <span>${vilName}</span>
-              <span class="vol" style="${!hasData ? 'font-size:0.68rem; color:var(--text-muted);' : ''}">${popStr}</span>
+            <div class="village-row ${isSelected ? 'selected' : ''}" onclick="selectVillageByCode('${escapeHTML(props.village_code)}')">
+              <span>${escapeHTML(vilName)}</span>
+              <span class="vol" style="${!hasData ? 'font-size:0.68rem; color:var(--text-muted);' : ''}">${escapeHTML(popStr)}</span>
             </div>
           `;
         }).join('');
@@ -5309,9 +5322,9 @@
           <div class="card village-detail-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
               <div>
-                <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${vilName}</h3>
+                <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${escapeHTML(vilName)}</h3>
                 <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
-                  ${parentSubProps.subdistrict_name || ''} · ${APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''}
+                  ${escapeHTML(parentSubProps.subdistrict_name || '')} · ${escapeHTML(APP.activeDistrict ? APP.activeDistrict.properties.district_name : '')}
                 </span>
               </div>
               
@@ -5359,9 +5372,9 @@
         <div class="card village-detail-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
             <div>
-              <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${vilName}</h3>
+              <h3 style="font-size: 1.3rem; color: var(--ucost-blue-dark); margin-bottom: 4px;">${escapeHTML(vilName)}</h3>
               <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
-                ${parentSubProps.subdistrict_name} · ${APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''}
+                ${escapeHTML(parentSubProps.subdistrict_name)} · ${escapeHTML(APP.activeDistrict ? APP.activeDistrict.properties.district_name : '')}
               </span>
             </div>
             
@@ -5662,8 +5675,8 @@
         const isChecked = APP.compareSelectedDistricts.includes(properties.district_code);
         return `
           <label class="checklist-item">
-            <input type="checkbox" value="${properties.district_code}" ${isChecked ? 'checked' : ''} onchange="handleCompareCheckboxChange(this)">
-            <span>${properties.district_name}</span>
+            <input type="checkbox" value="${escapeHTML(properties.district_code)}" ${isChecked ? 'checked' : ''} onchange="handleCompareCheckboxChange(this)">
+            <span>${escapeHTML(properties.district_name)}</span>
           </label>
         `;
       }).join('');
@@ -5692,7 +5705,7 @@
 
       // Handle empty state warning
       if (filteredDistricts.length < 2) {
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; font-weight:700; color:var(--saffron-accent);">${UI_TRANSLATIONS[lang].selectAtLeastTwo}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; font-weight:700; color:var(--saffron-accent);">${escapeHTML(UI_TRANSLATIONS[lang].selectAtLeastTwo)}</td></tr>`;
         
         // Clear/Dispose chart inside
         if (APP.charts.compareChart) {
@@ -5705,7 +5718,7 @@
         const p = f.properties;
         return `
           <tr>
-            <td style="font-weight:700; color:var(--ucost-blue-dark);">${p.district_name}</td>
+            <td style="font-weight:700; color:var(--ucost-blue-dark);">${escapeHTML(p.district_name)}</td>
             <td>${parseInt(p.total_population).toLocaleString('en-IN')}</td>
             <td>${parseFloat(p.sc_percent).toFixed(1)}%</td>
             <td>${parseFloat(p.st_percent).toFixed(1)}%</td>
@@ -5756,7 +5769,8 @@
       if (!APP.selectedVillage) return;
       const v = APP.selectedVillage.properties;
       const vilName = v.census_village_name || v.village_name || 'village';
-      const filename = `${vilName.toLowerCase().replace(/\s+/g, '_')}_census_data.csv`;
+      const safeVilName = vilName.toLowerCase().replace(/[^a-z0-9_]/gi, '_');
+      const filename = `${safeVilName}_census_data.csv`;
       const isAvail = v.total_population !== null && v.total_population !== undefined;
 
       const rows = [
@@ -5786,7 +5800,8 @@
     window.exportSubdistrictCSV = function(btnEl) {
       if (!APP.activeSubdistrict) return;
       const sd = APP.activeSubdistrict.properties;
-      const filename = `${sd.subdistrict_name.toLowerCase().replace(/\s+/g, '_')}_villages_dataset.csv`;
+      const safeSdName = (sd.subdistrict_name || 'subdistrict').toLowerCase().replace(/[^a-z0-9_]/gi, '_');
+      const filename = `${safeSdName}_villages_dataset.csv`;
 
       const headers = [
         "Village Code", "Village Name", "Census Data Available", "Households", 
