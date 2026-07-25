@@ -3656,7 +3656,7 @@
         return v.toFixed(1) + '% ' + (lang === 'hi' ? 'कुल में से' : 'of total');
       }
       function getName(item) {
-        return item.district_name || item.subdistrict_name || item.village_name || item.census_village_name || '';
+        return item.district_name || item.subdistrict_name || item.census_village_name || item.village_name || '';
       }
       function getCode(item) {
         return item.district_code || item.subdistrict_code || item.village_code || '';
@@ -5549,7 +5549,7 @@
           parseFloat(properties.literacy_percent) || 0,
           comb,
           parseInt(properties.total_population) || 0,
-          properties.village_name || '',
+          properties.census_village_name || properties.village_name || '',
           item // store reference to village object
         ];
       });
@@ -5558,7 +5558,7 @@
         litPct,
         scPct + stPct,
         totalPop,
-        v.village_name || ''
+        v.census_village_name || v.village_name || ''
       ];
 
       // §7 — Population-based color gradient for scatter dots
@@ -5610,6 +5610,22 @@
               },
               opacity: 0.6
             },
+            emphasis: {
+              focus: 'series',
+              itemStyle: {
+                opacity: 1,
+                borderWidth: 2,
+                borderColor: '#0B3D6E'
+              },
+              label: {
+                show: true,
+                formatter: function(params) { return params.data[3]; },
+                position: 'top',
+                fontSize: 10,
+                fontWeight: 'bold',
+                color: '#0B3D6E'
+              }
+            },
             animationDelay: function(idx) {
               return idx * (10 + Math.random() * 30);
             },
@@ -5629,6 +5645,14 @@
               opacity: 1,
               shadowBlur: 10,
               shadowColor: 'var(--saffron-accent)'
+            },
+            label: {
+              show: true,
+              formatter: function(params) { return params.data[3]; },
+              position: 'top',
+              fontSize: 11,
+              fontWeight: 'bold',
+              color: '#d97706'
             },
             z: 10
           }
@@ -5776,7 +5800,7 @@
       const rows = [
         ["Census Indicator", "Value"],
         ["Village Code", v.village_code],
-        ["Village Name", v.village_name || ''],
+        ["Village Name", v.census_village_name || v.village_name || ''],
         ["Sub-district", APP.activeSubdistrict ? APP.activeSubdistrict.properties.subdistrict_name : ''],
         ["District", APP.activeDistrict ? APP.activeDistrict.properties.district_name : ''],
         ["Census Data Available", isAvail ? "Yes" : "No"],
@@ -5818,7 +5842,7 @@
         const vilName = v.census_village_name || v.village_name || '';
         rows.push([
           v.village_code,
-          v.village_name || '',
+          v.census_village_name || v.village_name || '',
           isAvail ? "Yes" : "No",
           isAvail && v.households != null ? v.households : "Data not available",
           isAvail && v.total_population != null ? v.total_population : "Data not available",
