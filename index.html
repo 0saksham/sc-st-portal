@@ -2187,25 +2187,25 @@
 
   <div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
 
-  <!-- ========== SC/ST CELL CHAT BOT FLOATING WIDGET ========== -->
-  <button id="faq-launcher" class="faq-launcher animate-bounce" aria-label="SC/ST Cell CHAT BOT" aria-expanded="false" aria-controls="faq-popup" onclick="toggleFaqPopup()">
-    <span class="faq-launcher-badge" data-en="💬 Ask Me!" data-hi="💬 मुझसे पूछें!">💬 Ask Me!</span>
-    <img src="SC,STCell-chatbot new.png" alt="SC/ST Cell CHAT BOT">
+  <!-- ========== NANDA CHAT BOT FLOATING WIDGET ========== -->
+  <button id="faq-launcher" class="faq-launcher animate-bounce" aria-label="NANDA Chatbot" aria-expanded="false" aria-controls="faq-popup" onclick="toggleFaqPopup()">
+    <span class="faq-launcher-badge" data-en="💬 Ask NANDA!" data-hi="💬 नंदा से पूछें!">💬 Ask NANDA!</span>
+    <img src="SC,STCell-chatbot new.png" alt="NANDA Chatbot">
   </button>
 
-  <div id="faq-popup" class="faq-popup card" role="dialog" aria-label="SC/ST Cell CHAT BOT">
+  <div id="faq-popup" class="faq-popup card" role="dialog" aria-label="NANDA Chatbot">
     <div class="faq-header">
       <div class="faq-header-left">
         <div class="faq-bot-avatar-wrap">
-          <img src="SC,STCell-chatbot new.png" alt="Bot Avatar">
+          <img src="SC,STCell-chatbot new.png" alt="NANDA Avatar">
           <span class="faq-bot-online-dot"></span>
         </div>
         <div class="faq-bot-title-group">
-          <span class="faq-bot-name" data-en="SC/ST Cell CHAT BOT" data-hi="एससी/एसटी सेल चैट बोट">SC/ST Cell CHAT BOT</span>
-          <span class="faq-bot-status" data-en="Online · Portal Guide" data-hi="ऑनलाइन · पोर्टल मार्गदर्शक">Online · Portal Guide</span>
+          <span class="faq-bot-name" data-en="NANDA" data-hi="नंदा">NANDA</span>
+          <span class="faq-bot-status" data-en="Online · SC/ST Portal Guide" data-hi="ऑनलाइन · एससी/एसटी पोर्टल मार्गदर्शक">Online · SC/ST Portal Guide</span>
         </div>
       </div>
-      <button class="faq-close-btn" aria-label="Close Chat Bot" onclick="toggleFaqPopup(false)">&times;</button>
+      <button class="faq-close-btn" aria-label="Close NANDA Chatbot" onclick="toggleFaqPopup(false)">&times;</button>
     </div>
     <div id="faq-body" class="faq-body">
       <!-- Chat Bot content rendered dynamically -->
@@ -3607,8 +3607,8 @@
       body.innerHTML = `
         <div class="faq-welcome-card">
           <span class="faq-welcome-icon">🤖</span>
-          <span class="faq-welcome-text" data-en="Hello! I am your SC/ST Portal Guide. Click any question below for an instant answer:" data-hi="नमस्ते! मैं आपका एससी/एसटी पोर्टल मार्गदर्शक हूँ। तुरंत उत्तर के लिए नीचे किसी भी प्रश्न पर क्लिक करें:">
-            ${lang === 'hi' ? 'नमस्ते! मैं आपका एससी/एसटी पोर्टल मार्गदर्शक हूँ। तुरंत उत्तर के लिए नीचे किसी भी प्रश्न पर क्लिक करें:' : 'Hello! I am your SC/ST Portal Guide. Click any question below for an instant answer:'}
+          <span class="faq-welcome-text" data-en="Hello! I am NANDA, your SC/ST Portal Guide. Click any question below for an instant answer:" data-hi="नमस्ते! मैं नंदा, आपकी एससी/एसटी पोर्टल मार्गदर्शक हूँ। तुरंत उत्तर के लिए नीचे किसी भी प्रश्न पर क्लिक करें:">
+            ${lang === 'hi' ? 'नमस्ते! मैं नंदा, आपकी एससी/एसटी पोर्टल मार्गदर्शक हूँ। तुरंत उत्तर के लिए नीचे किसी भी प्रश्न पर क्लिक करें:' : 'Hello! I am NANDA, your SC/ST Portal Guide. Click any question below for an instant answer:'}
           </span>
         </div>
         <div class="faq-questions-list">
