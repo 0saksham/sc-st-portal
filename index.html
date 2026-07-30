@@ -106,7 +106,7 @@
     .site-header{background:#fff;border-bottom:1px solid var(--border-color);position:relative;z-index:110}
     .header-inner{max-width:var(--max-width);margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
     .header-brand{display:flex;align-items:center;gap:24px}
-    .header-banner{height:100px;max-height:100px;width:auto;max-width:350px;object-fit:contain;border-radius:var(--radius-sm);margin-left:auto}
+    .header-banner{height:100px;max-height:100px;width:auto;max-width:350px;object-fit:contain;border-radius:var(--radius-sm);margin-left:0}
     .header-logo{height:100px;width:auto;object-fit:contain;flex-shrink:0}
     .scst-wordmark{display:flex;flex-direction:column;align-items:flex-start}
     .scst-badge{display:inline-flex;align-items:center;gap:0;font-weight:800;font-size:2.6rem;letter-spacing:-.02em;line-height:1.1}
@@ -115,6 +115,66 @@
     .scst-badge .st{color:var(--ucost-blue)}
     .scst-badge .cell{color:var(--ucost-blue);margin-left:8px;font-weight:700;font-size:2.4rem}
     .scst-subtitle{font-size:14px;color:var(--ucost-blue-light);letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-top:4px}
+
+    /* Audio Speaker Button Styles */
+    .speaker-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 50px;
+      background: linear-gradient(135deg, var(--ucost-blue-dark), var(--ucost-blue));
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 153, 51, 0.5);
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(11, 61, 110, 0.25);
+      flex-shrink: 0;
+      user-select: none;
+      height: 42px;
+    }
+    .speaker-btn:hover {
+      background: linear-gradient(135deg, var(--ucost-blue), var(--ucost-blue-light));
+      border-color: var(--saffron-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(255, 153, 51, 0.4);
+      color: #ffffff;
+    }
+    .speaker-btn:active {
+      transform: translateY(0);
+    }
+    .speaker-icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+    }
+    .speaker-icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+    .speaker-btn.playing {
+      background: linear-gradient(135deg, #FF9933, #FF6600);
+      color: #071E3A;
+      border-color: #ffffff;
+      box-shadow: 0 0 18px rgba(255, 153, 51, 0.7);
+      animation: speakerGlow 1.8s ease-in-out infinite alternate;
+    }
+    .speaker-btn.playing .speaker-on {
+      animation: wavePulse 1s ease-in-out infinite alternate;
+    }
+    @keyframes speakerGlow {
+      0% { box-shadow: 0 0 8px rgba(255, 153, 51, 0.5); }
+      100% { box-shadow: 0 0 22px rgba(255, 153, 51, 0.9); }
+    }
+    @keyframes wavePulse {
+      0% { transform: scale(0.95); }
+      100% { transform: scale(1.15); }
+    }
     
     html[lang="hi"] .scst-badge {
       font-size: 1.45rem;
@@ -2078,8 +2138,27 @@
           <div class="scst-subtitle" data-en="SEED · DST · Government of India" data-hi="सीड (SEED) · विज्ञान एवं प्रौद्योगिकी विभाग (DST) · भारत सरकार">SEED · DST · Government of India</div>
         </div>
       </div>
-      <!-- Banner Image -->
-      <img src="top.png" alt="Branding Banner" class="header-banner">
+      <!-- Banner Image & Audio Speaker Button -->
+      <div class="header-right-area" style="display:flex; align-items:center; gap:16px; margin-left:auto; flex-shrink:0;">
+        <img src="top.png" alt="Branding Banner" class="header-banner">
+        <button id="speaker-audio-btn" class="speaker-btn" aria-label="Toggle Audio Playback" title="Play / Stop Theme Audio" onclick="toggleThemeAudio()">
+          <span class="speaker-icon-wrap">
+            <svg class="speaker-icon speaker-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+            <svg class="speaker-icon speaker-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </span>
+          <span class="speaker-text" data-en="Audio" data-hi="ऑडियो">Audio</span>
+        </button>
+        <audio id="theme-audio-player" src="song.mp3" preload="auto"></audio>
+      </div>
     </div>
   </header>
 
@@ -6240,6 +6319,33 @@
       highlightTribeDistricts(tribeKey, cardElement);
     };
 
+    /* ===========================================
+       §10 — AUDIO PLAYER TOGGLE (song.mp3)
+    =========================================== */
+    window.toggleThemeAudio = function() {
+      const audio = document.getElementById('theme-audio-player');
+      const btn = document.getElementById('speaker-audio-btn');
+      if (!audio || !btn) return;
+
+      const iconOff = btn.querySelector('.speaker-off');
+      const iconOn = btn.querySelector('.speaker-on');
+
+      if (audio.paused) {
+        audio.play().then(() => {
+          btn.classList.add('playing');
+          if (iconOff) iconOff.style.display = 'none';
+          if (iconOn) iconOn.style.display = 'inline-block';
+        }).catch(err => {
+          console.error("Audio playback failed:", err);
+        });
+      } else {
+        audio.pause();
+        btn.classList.remove('playing');
+        if (iconOff) iconOff.style.display = 'inline-block';
+        if (iconOn) iconOn.style.display = 'none';
+      }
+    };
+
     async function init() {
       await loadTickerData();
       renderNewsTicker();
@@ -6247,6 +6353,21 @@
       initFontSize();
       initHighContrast();
       initScrollProgress();
+
+      // Reset audio button when playback finishes naturally
+      const themeAudio = document.getElementById('theme-audio-player');
+      if (themeAudio) {
+        themeAudio.addEventListener('ended', () => {
+          const btn = document.getElementById('speaker-audio-btn');
+          if (btn) {
+            btn.classList.remove('playing');
+            const iconOff = btn.querySelector('.speaker-off');
+            const iconOn = btn.querySelector('.speaker-on');
+            if (iconOff) iconOff.style.display = 'inline-block';
+            if (iconOn) iconOn.style.display = 'none';
+          }
+        });
+      }
       
       // Initial Routing Trigger
       handleHashChange();
