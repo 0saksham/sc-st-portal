@@ -2157,7 +2157,7 @@
           </span>
           <span class="speaker-text" data-en="Audio" data-hi="ऑडियो">Audio</span>
         </button>
-        <audio id="theme-audio-player" src="song.mp3" preload="auto"></audio>
+        <audio id="theme-audio-player" src="song.mp3" preload="auto" loop></audio>
       </div>
     </div>
   </header>
@@ -6327,6 +6327,7 @@
       const btn = document.getElementById('speaker-audio-btn');
       if (!audio || !btn) return;
 
+      audio.loop = true;
       const iconOff = btn.querySelector('.speaker-off');
       const iconOn = btn.querySelector('.speaker-on');
 
@@ -6354,19 +6355,10 @@
       initHighContrast();
       initScrollProgress();
 
-      // Reset audio button when playback finishes naturally
+      // Ensure audio loops continuously until stopped by user
       const themeAudio = document.getElementById('theme-audio-player');
       if (themeAudio) {
-        themeAudio.addEventListener('ended', () => {
-          const btn = document.getElementById('speaker-audio-btn');
-          if (btn) {
-            btn.classList.remove('playing');
-            const iconOff = btn.querySelector('.speaker-off');
-            const iconOn = btn.querySelector('.speaker-on');
-            if (iconOff) iconOff.style.display = 'inline-block';
-            if (iconOn) iconOn.style.display = 'none';
-          }
-        });
+        themeAudio.loop = true;
       }
       
       // Initial Routing Trigger
