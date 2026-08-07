@@ -1942,6 +1942,31 @@
       color: var(--saffron-accent);
       font-weight: 500;
     }
+    .faq-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .faq-speaker-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .faq-speaker-btn:hover {
+      background: var(--saffron-accent, #FF9933);
+      color: #071E3A;
+      transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(255, 153, 51, 0.6);
+    }
     .faq-close-btn {
       background: rgba(255, 255, 255, 0.1);
       border: none;
@@ -1961,6 +1986,215 @@
       background: rgba(255, 153, 51, 0.8);
       color: #071E3A;
       transform: scale(1.1);
+    }
+
+    /* Info Video Popup (Positioned on the LEFT side of NANDA Chatbot) */
+    .info-video-popup {
+      position: fixed;
+      bottom: 122px;
+      right: 396px;
+      width: 340px;
+      max-width: calc(100vw - 32px);
+      background: linear-gradient(135deg, #050F1E 0%, #071E3A 100%);
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(7, 30, 58, 0.35), 0 0 0 1px rgba(255, 153, 51, 0.35);
+      border: 1px solid rgba(255, 153, 51, 0.3);
+      z-index: 9998;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(16px) scale(0.95);
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .info-video-popup.active {
+      display: flex;
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    @media (max-width: 768px) {
+      .info-video-popup {
+        bottom: 122px;
+        right: 16px;
+        left: 16px;
+        width: auto;
+      }
+    }
+    .info-video-header {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 153, 51, 0.3);
+    }
+    .info-video-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #ffffff;
+    }
+    .info-video-close-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #ffffff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .info-video-close-btn:hover {
+      background: var(--saffron-accent, #FF9933);
+      color: #071E3A;
+      transform: scale(1.1);
+    }
+    .info-video-body {
+      width: 100%;
+      background: #000000;
+    }
+    .info-video-body video {
+      width: 100%;
+      max-height: 240px;
+      display: block;
+      outline: none;
+    }
+    .info-video-body video {
+      width: 100%;
+      max-height: 220px;
+      display: block;
+      outline: none;
+    }
+
+    /* Guide Video Modal (Covers 70-80% of screen) */
+    .guide-video-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .guide-video-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+    .guide-video-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 15, 30, 0.82);
+      backdrop-filter: blur(6px);
+    }
+    .guide-video-dialog {
+      position: relative;
+      width: 78vw;
+      max-width: 980px;
+      max-height: 82vh;
+      background: linear-gradient(135deg, #050F1E 0%, #071E3A 100%);
+      border-radius: 16px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 153, 51, 0.4);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      z-index: 10001;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .guide-video-modal.active .guide-video-dialog {
+      transform: scale(1);
+    }
+    .guide-video-header {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--saffron-accent, #FF9933);
+    }
+    .guide-video-title {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .guide-video-close-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .guide-video-close-btn:hover {
+      background: var(--saffron-accent, #FF9933);
+      color: #071E3A;
+      transform: scale(1.1);
+    }
+    .guide-video-body {
+      width: 100%;
+      background: #000000;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .guide-video-body video {
+      width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      outline: none;
+    }
+
+    .faq-tutorial-btn-wrap {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(11, 61, 110, 0.18);
+      display: flex;
+      justify-content: flex-start;
+    }
+    .faq-tutorial-btn {
+      background: linear-gradient(135deg, #FF9933 0%, #E67E22 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.35);
+      transition: all 0.22s ease;
+    }
+    .faq-tutorial-btn:hover {
+      background: linear-gradient(135deg, #FFAC4D 0%, #F39C12 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(230, 126, 34, 0.45);
     }
     .faq-body {
       padding: 14px;
@@ -2284,10 +2518,52 @@
           <span class="faq-bot-status" data-en="Online · SC/ST Portal Guide" data-hi="ऑनलाइन · एससी/एसटी पोर्टल मार्गदर्शक">Online · SC/ST Portal Guide</span>
         </div>
       </div>
-      <button class="faq-close-btn" aria-label="Close NANDA Chatbot" onclick="toggleFaqPopup(false)">&times;</button>
+      <div class="faq-header-actions">
+        <button id="faq-speaker-btn" class="faq-speaker-btn" aria-label="Play Info Video" data-aria-en="Play Info Video" data-aria-hi="जानकारी वीडियो देखें" title="Play Info Video" onclick="toggleInfoVideoPopup()">
+          🔊
+        </button>
+        <button class="faq-close-btn" aria-label="Close NANDA Chatbot" onclick="toggleFaqPopup(false)">&times;</button>
+      </div>
     </div>
     <div id="faq-body" class="faq-body">
       <!-- Chat Bot content rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- ========== NANDA INFO VIDEO POPUP (LEFT SIDE OF CHATBOT) ========== -->
+  <div id="info-video-popup" class="info-video-popup card" role="dialog" aria-label="NANDA Info Video">
+    <div class="info-video-header">
+      <div class="info-video-title">
+        <span>📢</span>
+        <span data-en="NANDA Portal Overview" data-hi="नंदा पोर्टल जानकारी">NANDA Portal Overview</span>
+      </div>
+      <button class="info-video-close-btn" aria-label="Close video" title="Close video" onclick="closeInfoVideo()">&times;</button>
+    </div>
+    <div class="info-video-body">
+      <video id="info-video-player" controls playsinline preload="metadata">
+        <source src="videos/info_ENG.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+  <!-- ========== NANDA GUIDE VIDEO MODAL ========== -->
+  <div id="guide-video-modal" class="guide-video-modal" role="dialog" aria-label="NANDA Full Tutorial Video">
+    <div class="guide-video-backdrop" onclick="closeGuideVideo()"></div>
+    <div class="guide-video-dialog">
+      <div class="guide-video-header">
+        <div class="guide-video-title">
+          <span>🎬</span>
+          <span data-en="NANDA Full Portal Tutorial" data-hi="नंदा संपूर्ण पोर्टल वीडियो ट्यूटोरियल">NANDA Full Portal Tutorial</span>
+        </div>
+        <button class="guide-video-close-btn" aria-label="Close tutorial video" onclick="closeGuideVideo()">&times;</button>
+      </div>
+      <div class="guide-video-body">
+        <video id="guide-video-player" controls playsinline preload="metadata">
+          <source src="videos/guid_eng.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
     </div>
   </div>
 
@@ -2686,6 +2962,11 @@
       // Update FAQ Popup contents in-place
       if (typeof window.renderFaqPopup === 'function') {
         window.renderFaqPopup();
+      }
+
+      // Update active video sources on language switch
+      if (typeof window.updateVideoLanguage === 'function') {
+        window.updateVideoLanguage(lang);
       }
     };
 
@@ -3220,17 +3501,21 @@
         popup.classList.remove('active');
         launcher.classList.remove('popup-open');
         launcher.setAttribute('aria-expanded', 'false');
+        if (typeof window.closeInfoVideo === 'function') {
+          window.closeInfoVideo();
+        }
       }
     };
 
     document.addEventListener('click', function(e) {
       const popup = document.getElementById('faq-popup');
       const launcher = document.getElementById('faq-launcher');
+      const infoPopup = document.getElementById('info-video-popup');
       if (!popup || !launcher) return;
 
       const path = e.composedPath ? e.composedPath() : [];
-      const clickedInside = path.includes(popup) || path.includes(launcher) || 
-                            (e.target && (popup.contains(e.target) || launcher.contains(e.target) || (e.target.closest && (e.target.closest('#faq-popup') || e.target.closest('#faq-launcher')))));
+      const clickedInside = path.includes(popup) || path.includes(launcher) || (infoPopup && path.includes(infoPopup)) ||
+                            (e.target && (popup.contains(e.target) || launcher.contains(e.target) || (infoPopup && infoPopup.contains(e.target)) || (e.target.closest && (e.target.closest('#faq-popup') || e.target.closest('#faq-launcher') || e.target.closest('#info-video-popup')))));
 
       if (FAQ_STATE.isOpen && !clickedInside) {
         toggleFaqPopup(false);
@@ -3668,11 +3953,22 @@
             formattedAnsHtml = escapeHTML(item.a).replace(/\n/g, '<br>');
           }
 
+          const isTutorialQuestion = item.id === 'state_q13' || item.id === 'dist_q10' || item.id === 'subdist_q10' || (item.q && (item.q.includes('How do I use this page') || item.q.includes('उपयोग कैसे करूं')));
+          const tutorialBtnHtml = isTutorialQuestion ? `
+            <div class="faq-tutorial-btn-wrap">
+              <button class="faq-tutorial-btn" onclick="openGuideVideoModal()">
+                <span>🎬</span>
+                <span data-en="See full tutorial" data-hi="पूरा ट्यूटोरियल देखें">${lang === 'hi' ? 'पूरा ट्यूटोरियल देखें' : 'See full tutorial'}</span>
+              </button>
+            </div>
+          ` : '';
+
           body.innerHTML = `
             <div class="faq-answer-container">
               <div class="faq-user-msg-bubble">❓ ${escapeHTML(item.q)}</div>
               <div class="faq-bot-reply-card">
                 <div class="faq-answer-text">${formattedAnsHtml}</div>
+                ${tutorialBtnHtml}
               </div>
               <button class="faq-back-btn" onclick="backToFaqQuestions()">
                 ${lang === 'hi' ? '← प्रश्नों पर वापस जाएं' : '← Back to questions'}
@@ -3700,6 +3996,139 @@
         </div>
       `;
     };
+
+    /* ===========================================
+       NANDA VIDEO POPUPS & TUTORIAL MODAL LOGIC
+    =========================================== */
+    window.toggleInfoVideoPopup = function(forceState) {
+      const popup = document.getElementById('info-video-popup');
+      const player = document.getElementById('info-video-player');
+      if (!popup || !player) return;
+
+      const shouldOpen = (typeof forceState === 'boolean') ? forceState : !popup.classList.contains('active');
+
+      if (shouldOpen) {
+        window.closeGuideVideo();
+
+        const isHi = APP.currentLang === 'hi';
+        const targetSrc = isHi ? 'videos/info_HIN.mp4' : 'videos/info_ENG.mp4';
+
+        if (!player.src || !player.src.endsWith(targetSrc)) {
+          player.src = targetSrc;
+          player.load();
+        }
+
+        popup.classList.add('active');
+        player.play().catch(err => console.log('Autoplay deferred:', err));
+      } else {
+        window.closeInfoVideo();
+      }
+    };
+
+    window.closeInfoVideo = function() {
+      const popup = document.getElementById('info-video-popup');
+      const player = document.getElementById('info-video-player');
+      if (player) {
+        player.pause();
+        try { player.currentTime = 0; } catch (e) {}
+      }
+      if (popup) {
+        popup.classList.remove('active');
+      }
+    };
+
+    window.openGuideVideoModal = function() {
+      const modal = document.getElementById('guide-video-modal');
+      const player = document.getElementById('guide-video-player');
+      if (!modal || !player) return;
+
+      window.closeInfoVideo();
+
+      const isHi = APP.currentLang === 'hi';
+      const targetSrc = isHi ? 'videos/guid_HIN.mp4' : 'videos/guid_eng.mp4';
+
+      if (!player.src || !player.src.endsWith(targetSrc)) {
+        player.src = targetSrc;
+        player.load();
+      }
+
+      modal.classList.add('active');
+      player.play().catch(err => console.log('Autoplay deferred:', err));
+    };
+
+    window.closeGuideVideo = function() {
+      const modal = document.getElementById('guide-video-modal');
+      const player = document.getElementById('guide-video-player');
+      if (player) {
+        player.pause();
+      }
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    };
+
+    window.updateVideoLanguage = function(lang) {
+      const infoPopup = document.getElementById('info-video-popup');
+      const infoPlayer = document.getElementById('info-video-player');
+      if (infoPlayer) {
+        const infoSrc = lang === 'hi' ? 'videos/info_HIN.mp4' : 'videos/info_ENG.mp4';
+        if (!infoPlayer.src.endsWith(infoSrc)) {
+          const wasPlaying = !infoPlayer.paused;
+          const currentTime = infoPlayer.currentTime;
+          infoPlayer.src = infoSrc;
+          infoPlayer.load();
+          if (wasPlaying && infoPopup && infoPopup.classList.contains('active')) {
+            infoPlayer.currentTime = currentTime;
+            infoPlayer.play().catch(e => {});
+          }
+        }
+      }
+
+      const guideModal = document.getElementById('guide-video-modal');
+      const guidePlayer = document.getElementById('guide-video-player');
+      if (guidePlayer) {
+        const guideSrc = lang === 'hi' ? 'videos/guid_HIN.mp4' : 'videos/guid_eng.mp4';
+        if (!guidePlayer.src.endsWith(guideSrc)) {
+          const wasPlaying = !guidePlayer.paused;
+          const currentTime = guidePlayer.currentTime;
+          guidePlayer.src = guideSrc;
+          guidePlayer.load();
+          if (wasPlaying && guideModal && guideModal.classList.contains('active')) {
+            guidePlayer.currentTime = currentTime;
+            guidePlayer.play().catch(e => {});
+          }
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const infoPlayer = document.getElementById('info-video-player');
+      if (infoPlayer) {
+        infoPlayer.addEventListener('ended', function() {
+          window.closeInfoVideo();
+        });
+      }
+
+      const guidePlayer = document.getElementById('guide-video-player');
+      if (guidePlayer) {
+        guidePlayer.addEventListener('ended', function() {
+          window.closeGuideVideo();
+        });
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const guideModal = document.getElementById('guide-video-modal');
+        if (guideModal && guideModal.classList.contains('active')) {
+          window.closeGuideVideo();
+        }
+        const infoPopup = document.getElementById('info-video-popup');
+        if (infoPopup && infoPopup.classList.contains('active')) {
+          window.closeInfoVideo();
+        }
+      }
+    });
 
 
     /* ===========================================
